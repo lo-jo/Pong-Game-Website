@@ -10,6 +10,9 @@ Pillow = "*"
 channels = "*"
 channels_redis = "*"
 daphne = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+django-node-assets = "*"
 
 [dev-packages]
 
