@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<link rel="stylesheet" type="text/css" href="{% static 'SPA/bootstrap/css/bootstrap.min.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'SPA/css/style.css' %}">
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+		<script src="{% static 'SPA/login.js' %}"></script>
+		<script src="{% static 'SPA/register.js' %}"></script>
+		<script src="{% static 'SPA/profile.js' %}"></script>
+		<script src="{% static 'SPA/test.js' %}"></script>
+		<script src="{% static 'SPA/editProfile.js' %}"></script>
+		<script src="{% static 'SPA/showSection.js' %}"></script>
+        <title>Single Page</title>
+        <!-- JS scripts         -->
+    </head>
+    <body>
+		<div class="container-fluid">
+			
+				<div class="row">
+					<nav class="navbar navbar-light" style="background-color: #610929; justify-content: center">
+						  <button  data-section="1" type="button" class="btn btn-outline-warning">REGISTER</button>
+						  <button  data-section="2" type="button" class="btn btn-outline-warning">LOGIN</button>
+						  <button  data-section="3" type="button" class="btn btn-outline-warning">PROFILE</button>
+						  <button  data-section="4" type="button" class="btn btn-outline-warning">EDIT PROFILE</button>
+					  </nav>
+				</div>
+
+				</div>
+			  </div>
+			  <div class="row">
+				<div id="content">
+        <!-- Contents loaded from server is inserted here by javascript -->
+  		
+			  </div>
+    </div>
+    </body>
+</html>

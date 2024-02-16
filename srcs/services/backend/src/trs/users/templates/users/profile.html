@@ -1,0 +1,73 @@
+<!-- index.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+</head>
+<body>
+    <!-- Your HTML content goes here -->
+	<script> display_profile() </script>
+	<!-- <script> edit_profile() </script> -->
+
+	
+	<div class="container">
+		<div class="row">
+			<img src="" id="pic" class="avatar">
+			<!-- <img src="/media/users/profile_pic/default.png" class="mr-3"> -->
+
+		</div>
+		<h1><div class="row" id="username"></div></h1>
+		<div class="row" id="pic"></div>
+		<div class="row" id="nb"></div>
+		<div class="row" id="email"></div>
+		<div class="row" id="bio"></div>
+		
+	</div>
+
+
+
+	<!-- <h1>Edit profile</h1>
+	<div class="form-group">
+    <form id="editprofile">
+        <label for="username">Username:</label>
+        <input class="form-control form-control-sm" type="text" id="newusername" name="username" required placeholder="Enter username">
+		<br>
+        <label for="email">E-mail:</label>
+        <input class="form-control form-control-sm" type="email" id="newemail" name="email" required placeholder="Enter e-mail">
+        <br>
+        <label for="password">bio:</label>
+        <input class="form-control form-control-sm" type="text" id="newbio" name="bio" required placeholder="bio">
+        <br>
+        <button type="button" class="btn btn-dark btn-sm" onclick="edit_profile()">Submit</button>
+    </form>
+	</div> -->
+
+<!-- Your HTML content goes here 
+	<div class="dropdown">
+		<button type="button" class="btn btn-primary btn-sm dropdown-toggle" id="edit" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+			Edit profile
+		</button>
+		<form class="dropdown-menu p-4">
+		  <div class="mb-3">
+			<label class="form-label">New username (test)</label>
+			<input type="text" class="form-control form-control-sm" id="newusername" placeholder="New Username">
+		  </div>
+		  <div class="mb-3">
+			<label class="form-label">New e-mail (test)</label>
+			<input type="email" class="form-control form-control-sm" id="newemail" placeholder="email@example.com">
+		  </div>
+		  <div class="mb-3">
+			<label class="form-label">New bio (test)</label>
+			<input type="text" class="form-control form-control-sm" id="newbio" placeholder="email@example.com">
+		  </div>
+		  <button type="submit" class="btn btn-primary" onclick="edit_profile()">Submit</button>
+		</form>
+	  </div>
+-->
+
+</body>
+</html>
