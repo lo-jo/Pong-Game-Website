@@ -24,6 +24,7 @@ class UserView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RegisterUserView(APIView):
+    # Anybody can get this
     permission_classes = [AllowAny]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     def post(self, request):
