@@ -29,9 +29,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+#FriendShip model that holds a friendship betweenh two users
 class Friendship(models.Model):
-    from_user = models.ForeignKey(
-        User, related_name='from_user', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(
-        User, related_name='to_user', on_delete=models.CASCADE)
+    sender = models.ForeignKey(
+        User, related_name='sender', on_delete=models.CASCADE, null=True)
+    recipient = models.ForeignKey(
+        User, related_name='recipient', on_delete=models.CASCADE, null=True)
 

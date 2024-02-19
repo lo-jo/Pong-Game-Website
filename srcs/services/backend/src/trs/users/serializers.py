@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Friendship
 from rest_framework.permissions import AllowAny
 
 # A user serializer will translate python data to JSON data and vice versa
@@ -23,7 +23,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'bio', 'profile_pic')
-
 
     def validate_username(self, value):
         print("value:", value)
@@ -74,3 +73,20 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 #             'email' : {'required' : False},
 #             'bio' : {'required' : False}
 #         }
+
+# friendship serializer check if friendship already exists
+# returns a new instance of friendship
+class FriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = ('sender', 'recipient')
+    def create(self, validated_data):
+        print("FRIENSHIP:")
+        sender = validated_data['sender']
+        recipient = validated_data['recipient']
+        if Friendship.objects.filter(sender=sender, recipient=recipient).exists():
+            raise serializers.ValidationError("Friendship already exists.")
+        friendship = Friendship.objects.create(sender=sender, recipient=recipient)
+
+        return friendship
+

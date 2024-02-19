@@ -67,7 +67,7 @@ re: prune all
 # Execute a command in a running container
 # Usage: make exec service=[service_name] cmd="[command]"
 exec:
-	docker-compose exec $(service) $(cmd)
+	docker exec -it $(service) $(cmd)
 
 .PHONY: all up up-detached build-no-cache stop down debug prune re
 

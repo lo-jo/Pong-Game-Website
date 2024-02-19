@@ -1,5 +1,6 @@
-from .models import User
-from users.serializers import UserSerializer, UpdateUserSerializer
+from .models import User, Friendship
+from django.shortcuts import get_object_or_404
+from users.serializers import UserSerializer, UpdateUserSerializer, FriendSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.views import APIView
@@ -52,5 +53,31 @@ class UpdateProfileView(generics.UpdateAPIView):
             serializer.instance.profile_pic = profile_pic
         serializer.save()
 
-# une view qui prendrait en parametre le sender 
-# need a view to 
+class FriendshipView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self, username):
+        user = get_object_or_404(User, username=username)
+        return Friendship.objects.filter(sender=user) | Friendship.objects.filter(recipient=user)
+
+    def get(self, request, username, *args, **kwargs):
+        #print(self.request.data)
+        serializer = FriendSerializer(request.user, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, username, *args, **kwargs):
+        print("SELF:", get_object_or_404(User, username=username))
+        sender = request.data.get('sender')
+        print("SENDER:", sender)
+        recipient = request.data.get('recipient')
+        print("RECIPIENT", sender)
+
+        if sender == recipient:
+            return Response({"error": "Cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a new friendship using the serializer
+        serializer = FriendSerializer(data={'sender': sender, 'recipient': recipient})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
