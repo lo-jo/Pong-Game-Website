@@ -1,27 +1,95 @@
-import * as THREE from 'three';
+import { initGameThreeD, initGameTwoD } from './game.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const router = () => {
+    const path = window.location.pathname;
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+    switch (path) {
+        case '/':
+            renderView('home');
+            break;
+        case '/home':
+            renderView('home');
+            break;
+        case '/game':
+            renderView('game');
+            break;
+        default:
+            renderView('notFound');
+    }
+};
 
-const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+const renderView = (viewName) => {
+    fetch(`/${viewName}.js`)
+        .then((response) => response.text())
+        .then((html) => {
+            document.getElementById('app').innerHTML = html;
+            if (viewName === 'game') {
+                renderGame();
+            }
+            else if (viewName === 'home') {
+                renderHome();
+            }
+            else if (viewName === 'notFound') {
+                renderNotFound();
+            }
+        })
+        .catch((error) => {
+            console.error(`Error loading ${viewName} view:`, error);
+            renderNotFound();
+        });
+};
 
-camera.position.z = 5;
+const renderHome = () => {
+    document.getElementById('app').innerHTML = '<h1>Landing page!</h1>';
+};
 
-function animate() {
-	requestAnimationFrame( animate );
+const renderGame = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './src/game.js';
 
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
+    const styleCss = document.createElement('link');
+    styleCss.rel = 'stylesheet';
+    styleCss.href = './src/css/game.css';
 
-	renderer.render( scene, camera );
-}
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof initGameTwoD === 'function') {
+            initGameTwoD();
+        } else {
+            console.error('initGameTwoD function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
 
+    script.onerror = (error) => {
+        console.error('Error loading game script:', error);
+        renderNotFound();
+    };
 
-animate();
+    // Append the CSS file to the head and the script element to the body of the document
+    document.head.appendChild(styleCss);
+    document.body.appendChild(script);
+};
+
+const renderNotFound = () => {
+    document.getElementById('app').innerHTML = '<h1>404 Page Not Found</h1>';
+};
+
+// Initial route on page load
+document.addEventListener('DOMContentLoaded', () => {
+    router();
+});
+
+// const navigateTo = (path) => {
+//     history.pushState(null, null, path);
+//     router();
+// };
+
+// Handle navigation through links
+// document.addEventListener('click', (e) => {
+//     if (e.target.tagName === 'A') {
+//         e.preventDefault();
+//         navigateTo(e.target.href);
+//     }
+// });
