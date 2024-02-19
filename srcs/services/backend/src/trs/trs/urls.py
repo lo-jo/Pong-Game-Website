@@ -42,6 +42,7 @@ urlpatterns = [
     path("SPA/", include("SPA.urls")),
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),
+    path("auth/", include("auth_permissions.urls"))
  #   path('api/', include(router.urls)),
 ]
 if settings.DEBUG:
