@@ -64,24 +64,11 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 
         return instance
 
-# class UpdateUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email', 'bio']
-#         extra_kwargs = {
-#             'username' : {'required' : False},
-#             'email' : {'required' : False},
-#             'bio' : {'required' : False}
-#         }
-
-# friendship serializer check if friendship already exists
-# returns a new instance of friendship
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friendship
         fields = ('sender', 'recipient')
     def create(self, validated_data):
-        print("FRIENSHIP:")
         sender = validated_data['sender']
         recipient = validated_data['recipient']
         if Friendship.objects.filter(sender=sender, recipient=recipient).exists():
@@ -90,3 +77,10 @@ class FriendSerializer(serializers.ModelSerializer):
 
         return friendship
 
+class FriendUsernameSerializer(serializers.ModelSerializer):
+    sender_username = serializers.ReadOnlyField(source='sender.username')
+    recipient_username = serializers.ReadOnlyField(source='recipient.username')
+
+    class Meta:
+        model = Friendship
+        fields = ('sender_username', 'recipient_username')

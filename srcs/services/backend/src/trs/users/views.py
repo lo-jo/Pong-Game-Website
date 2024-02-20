@@ -1,12 +1,13 @@
 from .models import User, Friendship
 from django.shortcuts import get_object_or_404
-from users.serializers import UserSerializer, UpdateUserSerializer, FriendSerializer
+from users.serializers import UserSerializer, UpdateUserSerializer, FriendSerializer, FriendUsernameSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
+from django.db.models import Q
 
 class AllUsersView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -58,26 +59,53 @@ class FriendshipView(APIView):
 
     def get_queryset(self, username):
         user = get_object_or_404(User, username=username)
+        print("QUERY SET USERNAME:", user.username)
+        # List all the friendship objects where the target user was either a sender or a recipient (=all friends)
         return Friendship.objects.filter(sender=user) | Friendship.objects.filter(recipient=user)
-
+    #Show friend list of the target user 
     def get(self, request, username, *args, **kwargs):
-        #print(self.request.data)
-        serializer = FriendSerializer(request.user, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        print("THIS IS SUPPOSED TO B DELETED", username)
+        user = get_object_or_404(User, username=username)
+        usernombre = user.username
+        print("THIS IS SUPPOSED TO B DELETED", user.username)
+        friendships = self.get_queryset(username=user.username)
+        serializer = FriendUsernameSerializer(friendships, many=True)  # Use many=True since it's a queryset
+
+        modified_data = []
+        for entry in serializer.data:
+            print("is it looping thru : ", list(entry.values()))
+            if usernombre in entry.values():
+                if (entry['sender_username'] == usernombre):
+                    del entry['sender_username']
+                elif (entry['recipient_username'] == usernombre):
+                    del entry['recipient_username']
+            modified_data.append(entry)
+        return Response(modified_data, status=status.HTTP_200_OK)
 
     def post(self, request, username, *args, **kwargs):
-        print("SELF:", get_object_or_404(User, username=username))
-        sender = request.data.get('sender')
-        print("SENDER:", sender)
-        recipient = request.data.get('recipient')
-        print("RECIPIENT", sender)
+            #user sending the friend request (the sender)
+            current_user = request.user
+            print("SENDER id:", current_user)
+            print("USERNAME IN THE POST METHOD: (should be the target)", username)
+            # Get the target user (User 2)
 
-        if sender == recipient:
-            return Response({"error": "Cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
+            # target_user = username
+            # print("TARGET username:", target_user)
+            target_user = get_object_or_404(User, username=username)
+            print("TARGET username:", target_user.username)
 
-        # Create a new friendship using the serializer
-        serializer = FriendSerializer(data={'sender': sender, 'recipient': recipient})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+            # Check if the users are the same
+            if current_user == target_user:
+                return Response({"error": "Cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Check if the friendship already exists
+            if Friendship.objects.filter(sender=current_user, recipient=target_user).exists():
+                return Response({"error": "Friendship already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            if Friendship.objects.filter(sender=target_user, recipient=current_user).exists():
+                return Response({"error": "Friendship already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            # Create a new friendship using the serializer
+            serializer = FriendSerializer(data={'sender': current_user.pk, 'recipient': target_user.pk})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)

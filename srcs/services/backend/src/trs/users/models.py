@@ -29,10 +29,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-#FriendShip model that holds a friendship betweenh two users
+#FriendShip model that holds a friendship betweenh two user objects
 class Friendship(models.Model):
     sender = models.ForeignKey(
         User, related_name='sender', on_delete=models.CASCADE, null=True)
     recipient = models.ForeignKey(
         User, related_name='recipient', on_delete=models.CASCADE, null=True)
-
+    def __str__(self):
+        return f"{self.sender.username} - {self.recipient.username}"
