@@ -28,40 +28,48 @@ export const initGameThreeD = () => {
     animate();
 };
 
+// Ping pong elements
+let gameState;
+let board_coord;
+let paddle_1_coord;
+let paddle_2_coord;
+let score_1;
+let score_2;
+let message;
+let score;
+let board;
+let ball;
+let paddle_1;
+let paddle_2;
+
 // Main game
 export const initGameTwoD = () => {
-	let gameState = 'start';
+	gameState = 'start';
 	document.getElementById('app').innerHTML = '';
-	// document.getElementById('app').className = 'container';
+	document.getElementById('app').className = 'container';
 
-    let score_1 = createScore('player_1_score');
-    let score_2 = createScore('player_2_score');
-	document.getElementById('app').appendChild(score_1);
-	document.getElementById('app').appendChild(score_2);
+    score_1 = createScore('player_1_score');
+    message = createMessage('message', 'Press Enter');
+    score_2 = createScore('player_2_score');
+	score = document.createElement('div');
+	score.className = 'row';
+	score.appendChild(score_1);
+	score.appendChild(message);
+	score.appendChild(score_2);
+	document.getElementById('app').appendChild(score);
 
-    let message = createMessage('message');
-    document.getElementById('app').appendChild(message);
-
-    let board = createBoard('board');
+    board = createBoard('board');
 	document.getElementById('app').appendChild(board);
 
-    let paddle_1 = createPaddle('paddle_1');
-    let paddle_2 = createPaddle('paddle_2');
-    board.appendChild(paddle_1);
-    board.appendChild(paddle_2);
-
-    let initial_ball = createBall('ball');
-    let ball = initial_ball.cloneNode(true);
-    board.appendChild(ball);
-
-	let ball_coord = initial_ball.getBoundingClientRect();
-
-    let paddle_1_coord = paddle_1.getBoundingClientRect();
-    let paddle_2_coord = paddle_2.getBoundingClientRect();
-    let initial_ball_coord = ball.getBoundingClientRect();
-    ball_coord = initial_ball_coord; 
-    let board_coord = board.getBoundingClientRect();
-    let paddle_common = document.querySelector('.paddle').getBoundingClientRect();
+	// Ball movement
+	paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
+	paddle_2_coord = document.getElementById('app').querySelector('.paddle_2').getBoundingClientRect();
+    let paddle_common = document.getElementById('app').querySelector('.paddle').getBoundingClientRect();
+	
+	let initial_ball = document.getElementById('app').querySelector('.ball'); 
+    let initial_ball_coord = initial_ball.getBoundingClientRect();
+    let ball_coord = initial_ball_coord;
+    board_coord = document.getElementById('app').querySelector('.board').getBoundingClientRect();
 
     let dx = Math.floor(Math.random() * 4) + 3;
     let dy = Math.floor(Math.random() * 4) + 3;
@@ -70,165 +78,155 @@ export const initGameTwoD = () => {
 
     document.addEventListener('keydown', (e) => {
         if (e.key == 'Enter') {
-            gameState = gameState == 'start' ? 'play' : 'start';
+            gameState = (gameState == 'start') ? 'play' : 'start';
             if (gameState == 'play') {
-                message.innerHTML = 'Game started';
-                message.style.left = 42 + 'vw';
+				console.log("enter pressed");
+				message.querySelector('h1').innerHTML = 'Game started';
                 requestAnimationFrame(() => {
                     dx = Math.floor(Math.random() * 4) + 3;
                     dy = Math.floor(Math.random() * 4) + 3;
                     dxd = Math.floor(Math.random() * 2);
                     dyd = Math.floor(Math.random() * 2);
-                    if (ball_coord.top <= board_coord.top) {
-						dyd = 1;
-					}
-					if (ball_coord.bottom >= board_coord.bottom) {
-						dyd = 0;
-					}
-				
-					if (
-						ball_coord.left <= paddle_1_coord.right &&
-						ball_coord.top >= paddle_1_coord.top &&
-						ball_coord.bottom <= paddle_1_coord.bottom
-					) {
-						dxd = 1;
-						dx = Math.floor(Math.random() * 4) + 3;
-						dy = Math.floor(Math.random() * 4) + 3;
-					}
-				
-					if (
-						ball_coord.right >= paddle_2_coord.left &&
-						ball_coord.top >= paddle_2_coord.top &&
-						ball_coord.bottom <= paddle_2_coord.bottom
-					) {
-						dxd = 0;
-						dx = Math.floor(Math.random() * 4) + 3;
-						dy = Math.floor(Math.random() * 4) + 3;
-					}
-				
-					if (
-						ball_coord.left <= board_coord.left ||
-						ball_coord.right >= board_coord.right
-					) {
-						ball_coord = initial_ball_coord;
-						ball.style.top = ball_coord.top + 'px';
-						ball.style.left = ball_coord.left + 'px';
-						return;
-					}
-				
-					ball.style.top = ball_coord.top + dy * (dyd === 0 ? -1 : 1) + 'px';
-					ball.style.left = ball_coord.left + dx * (dxd === 0 ? -1 : 1) + 'px';
-					ball_coord = ball.getBoundingClientRect();
+                    moveBall(dx, dy, dxd, dyd, ball_coord, initial_ball_coord, initial_ball);
                 });
             }
         }
         if (gameState == 'play') {
             if (e.key == 'w') {
-                movePaddle(paddle_1, 'up');
+				console.log("`w` pressed");
+				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - window.innerHeight * 0.06) + 'px';
+				paddle_1_coord = paddle_1.getBoundingClientRect(); 
             }
             if (e.key == 's') {
-                movePaddle(paddle_1, 'down');
+				console.log("`s` pressed");
+				paddle_1.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_1_coord.top + window.innerHeight * 0.06) + 'px';
+				paddle_1_coord = paddle_1.getBoundingClientRect();
             }
-
-            if (e.key == 'ArrowUp') {
-                movePaddle(paddle_2, 'up');
+			if (e.key == 'ArrowUp') {
+				console.log("`arrowUp` pressed");
+				paddle_2.style.top = Math.max(board_coord.top, paddle_2_coord.top - window.innerHeight * 0.1) + 'px';
+				paddle_2_coord = paddle_2.getBoundingClientRect();
             }
             if (e.key == 'ArrowDown') {
-                movePaddle(paddle_2, 'down');
+				console.log("`arrowDown` pressed");
+				paddle_2.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_2_coord.top + window.innerHeight * 0.1) + 'px';
+				paddle_2_coord = paddle_2.getBoundingClientRect();
             }
         }
-        if (ball_coord.top <= board_coord.top) {
-			dyd = 1;
-		}
-		if (ball_coord.bottom >= board_coord.bottom) {
-			dyd = 0;
-		}
-	
-		if (
-			ball_coord.left <= paddle_1_coord.right &&
-			ball_coord.top >= paddle_1_coord.top &&
-			ball_coord.bottom <= paddle_1_coord.bottom
-		) {
-			dxd = 1;
-			dx = Math.floor(Math.random() * 4) + 3;
-			dy = Math.floor(Math.random() * 4) + 3;
-		}
-	
-		if (
-			ball_coord.right >= paddle_2_coord.left &&
-			ball_coord.top >= paddle_2_coord.top &&
-			ball_coord.bottom <= paddle_2_coord.bottom
-		) {
-			dxd = 0;
-			dx = Math.floor(Math.random() * 4) + 3;
-			dy = Math.floor(Math.random() * 4) + 3;
-		}
-	
-		if (
-			ball_coord.left <= board_coord.left ||
-			ball_coord.right >= board_coord.right
-		) {
-			ball_coord = initial_ball_coord;
-			ball.style.top = ball_coord.top + 'px';
-			ball.style.left = ball_coord.left + 'px';
-			return;
-		}
-	
-		ball.style.top = ball_coord.top + dy * (dyd === 0 ? -1 : 1) + 'px';
-		ball.style.left = ball_coord.left + dx * (dxd === 0 ? -1 : 1) + 'px';
-		ball_coord = ball.getBoundingClientRect();
     });
 };
 
 // Paddle
 const createPaddle = ( className ) => {
     const paddle = document.createElement('div');
-    paddle.className = className + ' paddle';
+    paddle.className = `${className} paddle`;
     return (paddle);
 };
-
-const movePaddle = ( paddle, direction ) => {
-    const paddleCoord = paddle.getBoundingClientRect();
-    const moveAmount = window.innerHeight * 0.06;
-
-    if (direction === 'up') {
-        paddle.style.top = Math.max(board_coord.top, paddleCoord.top - moveAmount) + 'px';
-    } else if (direction === 'down') {
-        paddle.style.top = Math.min(board_coord.bottom - paddle_common.height, paddleCoord.top + moveAmount) + 'px';
-    }
-}
 
 // Ball
 const createBall = ( className ) => {
 	const ball = document.createElement('div');
     ball.className = className;
-    
+
     const ballEffect = document.createElement('div');
     ballEffect.className = 'ball_effect';
-    
+
     ball.appendChild(ballEffect);
     return (ball);
 };
 
+const moveBall = (dx, dy, dxd, dyd, ball_coord, initial_ball_coord, initial_ball) => { 
+	if (ball_coord.top <= board_coord.top) { 
+		dyd = 1; 
+	} 
+	if (ball_coord.bottom >= board_coord.bottom) { 
+		dyd = 0; 
+	} 
+	if ( 
+		ball_coord.left <= paddle_1_coord.right && 
+		ball_coord.top >= paddle_1_coord.top && 
+		ball_coord.bottom <= paddle_1_coord.bottom 
+	) { 
+		dxd = 1; 
+		dx = Math.floor(Math.random() * 4) + 3; 
+		dy = Math.floor(Math.random() * 4) + 3; 
+	} 
+	if ( 
+		ball_coord.right >= paddle_2_coord.left && 
+		ball_coord.top >= paddle_2_coord.top && 
+		ball_coord.bottom <= paddle_2_coord.bottom 
+	) { 
+		dxd = 0; 
+		dx = Math.floor(Math.random() * 4) + 3; 
+		dy = Math.floor(Math.random() * 4) + 3; 
+	} 
+	if ( 
+		ball_coord.left <= board_coord.left || 
+		ball_coord.right >= board_coord.right 
+	) { 
+		if (ball_coord.left <= board_coord.left) {
+			document.querySelector('.player_2_score').textContent = +document.querySelector('.player_2_score').textContent + 1;
+		} else { 
+			document.querySelector('.player_1_score').textContent = +document.querySelector('.player_1_score').textContent + 1;
+		} 
+		gameState = 'start'; 
+	  
+		ball_coord = initial_ball_coord; 
+		ball.style = initial_ball.style;
+		document.querySelector('.message').textContent = 'Press Enter'; 
+		return;
+	} 
+	ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px'; 
+	ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px'; 
+	ball_coord = ball.getBoundingClientRect(); 
+	requestAnimationFrame(() => { 
+		moveBall(dx, dy, dxd, dyd, ball_coord, initial_ball_coord, initial_ball); 
+	}); 
+}
+
 // Score
 const createScore = ( className ) => {
+	const box = document.createElement('div');
+	box.className = 'col-3 text-center align-items-center d-flex flex-column';
 	const score = document.createElement('h1');
-	score.className = className;
+	box.appendChild(score);
+	score.className = `${className} my-3`;
     score.textContent = '0';
-	return (score);
+	return (box);
 };
 
 // Message
 const createMessage = ( className, msg ) => {
+	const box = document.createElement('div');
+	box.className = 'col-5 text-center align-items-center d-flex flex-column';
     const message = document.createElement('h1');
-    message.className = className;
+	box.appendChild(message);
+    message.className = `${className} my-3 display-7`;
     message.textContent = msg;
-	return (message);
+	return (box);
 };
 
 // Board
-const createBoard = ( className ) => {
+const createBoard = (className) => {
+    const boardContainer = document.createElement('div');
+    boardContainer.className = 'container-fluid';
+
+    const boardRow = document.createElement('div');
+    boardRow.className = 'row justify-content-center';
+
     const board = document.createElement('div');
-    board.className = className;
-    return (board);
+    board.className = `col-12 ${className}`;
+
+    ball = createBall('ball');
+    paddle_1 = createPaddle('paddle_1');
+    paddle_2 = createPaddle('paddle_2');
+
+    board.appendChild(ball);
+    board.appendChild(paddle_1);
+    board.appendChild(paddle_2);
+
+    boardRow.appendChild(board);
+    boardContainer.appendChild(boardRow);
+
+    return (boardContainer);
 };

@@ -81,12 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
     router();
 });
 
+
+// CHECK IF THIS IS NECESSARRY AT SOME POINT
 // const navigateTo = (path) => {
 //     history.pushState(null, null, path);
 //     router();
 // };
 
-// Handle navigation through links
+// // Handle navigation through links
 // document.addEventListener('click', (e) => {
 //     if (e.target.tagName === 'A') {
 //         e.preventDefault();

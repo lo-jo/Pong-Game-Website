@@ -1,27 +1,27 @@
-* { 
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-} 
-  
-body { 
+}
+
+body {
     height: 100vh;
     width: 100vw;
     background-color: #000000;
     display: flex;
     justify-content: center;
     align-items: center;
-} 
+}
 
 .board {
+    padding: 0;
     height: 85vh;
     width: 80vw;
     border: 2px solid #7000ff;
     box-sizing: border-box;
-    margin-top: 50px;
 }
-  
-.ball { 
+
+.ball {
     height: 30px;
     width: 30px;
     border-radius: 50%;
@@ -29,8 +29,8 @@ body {
     top: calc(50% - 15px);
     left: calc(50% - 15px);
 }
-  
-.ball_effect { 
+
+.ball_effect {
     height: 100%;
     width: 100%;
     border-radius: 100px;
@@ -42,24 +42,24 @@ body {
         inset -6px 0 30px #ff003d,
         0 0 18px #fffffc, -4px 0 18px
         #7000ff, 4px 0 18px #fffffc;
-} 
-  
-@keyframes spinBall { 
-    100% { 
+}
+
+@keyframes spinBall {
+    100% {
         -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
-    } 
-} 
-  
-.paddle { 
+    }
+}
+
+.paddle {
     height: 100px;
     width: 18px;
     position: fixed;
-} 
-  
-.paddle_1 { 
-    top: calc(7.5vh + 55px);
-    left: calc(10vw + 30px);
+}
+
+.paddle_1 {
+    padding: 0;
+    margin: 0;
     box-shadow: inset 0 0 18px #fffffc,
         inset -6px 0 18px #fffffc,
         inset 6px 0 18px #fffffc,
@@ -67,11 +67,11 @@ body {
         inset 6px 0 30px #fffffc,
         0 0 18px #fffffc, 4px 0 18px
         #fffffc, -4px 0 18px #fffffc;
-} 
-  
-.paddle_2 { 
+}
+
+.paddle_2 {
     top: calc(85vh + 7.5vh - 100px - 55px);
-    right: calc(10vw + 30px);
+    right: calc(11vw + 30px);
     box-shadow: inset 0 0 18px #fffffc,
         inset 6px 0 18px #fffffc,
         inset -6px 0 18px #fffffc,
@@ -79,39 +79,18 @@ body {
         inset -6px 0 30px #fffffc,
         0 0 18px #fffffc, -4px 0 18px
         #fffffc, 4px 0 18px #fffffc;
-} 
+}
 
 .player_1_score,
 .player_2_score {
-    height: 50px;
-    width: 50px;
     color: #fcff76;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.player_1_score {
-    left: 30%;
-}
-
-.player_2_score {
-    left: 70%;
+    font-weight: bold;
 }
 
 .message {
-    position: fixed;
-    /* height: 10vh; */
-    /* width: 30vw; */
     color: #fffffc;
-    left: 60%;
-    top: 20px;
-    transform: translateX(-50%);
     text-align: center;
-    /* display: flex; */
     font-family: 'Open Sans', sans-serif;
-    /* flex-direction: column; */
-    /* align-items: center; */
-    /* justify-content: center; */
+    align-items: center;
+    justify-content: center;
 }
