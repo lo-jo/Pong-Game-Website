@@ -6,14 +6,13 @@ from classes.Endpoints import UsersEndpoint
 
 # Endpoints container dict
 endpoints = {
-    '/users': UsersEndpoint(),
-    '/matches': UsersEndpoint(),
-    '/tournaments': UsersEndpoint(),
-    # 'matches': MatchesEndpoint()
+    '/users/': UsersEndpoint(),
+    # '/matches/': UsersEndpoint(),
+    # '/tournaments/': UsersEndpoint(),
 }
 
 # Http methods
-http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
+http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'EXIT']
 
 def prompt(stdscr, collection_list, prompt_message):
     # Clear and refresh the screen
@@ -63,12 +62,13 @@ def main():
     user_cli = UserCLI(username, password)
     if user_cli.authenticate() == False:
         return
-    endpoint = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoints.keys()), "Choose the endpoint:\n"))
-    print(endpoint)
-    print(user_cli)
+    endpoint_choice = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoints.keys()), "Choose the endpoint:\n"))
+    endpoint_class = endpoints.get(endpoint_choice)
+    # print(endpoint_class)
+    # print(user_cli)
     while True:
         http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the HTTP Method for your request and type 'Enter':\n"))
-        if not user_cli.send_curl_request(endpoint, http_method):
+        if not user_cli.send_curl_request(endpoint_class, http_method):
             break
 
 if __name__ == "__main__":
