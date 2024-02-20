@@ -16,7 +16,7 @@ body {
 .board {
     padding: 0;
     height: 85vh;
-    width: 80vw;
+    width: 100%;
     border: 2px solid #7000ff;
     box-sizing: border-box;
 }
@@ -70,8 +70,10 @@ body {
 }
 
 .paddle_2 {
-    top: calc(85vh + 7.5vh - 100px - 55px);
-    right: calc(11vw + 30px);
+    padding: 0;
+    margin-right: 20px;
+    /* position: absolute; */
+    right: 0;
     box-shadow: inset 0 0 18px #fffffc,
         inset 6px 0 18px #fffffc,
         inset -6px 0 18px #fffffc,
