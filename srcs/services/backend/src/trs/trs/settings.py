@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #custom apps
     'SPA',
     'users',
+    'notification',
     #REST
     'rest_framework',
     'rest_framework_simplejwt',
@@ -87,6 +88,11 @@ TEMPLATES = [
 # Daphne
 ASGI_APPLICATION = "trs.asgi.application"
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
