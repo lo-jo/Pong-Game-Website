@@ -4,6 +4,8 @@ import requests
 import json
 import curses
 import time
+import os
+
 
 class UserCLI:
     def __init__(self, username, password, host="http://127.0.0.1:8000"):
@@ -29,28 +31,13 @@ class UserCLI:
             print(f"Log : {response.text}")
             return False
 
-    def send_curl_request(self, endpoint, http_method):
-        # print(endpoint)
-        # print(http_method)
-        
+    def send_curl_request(self, endpoint_class, endpoint_uri, http_method):        
         if http_method == 'EXIT':
             return False
-        endpoint.handle_request(http_method, self.token, self.host)
-        # try:
-        #     output = subprocess.check_output(command)
-        #     json_response = output.decode()
-        #     usuarios = json.loads(json_response)
-        #     for usuario in usuarios:
-        #         print("Username:", usuario["username"])
-        #         print("Email:", usuario["email"])
-        #         print("ID:", usuario["id"])
-        #         print("Bio:", usuario["bio"])
-        #         print("Profile Pic:", usuario["profile_pic"])
-            
-        #     time.sleep(5)
-        # except subprocess.CalledProcessError as e:
-        #     print(f"Error to execute request: {e}")
-        #     return False
 
+        uri = endpoint_class.set_uri(endpoint_uri)
+        endpoint_class.handle_request(uri, http_method, self.token, self.host)
+        print("A JSON file has been created with the response from the API")
         input("Press any to continue ...")
+        os.system('clear')
         return True

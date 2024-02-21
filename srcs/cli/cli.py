@@ -1,75 +1,52 @@
 import curses
 import signal
+import getpass
+import os
 # Own classes and modules
 from classes.UserCLI import UserCLI
-from classes.Endpoints import UsersEndpoint
+from classes.Endpoints import UsersEndpoint, MatchesEndpoint
+from modules.prompt import prompt
 
 # Endpoints container dict
 endpoints = {
     '/users/': UsersEndpoint(),
-    # '/matches/': UsersEndpoint(),
+    '/matches/': MatchesEndpoint(),
     # '/tournaments/': UsersEndpoint(),
 }
 
 # Http methods
-http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'EXIT']
-
-def prompt(stdscr, collection_list, prompt_message):
-    # Clear and refresh the screen
-    curses.curs_set(0)
-    stdscr.clear()
-    stdscr.refresh()
-
-    # Initialize the current selected option to 0
-    current_option = 0
-    
-    # Loop indefinitely until a selection is made
-    while True:
-        # Clear the screen
-        stdscr.clear()
-        
-        # Display the prompt message at the top of the screen
-        stdscr.addstr(prompt_message)
-        
-        # Iterate over each item in the collection_list
-        for idx, item in enumerate(collection_list):
-            # Highlight the currently selected option
-            if idx == current_option:
-                stdscr.addstr(f"> {item}\n", curses.A_BOLD)
-            else:
-                stdscr.addstr(f"  {item}\n")
-        
-        # Refresh the screen to display changes
-        stdscr.refresh()
-        
-        # Get the user's input (key press)
-        key = stdscr.getch()
-
-        # Handle navigation keys (up and down arrow keys)
-        if key == curses.KEY_UP:
-            current_option = (current_option - 1) % len(collection_list)
-        elif key == curses.KEY_DOWN:
-            current_option = (current_option + 1) % len(collection_list)
-        # Handle selection (Enter key)
-        elif key == 10:  # 'Enter' key
-            # Return the selected option
-            return collection_list[current_option]
+http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 
 
 def main():
+    # Authentification
     username = input("Username: ")
-    password = input("Password: ")
+    password = getpass.getpass("Password: ")
     user_cli = UserCLI(username, password)
     if user_cli.authenticate() == False:
         return
-    endpoint_choice = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoints.keys()), "Choose the endpoint:\n"))
-    endpoint_class = endpoints.get(endpoint_choice)
-    # print(endpoint_class)
-    # print(user_cli)
+    os.system('clear')
+    
+    # CLI main loop
+    # The main endpoint, the uri and the http method are choosed for send the request
     while True:
-        http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the HTTP Method for your request and type 'Enter':\n"))
-        if not user_cli.send_curl_request(endpoint_class, http_method):
+        endpoint_choice = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoints.keys()), "Choose the main endpoint:\n", False))
+        if endpoint_choice == 'EXIT':
             break
+        endpoint_class = endpoints.get(endpoint_choice)
+        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, endpoint_class.uri_lst_endpoint, "Choose uri for entrypoint:\n", True))
+        if endpoint_uri == 'GO BACK':
+            continue
+        elif endpoint_uri == 'EXIT':
+            break
+        else:
+            http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the HTTP Method for your request and type 'Enter':\n", True))
+            if http_method == 'GO BACK':
+                continue
+            elif http_method == 'EXIT':
+                break
+            if not user_cli.send_curl_request(endpoint_class, endpoint_uri, http_method):
+                break
 
 if __name__ == "__main__":
     # signal.signal(signal.SIGINT, handler)

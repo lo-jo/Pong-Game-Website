@@ -3,9 +3,13 @@ from users.serializers import UserSerializer, UpdateUserSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
 
 class AllUsersView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -53,5 +57,10 @@ class UpdateProfileView(generics.UpdateAPIView):
             serializer.instance.profile_pic = profile_pic
         serializer.save()
 
-# une view qui prendrait en parametre le sender 
-# need a view to 
+
+class UserDetailView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    # Defines the field to be used to search for the user by user ID
+    lookup_field = 'pk'

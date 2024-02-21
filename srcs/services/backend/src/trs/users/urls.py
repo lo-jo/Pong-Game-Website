@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import UserView, RegisterUserView, AllUsersView, UpdateProfileView
+from .views import UserView, RegisterUserView, AllUsersView, UpdateProfileView, UserDetailView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -10,6 +10,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', AllUsersView.as_view()),
+    path('<int:pk>/', UserDetailView.as_view(), name='user_detail'),
     path('profile/', UserView.as_view()),
     path('register/', RegisterUserView.as_view()),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
