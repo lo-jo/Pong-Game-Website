@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./dependencies/* .
 
-COPY index.html index.html
+COPY *.html .
 
 RUN npm install --save
 

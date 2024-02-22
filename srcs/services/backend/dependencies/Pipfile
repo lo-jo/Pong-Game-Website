@@ -13,6 +13,8 @@ daphne = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 django-node-assets = "*"
+django-cors-headers = "*"
+
 
 [dev-packages]
 
