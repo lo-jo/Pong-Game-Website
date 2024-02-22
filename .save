@@ -36,12 +36,10 @@ class UserProfileView(RetrieveAPIView):
         return Response(data)
 
 
-// Después de la autenticación
-localStorage.setItem('jwtToken', jwtToken); // Almacena el token JWT recibido del backend
-
-// Cuando necesites acceder al perfil de otro usuario
-var jwtToken = localStorage.getItem('jwtToken');
-var decodedToken = jwt_decode(jwtToken); // Decodificar el token JWT para obtener la información del usuario
-var userId = decodedToken.user_id; // Extraer el ID del usuario del token JWT
-var otherUserId = obtenerIdUsuarioDeAlgunaManera(); // Esto depende de cómo obtengas el ID del otro usuario
-var profileUrl = `/users/${otherUserId}/profile`;
+# status -> string
+# user_1 -> id 
+# user_2 -> id
+# winner -> id_user 
+# loser  -> id_user
+# tournament_id -> id_tournoi
+# created_at -> time

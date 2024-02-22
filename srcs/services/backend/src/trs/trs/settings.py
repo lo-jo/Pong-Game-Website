@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'SPA',
     'users',
     'notification',
-    'auth_permissions',
+    'pong',
     #REST
     'rest_framework',
     'rest_framework_simplejwt',

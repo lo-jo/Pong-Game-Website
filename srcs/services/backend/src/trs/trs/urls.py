@@ -43,8 +43,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),
     path("notify/", include("notification.urls")),
-    path("auth/", include("auth_permissions.urls"))
- #   path('api/', include(router.urls)),
+    path('matches/', include("pong.urls"))
 ]
 
 if settings.DEBUG:
