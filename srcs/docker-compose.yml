@@ -30,6 +30,12 @@ services:
       - "5173:5173"
     depends_on:
       - db
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    ports:
+      - "7474:6379"
+    restart: unless-stopped
 
 networks:
   trs:
