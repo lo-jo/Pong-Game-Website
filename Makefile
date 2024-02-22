@@ -1,6 +1,8 @@
 SRCS_PATH = ./srcs/
+CLI_PATH = cli/cli.py
 YML_FILE = docker-compose.yml
 COMPOSE_FILE = $(addprefix $(SRCS_PATH), $(YML_FILE))
+CLI = $(addprefix $(SRCS_PATH), $(CLI_PATH))
 
 all:
 	@echo "Launching ft_transcendence ..."
@@ -68,6 +70,9 @@ re: prune all
 # Usage: make exec service=[service_name] cmd="[command]"
 exec:
 	docker exec -it $(service) $(cmd)
+
+cli:
+	@python3 $(CLI)
 
 .PHONY: all up up-detached build-no-cache stop down debug prune re
 

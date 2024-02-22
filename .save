@@ -1,0 +1,36 @@
+from rest_framework.generics import RetrieveAPIView
+from rest_framework import status
+from rest_framework.response import Response
+from .models import UserProfile, Match, Tournament
+from .serializers import UserProfileSerializer, MatchSerializer, TournamentSerializer
+
+class UserProfileView(RetrieveAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def get_object(self):
+        id = self.kwargs['pk']
+        try:
+            return UserProfile.objects.get(pk=id)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get_related_data(self, user_profile):
+        # Obtener historial de partidos del usuario
+        matches = Match.objects.filter(player=user_profile.user)
+        match_serializer = MatchSerializer(matches, many=True)
+        
+        # Obtener historial de torneos del usuario
+        tournaments = Tournament.objects.filter(players=user_profile.user)
+        tournament_serializer = TournamentSerializer(tournaments, many=True)
+        
+        return {
+            'user_profile': self.serializer_class(user_profile).data,
+            'matches': match_serializer.data,
+            'tournaments': tournament_serializer.data
+        }
+
+    def retrieve(self, request, *args, **kwargs):
+        user_profile = self.get_object()
+        data = self.get_related_data(user_profile)
+        return Response(data)

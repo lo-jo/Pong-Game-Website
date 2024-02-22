@@ -4,9 +4,13 @@ from users.serializers import UserSerializer, UpdateUserSerializer, FriendSerial
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, generics
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
 
 class AllUsersView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -25,6 +29,7 @@ class UserView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RegisterUserView(APIView):
+    # Anybody can get this
     permission_classes = [AllowAny]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     def post(self, request):
@@ -108,3 +113,21 @@ class FriendshipView(APIView):
             serializer.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UserDetailView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    # Defines the field to be used to search for the user by user ID
+    lookup_field = 'pk'
+
+class UserProfileView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        id = self.kwargs['pk']
+        try:
+            return User.objects.get(pk=id)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
