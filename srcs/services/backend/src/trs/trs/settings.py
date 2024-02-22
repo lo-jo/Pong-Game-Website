@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     # server pong app
     #'server_side_pong.apps.ServerSidePongConfig',
     # channels
-    'channels',
     'daphne',
+    'channels',
     'corsheaders',
     #custom apps
     'SPA',
@@ -92,13 +92,14 @@ TEMPLATES = [
 ]
 
 # Daphne
+# WSGI_APPLICATION = 'trs.wsgi.application'
 ASGI_APPLICATION = "trs.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
