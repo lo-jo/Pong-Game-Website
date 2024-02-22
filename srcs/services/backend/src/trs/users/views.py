@@ -64,3 +64,14 @@ class UserDetailView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     # Defines the field to be used to search for the user by user ID
     lookup_field = 'pk'
+
+class UserProfileView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        id = self.kwargs['pk']
+        try:
+            return User.objects.get(pk=id)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

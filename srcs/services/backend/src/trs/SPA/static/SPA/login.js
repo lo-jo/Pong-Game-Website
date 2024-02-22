@@ -18,6 +18,7 @@ function loginuser() {
 		if (data.access) {
 			// Store the JWT token in localStorage
 			localStorage.setItem('token', data.access);
+			alert("Here get the id")
 			document.getElementById('content').innerHTML = "successfully logged in"
 			// Redirect to another page or perform additional actions
 		} else {
