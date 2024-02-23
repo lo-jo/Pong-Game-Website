@@ -4,12 +4,13 @@ import getpass
 import os
 # Own classes and modules
 from classes.UserCLI import UserCLI
-from classes.Endpoints import UsersEndpoint, MatchesEndpoint
+# from classes.Endpoints import UsersEndpoint, MatchesEndpoint
+from classes.Endpoints import MatchesEndpoint
 from modules.prompt import prompt
 
 # Endpoints container dict
 endpoints = {
-    '/users/': UsersEndpoint(),
+    # '/users/': UsersEndpoint(),
     '/matches/': MatchesEndpoint(),
     # '/tournaments/': UsersEndpoint(),
 }
@@ -34,7 +35,7 @@ def main():
         if endpoint_choice == 'EXIT':
             break
         endpoint_class = endpoints.get(endpoint_choice)
-        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, endpoint_class.uri_lst_endpoint, "Choose uri for entrypoint:\n", True))
+        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request.keys()), "Choose uri for entrypoint:\n", True))
         if endpoint_uri == 'GO BACK':
             continue
         elif endpoint_uri == 'EXIT':

@@ -1,6 +1,8 @@
 # Latest version of Python
 FROM python:3.10
 
+RUN apt-get update && \
+    apt-get install -y postgresql-client
 # Main directory in docker container
 WORKDIR /code
 
