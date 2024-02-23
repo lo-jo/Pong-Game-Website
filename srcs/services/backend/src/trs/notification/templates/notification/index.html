@@ -18,12 +18,14 @@
     <script>
         const token = localStorage.getItem('token');
         // setup chat scoket
-        const onlineSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/notify/'
-        );
+        // const onlineSocket = new WebSocket(
+        //     'ws://'
+        //     + window.location.host
+        //     + '/ws/notify/'
+        // );
         
+
+        const onlineSocket = new WebSocket(`ws://${window.location.host}/ws/notify/?token=${token}`);
         onlineSocket.onopen = function (e) {
             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
             console.log('Socket successfully connected.');
