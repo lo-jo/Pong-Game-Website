@@ -50,7 +50,9 @@ let paddle_2;
 export const initGameTwoD = () => {
 	gameState = 'start';
 	document.getElementById('app').innerHTML = '';
-	document.getElementById('app').className = 'container';
+	// document.getElementById('app').className = 'container';
+	let box = document.createElement('div');
+	box.className = 'container';
 
     score_1 = createScore('player_1_score');
     message = createMessage('message', 'Press Enter');
@@ -60,7 +62,8 @@ export const initGameTwoD = () => {
 	score.appendChild(score_1);
 	score.appendChild(message);
 	score.appendChild(score_2);
-	document.getElementById('app').appendChild(score);
+	box.appendChild(score);
+	document.getElementById('app').appendChild(box);
 
     board = createBoard('board');
 	document.getElementById('app').appendChild(board);
@@ -87,44 +90,55 @@ export const initGameTwoD = () => {
 
 	// Key events and movements
     document.addEventListener('keydown', (e) => {
-        if (e.key == 'Enter') {
-            gameState = (gameState == 'start') ? 'play' : 'start';
-            if (gameState == 'play') {
+		if (e.key == 'Enter') {
+			gameState = (gameState == 'start') ? 'play' : 'start';
+			if (gameState == 'play') {
 				console.log("enter pressed");
 				message.querySelector('h1').innerHTML = 'Game started';
-                requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
 					window.addEventListener('resize', updatePositionsOnResize);
-                    dx = Math.floor(Math.random() * 4) + 3;
-                    dy = Math.floor(Math.random() * 4) + 3;
-                    dxd = Math.floor(Math.random() * 2);
-                    dyd = Math.floor(Math.random() * 2);
-                    moveBall(dx, dy, dxd, dyd);
-                });
-            }
-        }
+					dx = Math.floor(Math.random() * 4) + 3;
+					dy = Math.floor(Math.random() * 4) + 3;
+					dxd = Math.floor(Math.random() * 2);
+					dyd = Math.floor(Math.random() * 2);
+					moveBall(dx, dy, dxd, dyd);
+				});
+			}
+		}
 
-        if (gameState == 'play') {
-            if (e.key == 'w') {
+		if (gameState == 'play') {
+			console.log(`Board_height: ${board_coord.height}, board_width ${board_coord.width}`);
+
+			if (e.key == 'w') { // go up
 				console.log("`w` pressed");
-				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - window.innerHeight * 0.06) + 'px';
-				paddle_1_coord = paddle_1.getBoundingClientRect(); 
-            }
-            if (e.key == 's') {
-				console.log("`s` pressed");
-				paddle_1.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_1_coord.top + window.innerHeight * 0.06) + 'px';
+				console.log(`paddle_1_coord.top  before = ${paddle_1_coord.top }`);
+				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - board_coord.height + 0.1) + 'px';
+				console.log(`paddle_1.style.top after = ${paddle_1.style.top}`);
 				paddle_1_coord = paddle_1.getBoundingClientRect();
-            }
-			// if (e.key == 'ArrowUp') {
-			// 	console.log("`ArrowUp` pressed");
-			// 	paddle_2.style.top = Math.max(board_coord.top, paddle_2_coord.top - window.innerHeight * 0.1) + 'px';
-			// 	paddle_2_coord = paddle_2.getBoundingClientRect();
-            // }
-            // if (e.key == 'ArrowDown') {
-			// 	console.log("`ArrowDown` pressed");
-			// 	paddle_2.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_2_coord.top + window.innerHeight * 0.1) + 'px';
-			// 	paddle_2_coord = paddle_2.getBoundingClientRect();
-            // }
-        }
+				console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
+			}
+
+			if (e.key == 's') { // go down
+				console.log("`s` pressed");
+				paddle_1.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_1_coord.top + board_coord.height * 0.06) + 'px';
+				paddle_1_coord = paddle_1.getBoundingClientRect();
+				console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
+			}
+
+			if (e.key == 'ArrowUp') {
+				console.log("`ArrowUp` pressed");
+				paddle_2.style.top = Math.max(board_coord.top, paddle_2_coord.top - board_coord.height * 0.1) + 'px';
+				paddle_2_coord = paddle_2.getBoundingClientRect();
+				console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
+			}
+
+			if (e.key == 'ArrowDown') {
+				console.log("`ArrowDown` pressed");
+				paddle_2.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_2_coord.top + board_coord.height * 0.1) + 'px';
+				paddle_2_coord = paddle_2.getBoundingClientRect();
+				console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
+			}
+		}
     });
 };
 
@@ -148,50 +162,94 @@ const createBall = ( className ) => {
 };
 
 const moveBall = (dx, dy, dxd, dyd) => {
+	// Bounce the ball when it hits the top or bottom of the board
 	if (ball_coord.top <= board_coord.top) {
-		dyd = 1;
+		dyd = 1; // Change direction to down
 	}
 	if (ball_coord.bottom >= board_coord.bottom) {
-		dyd = 0;
+		dyd = 0; // Change direction to up
 	}
+	// Bounce the ball off paddle_1 (left paddle)
 	if (
 		ball_coord.left <= paddle_1_coord.right &&
 		ball_coord.top >= paddle_1_coord.top &&
 		ball_coord.bottom <= paddle_1_coord.bottom
 	) {
-		dxd = 1;
+		dxd = 1; // Change direction to the right
+		// Randomize the ball's speed and direction after bouncing off the paddle
 		dx = Math.floor(Math.random() * 4) + 3;
 		dy = Math.floor(Math.random() * 4) + 3;
 	}
+	// Bounce the ball off paddle_2 (right paddle)
 	if (
 		ball_coord.right >= paddle_2_coord.left &&
 		ball_coord.top >= paddle_2_coord.top &&
 		ball_coord.bottom <= paddle_2_coord.bottom
 	) {
-		dxd = 0;
+		dxd = 0; // Change direction to the left
+		// Randomize the ball's speed and direction after bouncing off the paddle
 		dx = Math.floor(Math.random() * 4) + 3;
 		dy = Math.floor(Math.random() * 4) + 3;
 	}
+	// Check if the ball has gone out of bounds on the left or right
 	if (
 		ball_coord.left <= board_coord.left ||
 		ball_coord.right >= board_coord.right
 	) {
+		// Update the scores and reset the game state
 		if (ball_coord.left <= board_coord.left) {
 			document.querySelector('.player_2_score').textContent = +document.querySelector('.player_2_score').textContent + 1;
 		} else {
 			document.querySelector('.player_1_score').textContent = +document.querySelector('.player_1_score').textContent + 1;
 		}
+
+		// Check if the game is over when someone scores 5
+		if (
+			+document.querySelector('.player_1_score').textContent == 5 ||
+			+document.querySelector('.player_2_score').textContent == 5
+		) {
+			
+			const winMessageDiv = document.createElement('div');
+			winMessageDiv.classList.add('win-message');
+			
+			const heading = document.createElement('h1');
+			heading.classList.add('display-1', 'text-center');
+			const winningPlayer = (+document.querySelector('.player_1_score').textContent == 5) ? 'Player 1' : 'Player 2';
+			heading.textContent = `${winningPlayer} Wins!`;
+			winMessageDiv.appendChild(heading);
+
+			
+			document.querySelector('.player_1_score').textContent = 0;
+			document.querySelector('.player_2_score').textContent = 0;
+			document.querySelector('.board').appendChild(winMessageDiv);
+
+			document.querySelector('.message').textContent = 'Game Over';
+			winMessageDiv.style.display = 'block';
+			setTimeout(() => {
+				winMessageDiv.style.display = 'none';
+				gameState = 'start';
+				ball.style = initial_ball.style;
+				document.querySelector('.message').textContent = 'Press Enter';
+			}, 1500);
+			return ;
+		}
+  
 		gameState = 'start';
 
+		// Reset the ball's position and style
 		ball_coord = initial_ball_coord;
 		ball.style = initial_ball.style;
 		document.querySelector('.message').textContent = 'Press Enter';
 		return;
 	}
+	// Move the ball based on the calculated positions and directions
 	ball.style.top = ball_coord.top + dy * (dyd == 0 ? -1 : 1) + 'px';
 	ball.style.left = ball_coord.left + dx * (dxd == 0 ? -1 : 1) + 'px';
+	// Update the ball's position after the move
 	ball_coord = ball.getBoundingClientRect();
+	// Use requestAnimationFrame for smoother animation and call the moveBall function recursively
 	requestAnimationFrame(() => {
+		// console.log(`ball_coord = ${JSON.stringify(ball_coord, null, 2)}`);
 		moveBall(dx, dy, dxd, dyd); 
 	});
 }
@@ -221,13 +279,7 @@ const createMessage = ( className, msg ) => {
 // Board
 const createBoard = (className) => {
     const boardContainer = document.createElement('div');
-    boardContainer.className = 'container-fluid';
-
-    const boardRow = document.createElement('div');
-    boardRow.className = 'row';
-
-    const board = document.createElement('div');
-    board.className = `col ${className}`;
+    boardContainer.className = `${className}`;
 
     const dottedLine = document.createElement('div');
     dottedLine.className = 'dotted-line';
@@ -236,17 +288,15 @@ const createBoard = (className) => {
     paddle_1 = createPaddle('paddle_1');
     paddle_2 = createPaddle('paddle_2');
 	
-    board.appendChild(ball);
-    board.appendChild(paddle_1);
-    board.appendChild(paddle_2);
-	board.appendChild(dottedLine);
-
-    boardRow.appendChild(board);
-    boardContainer.appendChild(boardRow);
+    boardContainer.appendChild(ball);
+    boardContainer.appendChild(paddle_1);
+    boardContainer.appendChild(paddle_2);
+	boardContainer.appendChild(dottedLine);
 
     return (boardContainer);
 };
 
+// Screen resizing function
 const updatePositionsOnResize = () => {
 	console.log("window resize detected, updating ping pong elements");
 	paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
