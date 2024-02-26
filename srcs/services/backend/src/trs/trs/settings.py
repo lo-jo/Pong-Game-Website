@@ -66,6 +66,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+
+# HTTPS
+SECURE_SSL_REDIRECT = True
+SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
+SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
+
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]

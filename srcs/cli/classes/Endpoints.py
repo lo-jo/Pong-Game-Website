@@ -28,28 +28,27 @@ class BaseEndpoint:
             return False
 
         command = func(endpoint_uri, http_method, token_user, host)
+    
+        try:
+            output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
+            json_response = output.decode()
+            self.create_temp_file(json_response)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"Error to execute request: {e}")
+            return False
 
-        print(command)
-        # try:
-        #     output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
-        #     json_response = output.decode()
-        #     self.create_temp_file(json_response)
-        # except subprocess.CalledProcessError as e:
-        #     print(f"Error to execute request: {e}")
-        #     return False
 
-    # Http request
-    def request_get(self, endpoint_uri, http_method, token_user, host):
-        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{host}{endpoint_uri}']
+    def request_get_collection(self, endpoint_uri, http_method, token_user, host):
+        url = f'{host}{endpoint_uri}'
+        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
         return command
 
-    def request_post(self, endpoint_uri, http_method, token_user, host):
-        pass
-
-
-    def execute_request(self, option_http_method):
-        func = self.switch.get(option_http_method)
-        func()
+    def request_get_single_element(self, endpoint_uri, http_method, token_user, host):
+        endpoint_uri_with_id = self.set_id(endpoint_uri, self.uri_id_question)
+        url = f'{host}{endpoint_uri_with_id}'
+        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
+        return command
 
     def create_temp_file(self, json_response):
         with open('json_response.json', 'w') as file:
@@ -74,16 +73,33 @@ class BaseEndpoint:
         return endpoint_uri
 
 
-# class UsersEndpoint(BaseEndpoint):
-#     def __init__(self):
-#         super().__init__('/users/')
-#         self.uri_lst_endpoint = ['/users/', '/users/<id>/', '/users/<id>/profile/', '/users/<id>/update_profile/']
-#         self.uri_id_question = "Enter the user ID: "
+class UsersEndpoint(BaseEndpoint):
+    def __init__(self):
+        super().__init__('/users/')
+        self.switch_request = {
+            '/users/': {
+                'GET' : self.request_get_collection,
+                # 'POST' : self.request_post_collection,
+                # 'PUT': self.request_put_collection,
+                # 'PATCH': self.request_patch_collection,
+                # 'DELETE': self.request_delete_collection,
+            },
+            '/users/<id>/' : {
+                'GET' : self.request_get_single_element
+            },
+            '/users/<id>/profile' : {
+                'GET' : self.request_get_single_element
+            },
+            # '/users/<id>/update_profile/' : {
+            #     'GET' : self.request_get_single_element
+            # }
+        }
 
-#     # HTTP functions
-#     def request_post(self):
-#         pass
+        self.uri_id_question = "Enter the user ID: "
 
+    # HTTP functions
+    def request_post(self):
+        pass
 
 class MatchesEndpoint(BaseEndpoint):
     def __init__(self):
@@ -91,26 +107,22 @@ class MatchesEndpoint(BaseEndpoint):
         
         self.switch_request = {
             '/matches/': {
-                'GET': self.request_get_collection,
-                'POST': self.request_post_collection,
+                'GET' : self.request_get_collection,
+                'POST' : self.request_post_collection,
                 # 'PUT': self.request_put_collection,
                 # 'PATCH': self.request_patch_collection,
                 # 'DELETE': self.request_delete_collection,
             },
             '/matches/<id>/' : {
                 'GET' : self.request_get_single_element
+            },
+            '/matches/join_match/' : {
+                'POST' : self.post_join_match
             }
         }
-
         self.uri_id_question = "Enter the match ID: "
-
-    # HTTP request functions for `/matches/`
-    def request_get_collection(self, endpoint_uri, http_method, token_user, host):
-        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{host}{endpoint_uri}']
-        return command
     
     def request_post_collection(self, endpoint_uri, http_method, token_user, host):
-        
         match_data = self.get_data_for_post()
         match_data_json = json.dumps(match_data)
         command = [
@@ -143,17 +155,11 @@ class MatchesEndpoint(BaseEndpoint):
 
         return match_data
 
-
-    def request_get_single_element:
-        id = set_id()
-
-    # def join_match(match_id, user_id):
-    #     url = f'http://tu_api.com/matches/{match_id}/join'
-    #     headers = {'Authorization': 'Bearer tu_token_de_autenticacion'}
-    #     data = {'user_id': user_id}
-    #     response = requests.post(url, headers=headers, json=data)
-    #     if response.status_code == 200:
-    #         print('Usuario agregado al partido con éxito.')
-    #     else:
-    #         print('Error al intentar unirse al partido.')
+    def post_join_match(self, endpoint_uri, http_method, token_user, host):
+        command = [
+            'curl', '-X', 'POST',
+            '-H', f'Authorization: Bearer {token_user}',
+            f'{host}{endpoint_uri}'
+        ]
+        return command
 

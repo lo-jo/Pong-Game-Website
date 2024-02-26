@@ -10,13 +10,17 @@ check_postgres_ready() {
 
 check_postgres_ready
 
+# cd src/trs
 # Apply database migrations
 echo "Applying database migrations..."
-python src/trs/manage.py makemigrations
-python src/trs/manage.py migrate
+python manage.py makemigrations
+python manage.py migrate
+
+echo "Starting server..."
+# daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
+
 
 # Start server
-echo "Starting server..."
 # runserver is asynchronous, any command after \
 # that will be executed once the server is shutdown
 python src/trs/manage.py runserver 0.0.0.0:8000
