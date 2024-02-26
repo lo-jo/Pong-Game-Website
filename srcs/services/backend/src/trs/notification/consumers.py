@@ -25,7 +25,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         #Accepts the websocket connection and completes the handshake process
         await self.accept()
 
-#RECEIVE MSG FROM WEBSOCKET
+    #RECEIVE MSG FROM WEBSOCKET
     async def receive(self, text_data):
             data = json.loads(text_data)
             token = data.get('token', None)

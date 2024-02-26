@@ -17,14 +17,9 @@
 
     <script>
         const token = localStorage.getItem('token');
-        // setup chat scoket
-        // const onlineSocket = new WebSocket(
-        //     'ws://'
-        //     + window.location.host
-        //     + '/ws/notify/'
-        // );
-        
 
+        // NEED TO PROTECT WEBSOCKET CALL WHEN NO TOKEN WAS FOUND
+        // NEED TO PROTECT VIEW TO FORBID NON AUTHENTICATED USERS FROM ENTERING THE PAGE
         const onlineSocket = new WebSocket(`ws://${window.location.host}/ws/notify/?token=${token}`);
         onlineSocket.onopen = function (e) {
             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
