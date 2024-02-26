@@ -1,12 +1,10 @@
-import { initGameThreeD, initGameTwoD } from './game.js';
+import { initGameTwoD } from './game.js';
 
 const router = () => {
     const path = window.location.pathname;
 
     switch (path) {
         case '/':
-            renderView('home');
-            break;
         case '/home':
             renderView('home');
             break;
@@ -37,6 +35,12 @@ const renderView = (viewName) => {
             console.error(`Error loading ${viewName} view:`, error);
             renderNotFound();
         });
+    // window.history.pushState({ view: viewName }, '', '/');
+    // Use replaceState to update the current history entry with additional information
+    if (window.history.replaceState) {
+        //prevents browser from storing history with each change:
+        window.history.replaceState({ view: viewName }, '', '/');
+    }
 };
 
 const renderHome = () => {
@@ -78,9 +82,15 @@ const renderNotFound = () => {
 
 // Initial route on page load
 document.addEventListener('DOMContentLoaded', () => {
-    router();
+    // Retrieve the initial state from the history
+    const initialState = window.history.state || {};
+    // Use the initial state to render the correct view
+    if (initialState.view) {
+        renderView(initialState.view);
+    } else {
+        router();
+    }
 });
-
 
 // CHECK IF THIS IS NECESSARRY AT SOME POINT
 // const navigateTo = (path) => {

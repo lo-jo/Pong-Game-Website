@@ -5,70 +5,30 @@
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
   height: 100vh;
   width: 100vw;
   background-color: #000000;
-}
-  
-.container {
-  flex: 1;
-  max-width: 80%;
-  max-height: 15%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .board {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   height: 85vh; 
   width: 80vw;
-  max-width: 80%;
-  max-height: 85%;
-  justify-content: center;
-  align-items: center;
   border: 2px solid #7000ff;
   box-sizing: border-box;
-  position: relative;
-}
-
-.paddle {
-  /* position: fixed; */
-  position: absolute;
-  width: 20px;
-  height: 100px;
-  box-shadow: inset 0 0 18px #fffffc,
-  inset -6px 0 18px #fffffc,
-  inset 6px 0 18px #fffffc,
-  inset -6px 0 30px #fffffc,
-  inset 6px 0 30px #fffffc,
-  0 0 18px #fffffc, 4px 0 18px
-  #fffffc, -4px 0 18px #fffffc;
-}
-
-.paddle_1 {
-  left: 10px;
-}
-
-.paddle_2 {
-  right: 10px;
 }
 
 .ball {
-  position: fixed;
-  /* position: absolute; */
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  top: calc(50% - 15px);
+  position: fixed;
+  top: calc(53% - 15px);
   left: calc(50% - 15px);
-  /* top: 50%;
-  left: 50%; */
 }
 
 .ball_effect {
@@ -91,9 +51,32 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.paddle {
+  position: fixed;
+  width: 14px;
+  height: 100px;
+  box-shadow: inset 0 0 18px #fffffc,
+  inset -6px 0 18px #fffffc,
+  inset 6px 0 18px #fffffc,
+  inset -6px 0 30px #fffffc,
+  inset 6px 0 30px #fffffc,
+  0 0 18px #fffffc, 4px 0 18px
+  #fffffc, -4px 0 18px #fffffc;
+}
+
+.paddle_1 {
+  top: calc(7.5vh + 55px);
+  left: calc(10vw + 30px);
+}
+
+.paddle_2 {
+  top: calc(85vh + 7.5vh - 100px - 55px);
+  right: calc(10vw + 30px);
+}
   
 .dotted-line {
-  /* position: absolute; */
+  position: relative;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
@@ -102,7 +85,7 @@ body {
   background-color: #fffffc;
   border: dashed 2px #fffffc;
 }
-  
+
 .player_1_score,
 .player_2_score {
   color: #fcff76;
@@ -111,14 +94,11 @@ body {
 
 .message {
   color: #fffffc;
-  text-align: center;
   font-family: 'Open Sans', sans-serif;
-  align-items: center;
-  justify-content: center;
 }
 
 .win-message {
-  /* position: absolute; */
+  position: absolute;
   top: calc(50%);
   left: calc(50%);
   transform: translate(-50%, -50%);

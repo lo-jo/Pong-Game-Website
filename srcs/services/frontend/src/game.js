@@ -112,7 +112,7 @@ export const initGameTwoD = () => {
 			if (e.key == 'w') { // go up
 				console.log("`w` pressed");
 				console.log(`paddle_1_coord.top  before = ${paddle_1_coord.top }`);
-				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - board_coord.height + 0.1) + 'px';
+				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - board_coord.height * 0.06) + 'px';
 				console.log(`paddle_1.style.top after = ${paddle_1.style.top}`);
 				paddle_1_coord = paddle_1.getBoundingClientRect();
 				console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
@@ -208,17 +208,16 @@ const moveBall = (dx, dy, dxd, dyd) => {
 			+document.querySelector('.player_1_score').textContent == 5 ||
 			+document.querySelector('.player_2_score').textContent == 5
 		) {
-			
+
 			const winMessageDiv = document.createElement('div');
 			winMessageDiv.classList.add('win-message');
-			
+
 			const heading = document.createElement('h1');
-			heading.classList.add('display-1', 'text-center');
+			heading.classList.add('display-3', 'text-center');
 			const winningPlayer = (+document.querySelector('.player_1_score').textContent == 5) ? 'Player 1' : 'Player 2';
 			heading.textContent = `${winningPlayer} Wins!`;
 			winMessageDiv.appendChild(heading);
 
-			
 			document.querySelector('.player_1_score').textContent = 0;
 			document.querySelector('.player_2_score').textContent = 0;
 			document.querySelector('.board').appendChild(winMessageDiv);
@@ -233,7 +232,7 @@ const moveBall = (dx, dy, dxd, dyd) => {
 			}, 1500);
 			return ;
 		}
-  
+
 		gameState = 'start';
 
 		// Reset the ball's position and style
@@ -250,7 +249,7 @@ const moveBall = (dx, dy, dxd, dyd) => {
 	// Use requestAnimationFrame for smoother animation and call the moveBall function recursively
 	requestAnimationFrame(() => {
 		// console.log(`ball_coord = ${JSON.stringify(ball_coord, null, 2)}`);
-		moveBall(dx, dy, dxd, dyd); 
+		moveBall(dx, dy, dxd, dyd);
 	});
 }
 
