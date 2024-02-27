@@ -39,6 +39,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
 urlpatterns = [
+    path('', view),
     path("SPA/", include("SPA.urls")),
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),

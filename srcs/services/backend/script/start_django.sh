@@ -13,8 +13,8 @@ check_postgres_ready
 # cd src/trs
 # Apply database migrations
 echo "Applying database migrations..."
-python manage.py makemigrations
-python manage.py migrate
+python src/trs/manage.py makemigrations
+python src/trs/manage.py migrate
 
 echo "Starting server..."
 # daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
