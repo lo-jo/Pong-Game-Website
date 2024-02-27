@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode';
 
-function loginuser() {
+function submitLogin() {
 	const username = document.getElementById("username").value;
 	const password = document.getElementById("password").value;
 
@@ -41,3 +41,22 @@ document.addEventListener('DOMContentLoaded', function() {
         loginButton.addEventListener('click', loginuser);
     }
 });
+
+export const loginUser = () => {
+    document.getElementById('content').innerHTML = `
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input class="form-control form-control-sm" type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label>
+        <input class="form-control form-control-sm" type="password" id="password" name="password" required><br>
+        <button type="submit" id="loginButton" class="btn btn-dark btn-sm">Sign-in</button>
+    </form>
+    `;
+
+document.getElementById("loginButton").addEventListener("click", (event) => {
+    event.preventDefault();
+    // alert("YOU JUST CLICKED LOGIN");
+    submitLogin();
+});
+}

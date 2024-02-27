@@ -1,4 +1,7 @@
 import {registerUser} from './register.js';
+import {loginUser} from './login.js';
+import {profileUser} from './profile.js';
+import {editUser} from './edit.js';
 
 const router = () => {
     const path = window.location.pathname;
@@ -77,17 +80,131 @@ const renderNotFound = () => {
 //     router();
 // });
 
-document.getElementById("register").addEventListener("click", () => {
+const renderLogin = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './login.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof loginUser === 'function') {
+            loginUser();
+        } else {
+            console.error('login view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading login script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+const renderEdit = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './edit.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof editUser === 'function') {
+            editUser();
+        } else {
+            console.error('edit view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading edit script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+const renderProfile = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './profile.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof profileUser === 'function') {
+            profileUser();
+        } else {
+            console.error('Profile view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading profile script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+function handleButtonClick(id) {
     console.log("click");
-    renderRegister();
-    // document.getElementById("content").innerHTML += "<h3>Hello geeks</h3>";
+    const element = document.getElementById(id);
+
+    if (element) {
+        switch (id) {
+            case "register":
+                renderRegister();
+                break;
+            case "login":
+                renderLogin();
+                break;
+            case "profile":
+                renderProfile();
+                break;
+            case "edit":
+                renderEdit();
+                break;
+            // Add more cases as needed for different IDs
+            default:
+                console.error("Unknown ID: " + id);
+                break;
+        }
+    } else {
+        console.error("Element not found for ID: " + id);
+    }
+}
+
+// Example usage:
+document.getElementById("register").addEventListener("click", () => {
+    handleButtonClick("register");
 });
 
+document.getElementById("login").addEventListener("click", () => {
+    handleButtonClick("login");
+});
+
+document.getElementById("profile").addEventListener("click", () => {
+    handleButtonClick("profile");
+});
+
+document.getElementById("edit").addEventListener("click", () => {
+    handleButtonClick("edit");
+});
+
+
+// faire un switch sur les boutons
+
 // CHECK IF THIS IS NECESSARRY AT SOME POINT
-// const navigateTo = (path) => {
-//     history.pushState(null, null, path);
-//     router();
-// };
+const navigateTo = (path) => {
+    history.pushState(null, null, path);
+    router();
+};
 
 // // Handle navigation through links
 // document.addEventListener('click', (e) => {
