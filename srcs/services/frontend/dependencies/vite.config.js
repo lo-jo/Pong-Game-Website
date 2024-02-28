@@ -1,7 +1,9 @@
 // vite.config.js
 import { defineConfig } from 'vite';
+// import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+  root: 'src',
   server: {
     https: {
       key: '/etc/ssl/private/selfsigned.key',
@@ -11,4 +13,7 @@ export default defineConfig({
       usePolling: true
     }
   },
+  // plugins: [
+  //   basicSsl()
+  // ]
 });

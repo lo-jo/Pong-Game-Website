@@ -49,7 +49,7 @@ let paddle_2;
 // Main game
 export const initGameTwoD = () => {
 	gameState = 'start';
-	document.getElementById('app').innerHTML = '';
+	// document.getElementById('app').innerHTML = '';
 	// document.getElementById('app').className = 'container';
 	let box = document.createElement('div');
 	box.className = 'container';

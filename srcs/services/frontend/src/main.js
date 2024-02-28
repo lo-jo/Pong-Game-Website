@@ -11,8 +11,8 @@ const router = () => {
         case '/game':
             renderView('game');
             break;
-        default:
-            renderView('notFound');
+        case '/toto':
+            renderView('toto')
     }
 };
 
@@ -21,11 +21,15 @@ const renderView = (viewName) => {
         .then((response) => response.text())
         .then((html) => {
             document.getElementById('app').innerHTML = html;
+            alert(viewName)
             if (viewName === 'game') {
                 renderGame();
             }
             else if (viewName === 'home') {
                 renderHome();
+            }
+            else if (viewName == 'toto'){
+                renderToto();
             }
             else if (viewName === 'notFound') {
                 renderNotFound();
@@ -37,24 +41,29 @@ const renderView = (viewName) => {
         });
     // window.history.pushState({ view: viewName }, '', '/');
     // Use replaceState to update the current history entry with additional information
-    if (window.history.replaceState) {
-        //prevents browser from storing history with each change:
-        window.history.replaceState({ view: viewName }, '', '/');
-    }
+    // if (window.history.replaceState) {
+    //     //prevents browser from storing history with each change:
+    //     window.history.replaceState({ view: viewName }, '', '/');
+    // }
 };
 
 const renderHome = () => {
     document.getElementById('app').innerHTML = '<h1>Landing page!</h1>';
 };
 
+const renderToto = () => {
+    document.getElementById('app').innerHTML = '<h1>Toto!</h1>';
+};
+
+
 const renderGame = () => {
     const script = document.createElement('script');
     script.type = 'module';
-    script.src = './src/game.js';
+    script.src = 'game.js';
 
     const styleCss = document.createElement('link');
     styleCss.rel = 'stylesheet';
-    styleCss.href = './src/css/game.css';
+    styleCss.href = './css/game.css';
 
     // Define a callback to execute once the script is loaded
     script.onload = () => {
@@ -82,14 +91,15 @@ const renderNotFound = () => {
 
 // Initial route on page load
 document.addEventListener('DOMContentLoaded', () => {
+    router();
     // Retrieve the initial state from the history
-    const initialState = window.history.state || {};
-    // Use the initial state to render the correct view
-    if (initialState.view) {
-        renderView(initialState.view);
-    } else {
-        router();
-    }
+    // const initialState = window.history.state || {};
+    // // Use the initial state to render the correct view
+    // if (initialState.view) {
+    //     renderView(initialState.view);
+    // } else {
+    //     router();
+    // }
 });
 
 // CHECK IF THIS IS NECESSARRY AT SOME POINT

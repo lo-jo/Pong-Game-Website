@@ -6,10 +6,12 @@
   "scripts": {
     "start": "npx vite --host 0.0.0.0",
     "dev": "npx vite --host 0.0.0.0",
+    "serve" : "npx vite serve --host 0.0.0.0 src",
     "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
     "vite": "^5.0.8"
   },
   "dependencies": {

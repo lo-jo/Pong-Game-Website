@@ -18,11 +18,9 @@ WORKDIR /app
 
 COPY ./dependencies/* .
 
-COPY index.html index.html
+# COPY index.html index.html
 
 RUN npm install --save
-
-# RUN npm install -D @vitejs/plugin-basic-ssl
 
 COPY ./src ./src
 
