@@ -1,11 +1,22 @@
 import { initGameTwoD } from './game.js';
+import { LandingPage } from './js/LandingPage.js'
 
 const routes = {
     '/' : {
         path : '/',
-        view : 
-    },
+        view : LandingPage,
+    }
+}
 
+const router = () => {
+    const path = window.location.pathname;
+
+    const viewObject = routes[path];
+
+    const view = new viewObject.view();
+
+    document.getElementById('app').innerHTML = `view.getHtml()`;
+    alert('hola')
 }
 
 // const router = () => {
@@ -89,17 +100,18 @@ const routes = {
 //     document.getElementById('app').innerHTML = '<h1>404 Page Not Found</h1>';
 // };
 
-// // Initial route on page load
-// document.addEventListener('DOMContentLoaded', () => {
-//     // Retrieve the initial state from the history
-//     const initialState = window.history.state || {};
-//     // Use the initial state to render the correct view
-//     if (initialState.view) {
-//         renderView(initialState.view);
-//     } else {
-//         router();
-//     }
-// });
+// Initial route on page load
+document.addEventListener('DOMContentLoaded', () => {
+    router();
+    // // Retrieve the initial state from the history
+    // const initialState = window.history.state || {};
+    // // Use the initial state to render the correct view
+    // if (initialState.view) {
+    //     renderView(initialState.view);
+    // } else {
+    //     router();
+    // }
+});
 
 // CHECK IF THIS IS NECESSARRY AT SOME POINT
 // const navigateTo = (path) => {

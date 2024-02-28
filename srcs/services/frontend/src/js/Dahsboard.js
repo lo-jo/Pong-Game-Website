@@ -1,5 +1,8 @@
-class Dashboard {
+import { BaseClass } from './BaseClass'
+
+class Dashboard extends BaseClass {
     constructor() {
+        super();
         // Set up click event listener on the document
         document.addEventListener('click', this.handleButtonClick.bind(this));
     }
@@ -40,13 +43,13 @@ class Dashboard {
                 // Do something with the data received from the backend if necessary
                 console.log('Backend response:', data);
             })
-            .catch(error => {
+            .catch(error => {     
                 // Handle request errors
                 console.error('Error making request:', error);
             });
     }
 
-    // Method to get the HTML of the dashboard
+    /*Method to get the HTML of the dashboard*/
     getHTML() {
         return `<div>
                     <button id='lauch-game-button'>
