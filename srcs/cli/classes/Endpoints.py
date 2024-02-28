@@ -2,6 +2,7 @@ import subprocess
 import requests
 import json
 import curses
+import time # to delete
 
 from modules.prompt import prompt
 
@@ -9,94 +10,156 @@ class BaseEndpoint:
     def __init__(self, endpoint):
         # Main endpoint
         self.endpoint = endpoint
-        self.uri = None # ?
-        self.switch_http = {
-            'GET': self.request_get,
-            'POST': self.request_post,
-        }
 
     def __str__(self):
         return self.endpoint
 
     # Methods
-    def handle_request(self):
-        pass
+    def handle_request(self, endpoint_uri, http_method, token_user, host):
+        if endpoint_uri in self.switch_request:
+            endpoint_methods = self.switch_request[endpoint_uri]
+            if http_method in endpoint_methods:
+                func = endpoint_methods[http_method]
+            else:
+                print(f"HTTP method {http_method} not supported for endpoint {endpoint_uri}")
+                return False
+        else:
+            print(f"Endpoint {endpoint_uri} not found in switch_request")
+            return False
 
-    def display_info_collection(self):
-        pass
+        command = func(endpoint_uri, http_method, token_user, host)
+    
+        try:
+            output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
+            json_response = output.decode()
+            self.create_temp_file(json_response)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"Error to execute request: {e}")
+            return False
 
-    def request_get(self):
-        pass
 
-    def request_post(self):
-        pass
+    def request_get_collection(self, endpoint_uri, http_method, token_user, host):
+        url = f'{host}{endpoint_uri}'
+        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
+        return command
 
-    def execute_request(self, option_http_method):
-        func = self.switch.get(option_http_method)
-        func()
+    def request_get_single_element(self, endpoint_uri, http_method, token_user, host):
+        endpoint_uri_with_id = self.set_id(endpoint_uri, self.uri_id_question)
+        url = f'{host}{endpoint_uri_with_id}'
+        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
+        return command
 
     def create_temp_file(self, json_response):
         with open('json_response.json', 'w') as file:
             file.write(json_response)
     
-    def request_id(self):
+    # Input functions
+    def request_id(self, message):
         while True:
-            id = input("Type the id: ")
-            if id.isdigit():
-                break
+            id = input(message).strip()
+            if id == '':
+                return None
+            elif id.isdigit():
+                return id
             else:
-                print("Please type only positive digits.")
-        return id
+                print("Please enter a valid positive integer for ID.")
 
-    
+
+    def set_id(self, endpoint_uri, question):
+        if '<id>' in endpoint_uri:
+            id = self.request_id(question)
+            endpoint_uri = endpoint_uri.replace('<id>', id)
+        return endpoint_uri
 
 
 class UsersEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/users/')
-        self.uri_lst_endpoint = ['/users/', '/users/<id>/', '/users/<id>/profile/', '/users/<id>/update_profile/']
+        self.switch_request = {
+            '/users/': {
+                'GET' : self.request_get_collection,
+                # 'POST' : self.request_post_collection,
+                # 'PUT': self.request_put_collection,
+                # 'PATCH': self.request_patch_collection,
+                # 'DELETE': self.request_delete_collection,
+            },
+            '/users/<id>/' : {
+                'GET' : self.request_get_single_element
+            },
+            '/users/<id>/profile' : {
+                'GET' : self.request_get_single_element
+            },
+            # '/users/<id>/update_profile/' : {
+            #     'GET' : self.request_get_single_element
+            # }
+        }
 
-    # Methods
-    def handle_request(self, endpoint_uri, http_method, token_user, host):
-        func = self.switch_http.get(http_method)
-        command = func(endpoint_uri, http_method, token_user, host)
+        self.uri_id_question = "Enter the user ID: "
 
-        try:
-            output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
-            json_response = output.decode()
-            self.create_temp_file(json_response)
-        except subprocess.CalledProcessError as e:
-            print(f"Error to execute request: {e}")
-            return False
-
-    def set_uri(self, endpoint_uri):
-        if '<id>' in endpoint_uri:
-            id = self.request_id()
-            print(id)
-            endpoint_uri = endpoint_uri.replace('<id>', id)
-        return endpoint_uri
-
-    def display_info_collection(self):
-        pass
-
-
-    def request_get(self, endpoint_uri, http_method, token_user, host):
-        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{host}{endpoint_uri}']
-        return command
-
-
+    # HTTP functions
     def request_post(self):
         pass
-
 
 class MatchesEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/matches/')
-        self.uri_lst_endpoint = ['/<id>/', '/create/']
+        
+        self.switch_request = {
+            '/matches/': {
+                'GET' : self.request_get_collection,
+                'POST' : self.request_post_collection,
+                # 'PUT': self.request_put_collection,
+                # 'PATCH': self.request_patch_collection,
+                # 'DELETE': self.request_delete_collection,
+            },
+            '/matches/<id>/' : {
+                'GET' : self.request_get_single_element
+            },
+            '/matches/join_match/' : {
+                'POST' : self.post_join_match
+            }
+        }
+        self.uri_id_question = "Enter the match ID: "
+    
+    def request_post_collection(self, endpoint_uri, http_method, token_user, host):
+        match_data = self.get_data_for_post()
+        match_data_json = json.dumps(match_data)
+        command = [
+            'curl', '-X', 'POST',
+            '-H', f'Authorization: Bearer {token_user}',
+            '-H', 'Content-Type: application/json',
+            '-d', match_data_json,
+            f'{host}{endpoint_uri}'
+        ]
+        return command
+    
+    def get_data_for_post(self):
+        print("This CLI only supports match initializations as pending, users to play and tournament id are optional.")
+        
+        match_data = {
+            'status': 'pending',
+        }
 
-    def handle_request(self):
-        pass
+        user_1_id = self.request_id("Enter the ID for user_1: (leave blank if none): ")
+        if user_1_id:
+            match_data['user_1'] = user_1_id
 
-    def display_info_collection(self):
-        pass
+        user_2_id = self.request_id("Enter the ID for user_2: (leave blank if none): ")
+        if user_2_id:
+            match_data['user_2'] = user_2_id
+
+        tournament_id = self.request_id("Enter the ID of tournament: (leave blank if none): ")
+        if tournament_id:
+            match_data['tournament'] = tournament_id
+
+        return match_data
+
+    def post_join_match(self, endpoint_uri, http_method, token_user, host):
+        command = [
+            'curl', '-X', 'POST',
+            '-H', f'Authorization: Bearer {token_user}',
+            f'{host}{endpoint_uri}'
+        ]
+        return command
 

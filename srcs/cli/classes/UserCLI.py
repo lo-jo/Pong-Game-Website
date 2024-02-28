@@ -35,9 +35,9 @@ class UserCLI:
         if http_method == 'EXIT':
             return False
 
-        uri = endpoint_class.set_uri(endpoint_uri)
-        endpoint_class.handle_request(uri, http_method, self.token, self.host)
-        print("A JSON file has been created with the response from the API")
+        # uri = endpoint_class.set_id(endpoint_uri, endpoint_class.uri_id_question)
+        if endpoint_class.handle_request(endpoint_uri, http_method, self.token, self.host) != False:
+            print("A JSON file has been created with the response from the API")
         input("Press any to continue ...")
         os.system('clear')
         return True

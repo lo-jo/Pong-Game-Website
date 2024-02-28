@@ -2,6 +2,7 @@ import curses
 import signal
 import getpass
 import os
+import time
 # Own classes and modules
 from classes.UserCLI import UserCLI
 from classes.Endpoints import UsersEndpoint, MatchesEndpoint
@@ -34,13 +35,14 @@ def main():
         if endpoint_choice == 'EXIT':
             break
         endpoint_class = endpoints.get(endpoint_choice)
-        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, endpoint_class.uri_lst_endpoint, "Choose uri for entrypoint:\n", True))
+        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request.keys()), "Choose uri for entrypoint:\n", True))
         if endpoint_uri == 'GO BACK':
             continue
         elif endpoint_uri == 'EXIT':
             break
         else:
-            http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the HTTP Method for your request and type 'Enter':\n", True))
+            http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
+            # http_method = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request[endpoint_uri].keys()), "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
             if http_method == 'GO BACK':
                 continue
             elif http_method == 'EXIT':

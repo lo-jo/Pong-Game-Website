@@ -36,12 +36,48 @@ class UserProfileView(RetrieveAPIView):
         return Response(data)
 
 
-// Después de la autenticación
-localStorage.setItem('jwtToken', jwtToken); // Almacena el token JWT recibido del backend
+# status -> string
+# user_1 -> id 
+# user_2 -> id
+# winner -> id_user 
+# loser  -> id_user
+# tournament_id -> id_tournoi
+# created_at -> time
+import os
+from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
+from channels.auth import AuthMiddlewareStack
+from notification.routing import websocket_urlpatterns
+from channels.http import AsgiHandler
+# Initialize Daphne with SSL support
+from daphne.server import Server
+from daphne.endpoints import build_ssl_options
+from django.urls import path
 
-// Cuando necesites acceder al perfil de otro usuario
-var jwtToken = localStorage.getItem('jwtToken');
-var decodedToken = jwt_decode(jwtToken); // Decodificar el token JWT para obtener la información del usuario
-var userId = decodedToken.user_id; // Extraer el ID del usuario del token JWT
-var otherUserId = obtenerIdUsuarioDeAlgunaManera(); // Esto depende de cómo obtengas el ID del otro usuario
-var profileUrl = `/users/${otherUserId}/profile`;
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'trs.settings')
+
+application = ProtocolTypeRouter({
+    "http": AsgiHandler(),
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter(
+                websocket_urlpatterns
+            )
+        )
+    ),
+})
+
+private_key_path = '/etc/ssl/private/selfsigned.key'
+certificate_path = '/etc/ssl/private/selfsigned.crt'
+
+ssl_options = build_ssl_options({
+    "privateKey": private_key_path,
+    "certChain": certificate_path,
+})
+
+
+Server(application, endpoint_description=ssl_options).run()
+
+Server(application, endpoint_description=ssl_options).run()

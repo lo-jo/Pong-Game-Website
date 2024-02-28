@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
+ALLOWED_HOSTS = ['paul-f5ar3s10', os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
 
 
 # Application definition
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'SPA',
     'users',
     'notification',
-    'auth_permissions',
+    'pong',
     #REST
     'rest_framework',
     'rest_framework_simplejwt',
@@ -65,6 +65,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+
+
+# HTTPS
+SECURE_SSL_REDIRECT = True
+SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
+SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
