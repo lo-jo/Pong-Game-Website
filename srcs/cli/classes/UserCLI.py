@@ -8,7 +8,7 @@ import os
 
 
 class UserCLI:
-    def __init__(self, username, password, host="http://127.0.0.1:8000"):
+    def __init__(self, username, password, host="https://127.0.0.1:8000"):
         self.username = username
         self.password = password
         self.host = host
@@ -21,7 +21,7 @@ class UserCLI:
         url = f"{self.host}/users/token/"
         data = {"username": self.username, "password": self.password}
         headers = {"Content-Type": "application/json"}
-        response = requests.post(url, json=data, headers=headers)
+        response = requests.post(url, json=data, headers=headers, verify=False)
         if response.status_code == 200:
             self.token = response.json()["access"]
             print("Authentication succesfully!")

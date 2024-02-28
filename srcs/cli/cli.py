@@ -26,8 +26,8 @@ def main():
     user_cli = UserCLI(username, password)
     if user_cli.authenticate() == False:
         return
-    os.system('clear')
-    
+    # os.system('clear')
+    return
     # CLI main loop
     # The main endpoint, the uri and the http method are choosed for send the request
     while True:

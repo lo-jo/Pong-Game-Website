@@ -11,6 +11,7 @@ all:
 # Start services in the foreground
 up:
 	@echo "Start service of ft_transcendence in the foreground ..."
+	@bash ./srcs/certs/certicate_generator.sh
 	@docker compose -f $(COMPOSE_FILE) up --build
 
 # Start services in the background

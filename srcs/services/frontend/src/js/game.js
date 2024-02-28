@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap/dist/css/bootstrap.css';
 
 export const initGameThreeD = () => {
     const scene = new THREE.Scene();

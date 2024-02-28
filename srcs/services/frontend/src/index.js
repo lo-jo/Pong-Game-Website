@@ -3,6 +3,7 @@ import {registerUser} from './js/register.js';
 import {loginUser} from './js/login.js';
 import {profileUser} from './js/profile.js';
 import {editUser} from './js/edit.js';
+import 'bootstrap/dist/css/bootstrap.css';
 
 const router = () => {
     const path = window.location.pathname;
