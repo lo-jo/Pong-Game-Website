@@ -1,7 +1,7 @@
 async function editProfile() {
 	const getData = async () => {
 		const jwtAccess = localStorage.getItem('token');
-		const response = await fetch('http://localhost:8000/users/profile/', {
+		const response = await fetch('https://localhost:8000/users/profile/', {
 			method: 'GET',
 			headers: {
 				'Authorization': `Bearer ${jwtAccess}`,
@@ -16,7 +16,7 @@ async function editProfile() {
 	const myObject = await getData().then(data => {
 						let objet = {}
 						objet.data = data;
-						url = "http://localhost:8000/users/update_profile/" + objet.data.id + "/";
+						url = "https://localhost:8000/users/update_profile/" + objet.data.id + "/";
                         console.log(url);
 						objet.url = url;
 						return objet;
@@ -73,7 +73,7 @@ async function editProfile() {
 		return response.json();
 	})
 	.then(data => {
-		document.getElementById('content').innerHTML = "Profile succesfully updated";
+		document.getElementById('app').innerHTML = "Profile succesfully updated";
 	})
 	.catch(error => {
 		console.error('Failed to update profile', error);
@@ -81,7 +81,7 @@ async function editProfile() {
 }
 
 export const editUser = () => {
-    document.getElementById('content').innerHTML = `
+    document.getElementById('app').innerHTML = `
     <h1>Edit profile</h1>
 	<div class="form-group">
     <form id="editprofile" enctype="multipart/form-data">

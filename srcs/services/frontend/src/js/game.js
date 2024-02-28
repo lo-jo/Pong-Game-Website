@@ -49,7 +49,7 @@ let paddle_2;
 // Main game
 export const initGameTwoD = () => {
 	gameState = 'start';
-	document.getElementById('app').innerHTML = '';
+	// document.getElementById('app').innerHTML = '';
 	// document.getElementById('app').className = 'container';
 	let box = document.createElement('div');
 	box.className = 'container';
@@ -79,8 +79,8 @@ export const initGameTwoD = () => {
     board_coord = document.getElementById('app').querySelector('.board').getBoundingClientRect();
 
 	// `dx` and `dy` determine the speed of the ball at the beginning
-    let dx = Math.floor(Math.random() * 4) + 1;
-    let dy = Math.floor(Math.random() * 4) + 1;
+    let dx = Math.floor(Math.random() * 4) + 3;
+    let dy = Math.floor(Math.random() * 4) + 3;
 	// `dxd` and `dyd` determine the initial direction of the ball along the x and y axes
     let dxd = Math.floor(Math.random() * 2);
     let dyd = Math.floor(Math.random() * 2);

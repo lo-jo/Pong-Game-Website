@@ -74,7 +74,7 @@ SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "https://localhost:5173",
 ]
 
 

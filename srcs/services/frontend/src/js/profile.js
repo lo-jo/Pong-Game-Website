@@ -8,10 +8,10 @@ class User{
         this.picpath = picpath;
       }
       getProfilePicPath() {
-        return "http://localhost:8000" + this.pic;
+        return "https://localhost:8000" + this.pic;
     }
       getFriendReq() {
-        return "http://localhost:8000/users/friendship/" + this.username + "/";
+        return "https://localhost:8000/users/friendship/" + this.username + "/";
     }
 }
 
@@ -45,7 +45,7 @@ const addFriend = (user) => {
 function display_profile() {
 	const jwtAccess = localStorage.getItem('token');
 
-	fetch('http://localhost:8000/users/profile/', {
+	fetch('https://localhost:8000/users/profile/', {
 		method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${jwtAccess}`,
@@ -56,7 +56,7 @@ function display_profile() {
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('Unauthorized access. Please log in.');
-				document.getElementById('content').innerHTML = "You need to login to see this page."
+				document.getElementById('app').innerHTML = "You need to login to see this page."
             } else {
                 console.error('Error:', response.status);
             }
@@ -92,7 +92,7 @@ function display_profile() {
 }
 
 export const profileUser = () => {
-    document.getElementById('content').innerHTML = `
+    document.getElementById('app').innerHTML = `
     <div class="container">
 		<div class="row">
 			<img src="" id="pic" class="avatar">

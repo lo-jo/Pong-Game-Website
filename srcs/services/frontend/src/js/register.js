@@ -12,7 +12,7 @@ const password = document.getElementById('password').value;
 const email = document.getElementById('email').value;
 console.log(`username ${username} password: ${password} email: ${email}`);
 
-fetch('http://localhost:8000/users/register/', {
+fetch('https://localhost:8000/users/register/', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ fetch('http://localhost:8000/users/register/', {
     // Handle successful login, e.g., store token in local storage
     console.log('Succesfully signed up', data);
     console.log("data: ", data);
-    document.getElementById('content').innerHTML = "successfully signed up";
+    document.getElementById('app').innerHTML = "successfully signed up";
 })
 .catch(error => {
     console.error('Login failed', error);
@@ -40,7 +40,7 @@ fetch('http://localhost:8000/users/register/', {
 
 export const registerUser = () => {
     console.log("registerUser HERE");
-    document.getElementById('content').innerHTML = `
+    document.getElementById('app').innerHTML = `
     <div class="form-group">
     <form id="loginForm">
         <label for="username">Username:</label>

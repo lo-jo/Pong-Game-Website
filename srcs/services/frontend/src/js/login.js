@@ -5,7 +5,7 @@ function submitLogin() {
 	const password = document.getElementById("password").value;
 
 	// Make an AJAX request to your DRF backend for authentication
-	fetch('http://localhost:8000/users/token/', {
+	fetch('https://localhost:8000/users/token/', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -23,10 +23,10 @@ function submitLogin() {
 			let jwtToken = localStorage.getItem('token');
             let decoded_token = jwt_decode(jwtToken);
             alert(decoded_token.user_id);
-			document.getElementById('content').innerHTML = "successfully logged in"
+			document.getElementById('app').innerHTML = "successfully logged in"
 			// Redirect to another page or perform additional actions
 		} else {
-			document.getElementById('content').innerHTML = "Invalid Credentials"
+			document.getElementById('app').innerHTML = "Invalid Credentials"
 		}
 	})
 	.catch(error => {
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 export const loginUser = () => {
-    document.getElementById('content').innerHTML = `
+    document.getElementById('app').innerHTML = `
     <h1>Login</h1>
     <form id="loginForm">
         <label for="username">Username:</label>
