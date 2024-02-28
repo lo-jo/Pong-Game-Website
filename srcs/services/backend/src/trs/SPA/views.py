@@ -16,6 +16,8 @@ def section(request, num):
         return render(request, "users/profile.html")
     if num == 4:
         return render(request, "users/editProfile.html")
+    if num == 5:
+        return render(request, "notification/index.html")
     else:
         raise Http404("No such section")
 

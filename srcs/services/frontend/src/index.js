@@ -1,123 +1,210 @@
-import { initGameTwoD } from './game.js';
-import { LandingPage } from './js/LandingPage.js'
-
-const routes = {
-    '/' : {
-        path : '/',
-        view : LandingPage,
-    }
-}
+import {registerUser} from './register.js';
+import {loginUser} from './login.js';
+import {profileUser} from './profile.js';
+import {editUser} from './edit.js';
 
 const router = () => {
     const path = window.location.pathname;
 
-    const viewObject = routes[path];
+    switch (path) {
+        case '/':
+        case '/home':
+            renderView('home');
+            break;
+        case '/game':
+            renderView('game');
+            break;
+        case '/register':
+            renderView('register');
+        default:
+            renderView('notFound');
+    }
+};
 
-    const view = new viewObject.view();
+const renderView = (viewName) => {
+    fetch(`/${viewName}.js`)
+        .then((response) => response.text())
+        .then((html) => {
+            document.getElementById('app').innerHTML = html;
+            if (viewName === 'home') {
+                renderHome();
+            }
+            else if (viewName === 'register') {
+                renderRegister();
+            }
+            else if (viewName === 'notFound') {
+                renderNotFound();
+            }
+        })
+        .catch((error) => {
+            console.error(`Error loading ${viewName} view:`, error);
+            renderNotFound();
+        });
+};
 
-    document.getElementById('app').innerHTML = `view.getHtml()`;
-    alert('hola')
-}
+const renderHome = () => {
+    document.getElementById('app').innerHTML = '<h1>Landing page!</h1>';
+};
 
-// const router = () => {
-//     const path = window.location.pathname;
+const renderRegister = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './register.js';
 
-//     switch (path) {
-//         case '/':
-//             renderView('home');
-//         case '/home':
-//             renderView('home');
-//             break;
-//         case '/game':
-//             renderView('game');
-//             break;
-//         default:
-//             renderView('notFound');
-//     }
-// };
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof registerUser === 'function') {
+            registerUser();
+        } else {
+            console.error('register view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
 
-// const renderView = (viewName) => {
-//     fetch(`/${viewName}.js`)
-//         .then((response) => response.text())
-//         .then((html) => {
-//             document.getElementById('app').innerHTML = html;
-//             if (viewName === 'game') {
-//                 renderGame();
-//             }
-//             else if (viewName === 'home') {
-//                 renderHome();
-//             }
-//             else if (viewName === 'notFound') {
-//                 renderNotFound();
-//             }
-//         })
-//         .catch((error) => {
-//             console.error(`Error loading ${viewName} view:`, error);
-//             renderNotFound();
-//         });
-//     // window.history.pushState({ view: viewName }, '', '/');
-//     // Use replaceState to update the current history entry with additional information
-//     if (window.history.replaceState) {
-//         //prevents browser from storing history with each change:
-//         window.history.replaceState({ view: viewName }, '', '/');
-//     }
-// };
+    script.onerror = (error) => {
+        console.error('Error loading register script:', error);
+        renderNotFound();
+    };
 
-// const renderHome = () => {
-//     document.getElementById('app').innerHTML = '<h1>Landing page!</h1>';
-// };
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
 
-// const renderGame = () => {
-//     const script = document.createElement('script');
-//     script.type = 'module';
-//     script.src = './src/game.js';
-
-//     const styleCss = document.createElement('link');
-//     styleCss.rel = 'stylesheet';
-//     styleCss.href = './src/css/game.css';
-
-//     // Define a callback to execute once the script is loaded
-//     script.onload = () => {
-//         if (typeof initGameTwoD === 'function') {
-//             initGameTwoD();
-//         } else {
-//             console.error('initGameTwoD function not found in ./src/game.js');
-//             renderNotFound();
-//         }
-//     };
-
-//     script.onerror = (error) => {
-//         console.error('Error loading game script:', error);
-//         renderNotFound();
-//     };
-
-//     // Append the CSS file to the head and the script element to the body of the document
-//     document.head.appendChild(styleCss);
-//     document.body.appendChild(script);
-// };
-
-// const renderNotFound = () => {
-//     document.getElementById('app').innerHTML = '<h1>404 Page Not Found</h1>';
-// };
+const renderNotFound = () => {
+    document.getElementById('app').innerHTML = '<h1>404 Page Not Found</h1>';
+};
 
 // Initial route on page load
-document.addEventListener('DOMContentLoaded', () => {
-    router();
-    // // Retrieve the initial state from the history
-    // const initialState = window.history.state || {};
-    // // Use the initial state to render the correct view
-    // if (initialState.view) {
-    //     renderView(initialState.view);
-    // } else {
-    //     router();
-    // }
+// document.addEventListener('DOMContentLoaded', () => {
+//     console.log("HEREEE");
+//     router();
+// });
+
+const renderLogin = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './login.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof loginUser === 'function') {
+            loginUser();
+        } else {
+            console.error('login view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading login script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+const renderEdit = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './edit.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof editUser === 'function') {
+            editUser();
+        } else {
+            console.error('edit view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading edit script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+const renderProfile = () => {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = './profile.js';
+
+    // Define a callback to execute once the script is loaded
+    script.onload = () => {
+        if (typeof profileUser === 'function') {
+            profileUser();
+        } else {
+            console.error('Profile view function not found in ./src/game.js');
+            renderNotFound();
+        }
+    };
+
+    script.onerror = (error) => {
+        console.error('Error loading profile script:', error);
+        renderNotFound();
+    };
+
+    // Append the CSS file to the head and the script element to the body of the document
+    document.body.appendChild(script);
+};
+
+function handleButtonClick(id) {
+    console.log("click");
+    const element = document.getElementById(id);
+
+    if (element) {
+        switch (id) {
+            case "register":
+                renderRegister();
+                break;
+            case "login":
+                renderLogin();
+                break;
+            case "profile":
+                renderProfile();
+                break;
+            case "edit":
+                renderEdit();
+                break;
+            // Add more cases as needed for different IDs
+            default:
+                console.error("Unknown ID: " + id);
+                break;
+        }
+    } else {
+        console.error("Element not found for ID: " + id);
+    }
+}
+
+// Example usage:
+document.getElementById("register").addEventListener("click", () => {
+    handleButtonClick("register");
 });
 
+document.getElementById("login").addEventListener("click", () => {
+    handleButtonClick("login");
+});
+
+document.getElementById("profile").addEventListener("click", () => {
+    handleButtonClick("profile");
+});
+
+document.getElementById("edit").addEventListener("click", () => {
+    handleButtonClick("edit");
+});
+
+
+// faire un switch sur les boutons
+
 // CHECK IF THIS IS NECESSARRY AT SOME POINT
-// const navigateTo = (path) => {
-//     history.pushState(null, null, path);
-//     router();
-// };
+const navigateTo = (path) => {
+    history.pushState(null, null, path);
+    router();
+};
 
 // // Handle navigation through links
 // document.addEventListener('click', (e) => {

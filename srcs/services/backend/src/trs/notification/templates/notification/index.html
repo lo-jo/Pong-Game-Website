@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Custom block for page title   -->
+    <title>Notify</title>
+
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="container mt-5">
+        <h1> Welcome 2 the lobby </h1>
+    </div>
+
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        // NEED TO PROTECT WEBSOCKET CALL WHEN NO TOKEN WAS FOUND
+        // NEED TO PROTECT VIEW TO FORBID NON AUTHENTICATED USERS FROM ENTERING THE PAGE
+        const onlineSocket = new WebSocket(`ws://${window.location.host}/ws/notify/?token=${token}`);
+        onlineSocket.onopen = function (e) {
+            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
+            console.log('Socket successfully connected.');
+        };
+
+        onlineSocket.onclose = function (e) {
+            console.log('Socket closed unexpectedly');
+        };
+
+        onlineSocket.addEventListener("message", (event) => {
+            alert(event.data);
+            console.log("Server:", event.data);
+        });
+
+    </script>
+
+</body>
+</html>

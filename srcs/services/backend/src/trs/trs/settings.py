@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     # server pong app
     #'server_side_pong.apps.ServerSidePongConfig',
     # channels
-    'channels',
     'daphne',
+    'channels',
     'corsheaders',
     #custom apps
     'SPA',
@@ -56,11 +56,12 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -99,13 +100,14 @@ TEMPLATES = [
 ]
 
 # Daphne
+# WSGI_APPLICATION = 'trs.wsgi.application'
 ASGI_APPLICATION = "trs.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
@@ -205,7 +207,7 @@ REST_FRAMEWORK = {
 #        'rest_framework.authentication.SessionAuthentication',
 #        'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
     ]
 }
 
