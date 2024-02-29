@@ -12,8 +12,8 @@ export class LandingPage extends BaseClass
 
     getHtmlForHeader() {
         return `<nav id="nav-bar">
-                    <button id="btn-sign-up" class="btn-nav-bar btn btn-outline-warning">Sign up</button>
-                    <button id="btn-log-in" class="btn-nav-bar btn btn-outline-warning">Log in</button>
+                    <a href="/register">Sign up</a>
+                    <a href="/login">Log in</a>
                 </nav>`;
     }
 

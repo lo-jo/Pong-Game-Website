@@ -5,9 +5,9 @@ export class BaseClass {
         }
     }
 
-    run() {
-        throw new Error("Method 'run()' must be implemented.");
-    }
+    // run() {
+    //     throw new Error("Method 'run()' must be implemented.");
+    // }
 
     getHtmlForHeader() {
         throw new Error("Method 'getHtmlForHeader()' must be implemented.");
