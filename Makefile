@@ -66,7 +66,10 @@ remove_certs:
 		echo "\n$(BOLD)$(GREEN)SSL certificates removed [ ✔ ]\n$(RESET)"; \
 	fi	
 
-clean: remove_certs remove_containers remove_images
+clean: remove_certs
+	@echo "ft_transcendence certs cleaned $(GREEN)\t\t[ ✔ ]$(RESET)"
+
+fclean : remove_certs remove_containers remove_images
 	@echo "ft_transcendence cleaned $(GREEN)\t\t[ ✔ ]$(RESET)"
 
 # Prune system - removes stopped containers, unused networks, dangling images, and build cache
@@ -86,7 +89,7 @@ exec:
 cli:
 	@python3 $(CLI)
 
-.PHONY: all up up-detached build-no-cache stop down debug prune re
+.PHONY: all up up-detached build-no-cache stop down debug prune re clean fclean
 
 # COLORS
 RESET = \033[0m
