@@ -1,8 +1,4 @@
 import { initGameTwoD } from './js/game.js';
-// import {registerUser} from './js/register.js';
-
-// import {profileUser} from './js/profile.js';
-import {editUser} from './js/edit.js';
 import 'bootstrap/dist/css/bootstrap.css';
 /*Import classes*/
 import { LandingPage } from './js/LandingPage.js'
