@@ -10,11 +10,17 @@ import { Login } from './js/Login.js'
 import { Register } from './js/Register.js'
 import { Profile } from './js/Profile.js'
 import { Settings } from './js/Settings.js'
+import { Dashboard } from './js/Dahsboard.js';
 
 const routes = {
     '/' : {
         path : '/',
         view : LandingPage,
+    },
+    '/dashboard' : {
+        path : '/dashboard',
+        view : Dashboard,
+        css : './css/dashboard.css'
     },
     '/login' : {
         path : '/login',
@@ -34,17 +40,6 @@ const routes = {
     },
 }
 
-// const buttons = {
-//     'btn-sign-up' : {
-//         path : '/login',
-//         view : Login
-//     },
-//     'btn-log-in' : {
-//         path : '/register',
-//         view : Register
-//     }
-// }
-
 const router = () => {
 
     const path = window.location.pathname;
@@ -52,6 +47,14 @@ const router = () => {
     const viewObject = routes[path];
 
     const view = new viewObject.view();
+
+    if (viewObject.css)
+    {
+        const styleCss = document.createElement('link');
+        styleCss.rel = 'stylesheet';
+        styleCss.href = viewObject.css;
+        document.head.appendChild(styleCss);
+    }
 
     document.getElementById('header').innerHTML = view.getHtmlForHeader();
 
