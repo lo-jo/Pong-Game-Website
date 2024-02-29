@@ -6,11 +6,17 @@ import {editUser} from './js/edit.js';
 import 'bootstrap/dist/css/bootstrap.css';
 /*Import classes*/
 import { LandingPage } from './js/LandingPage.js'
+import { Dashboard } from './js/Dahsboard.js';
 
 const routes = {
     '/' : {
         path : '/',
         view : LandingPage,
+    },
+    '/dashboard' : {
+        path : '/dashboard',
+        view : Dashboard,
+        css : './css/dashboard.css'
     }
 }
 
@@ -21,6 +27,14 @@ const router = () => {
     const viewObject = routes[path];
 
     const view = new viewObject.view();
+
+    if (viewObject.css)
+    {
+        const styleCss = document.createElement('link');
+        styleCss.rel = 'stylesheet';
+        styleCss.href = viewObject.css;
+        document.head.appendChild(styleCss);
+    }
 
     document.getElementById('header').innerHTML = view.getHtmlForHeader();
 

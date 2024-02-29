@@ -1,27 +1,22 @@
 import { BaseClass } from './BaseClass'
 
-class Dashboard extends BaseClass {
+export class Dashboard extends BaseClass {
     constructor() {
         super();
         // Set up click event listener on the document
         document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
-    // Handle button click
     handleButtonClick(event) {
-        // Check if the click came from the 'lauch-game-button' button
         if (event.target.id === 'lauch-game-button') {
-            // Launch the game (make request to backend)
             this.launchGame();
         }
     }
 
-    // Method to launch the game (make request to backend)
+    // Method to join a match
     launchGame() {
-        // URL of your backend endpoint
-        const url = 'http://your-backend.com/api/launch-game';
+        const url = 'https://localhost:8000//matches/join_match/';
 
-        // Request options (e.g., a POST request with JSON data)
         const options = {
             method: 'POST',
             headers: {
@@ -49,12 +44,29 @@ class Dashboard extends BaseClass {
             });
     }
 
+    getHtmlForHeader(){
+        return `<nav id="nav-bar">
+                    <a href="/profile">Profile</a>
+                    <a href="/game">Game</a>
+                    <a href="/chat">Chat</a>
+                    <a href="/logout">Log out</a>
+                </nav>`
+    }
+
     /*Method to get the HTML of the dashboard*/
-    getHTML() {
-        return `<div>
-                    <button id='lauch-game-button'>
-                        Let's play
-                    </button>
+    getHtmlForMain() {
+        return `<div id="main">
+                    <div id="game-actions">
+                        <div class="game-action">
+                            <button id="lauch-game-button" type="button">PLAY A MATCH</button>
+                        </div>
+                        <div class="game-action">
+                            <button type="button">CREATE A TOURNAMENT</button>
+                        </div>
+                    </div>
+                    <div id="game-stats">
+                        <h3>LAST MATCHES</h3>
+                    </div>
                 </div>`;
     }
 }
