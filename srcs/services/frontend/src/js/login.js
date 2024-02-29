@@ -1,5 +1,21 @@
 import jwt_decode from 'jwt-decode';
 
+function connectUser() {
+    const token = localStorage.getItem('token');
+
+        // NEED TO PROTECT WEBSOCKET CALL WHEN NO TOKEN WAS FOUND
+        // NEED TO PROTECT VIEW TO FORBID NON AUTHENTICATED USERS FROM ENTERING THE PAGE
+        const onlineSocket = new WebSocket(`wss://localhost:8000/ws/notify/?token=${token}`);
+        onlineSocket.onopen = function (e) {
+            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
+            console.log('Socket successfully connected.');
+        };
+
+        onlineSocket.onclose = function (e) {
+            console.log('Socket closed unexpectedly');
+        };
+}
+
 function submitLogin() {
 	const username = document.getElementById("username").value;
 	const password = document.getElementById("password").value;
@@ -24,6 +40,7 @@ function submitLogin() {
             let decoded_token = jwt_decode(jwtToken);
             alert(decoded_token.user_id);
 			document.getElementById('app').innerHTML = "successfully logged in"
+            connectUser();
 			// Redirect to another page or perform additional actions
 		} else {
 			document.getElementById('app').innerHTML = "Invalid Credentials"
@@ -35,12 +52,12 @@ function submitLogin() {
 	});
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const loginButton = document.getElementById('loginButton');
-    if (loginButton) {
-        loginButton.addEventListener('click', loginuser);
-    }
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//     const loginButton = document.getElementById('loginButton');
+//     if (loginButton) {
+//         loginButton.addEventListener('click', loginuser);
+//     }
+// });
 
 export const loginUser = () => {
     document.getElementById('app').innerHTML = `
