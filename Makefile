@@ -3,6 +3,8 @@ CLI_PATH = cli/cli.py
 YML_FILE = docker-compose.yml
 COMPOSE_FILE = $(addprefix $(SRCS_PATH), $(YML_FILE))
 CLI = $(addprefix $(SRCS_PATH), $(CLI_PATH))
+CERTS = ./srcs/services/backend/selfsigned.crt ./srcs/services/backend/selfsigned.key \
+		./srcs/services/frontend/selfsigned.crt ./srcs/services/frontend/selfsigned.key
 
 all:
 	@echo "Launching ft_transcendence ..."
@@ -55,7 +57,16 @@ remove_containers:
 		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
 	fi
 
-clean: remove_containers remove_images
+remove_certs:
+	@if [ -z "$(wildcard $(CERTS))" ]; then \
+		echo "\n$(BOLD)$(RED)No SSL certificates found.$(RESET)\n"; \
+	else \
+		echo "$(YELLOW)\n. . . deleting SSL certificates . . . \n$(RESET)"; \
+		rm -f $(CERTS); \
+		echo "\n$(BOLD)$(GREEN)SSL certificates removed [ ✔ ]\n$(RESET)"; \
+	fi	
+
+clean: remove_certs remove_containers remove_images
 	@echo "ft_transcendence cleaned $(GREEN)\t\t[ ✔ ]$(RESET)"
 
 # Prune system - removes stopped containers, unused networks, dangling images, and build cache
