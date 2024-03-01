@@ -18,7 +18,7 @@ export class Login extends BaseClass
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        fetch('https://localhost:8000/users/token/', {
+        fetch('http://localhost:8000/users/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

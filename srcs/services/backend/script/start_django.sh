@@ -17,10 +17,10 @@ python manage.py makemigrations
 python manage.py migrate
 
 echo "Starting server..."
-daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
+# daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
 
 
 # Start server
 # runserver is asynchronous, any command after \
 # that will be executed once the server is shutdown
-# python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:8000

@@ -10,10 +10,10 @@ class User{
         this.picpath = picpath;
       }
       getProfilePicPath() {
-        return "https://localhost:8000" + this.pic;
+        return "http://localhost:8000" + this.pic;
     }
       getFriendReq() {
-        return "https://localhost:8000/users/friendship/" + this.username + "/";
+        return "http://localhost:8000/users/friendship/" + this.username + "/";
     }
 }
 
@@ -53,7 +53,7 @@ export class Profile extends BaseClass {
     displayProfile() {
         const jwtAccess = localStorage.getItem('token');
     
-        fetch('https://localhost:8000/users/profile/', {
+        fetch('http://localhost:8000/users/profile/', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,

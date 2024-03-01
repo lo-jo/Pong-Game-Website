@@ -26,7 +26,7 @@ export class Register extends BaseClass
         const email = document.getElementById('email').value;
         console.log(`username ${username} password: ${password} email: ${email}`);
         
-        fetch('https://localhost:8000/users/register/', {
+        fetch('http://localhost:8000/users/register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

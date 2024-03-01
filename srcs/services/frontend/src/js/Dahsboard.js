@@ -15,7 +15,7 @@ export class Dashboard extends BaseClass {
 
     access(){
         const jwtAccess = localStorage.getItem('token');
-        const url = 'https://localhost:8000/pong/';
+        const url = 'http://localhost:8000/pong/';
 
         fetch(url, {
             method: 'GET',
@@ -40,7 +40,7 @@ export class Dashboard extends BaseClass {
     
     // Method to join a match
     launchGame() {
-        const url = 'https://localhost:8000//matches/join_match/';
+        const url = 'http://localhost:8000//matches/join_match/';
 
         const options = {
             method: 'POST',

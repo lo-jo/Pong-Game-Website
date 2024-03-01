@@ -14,7 +14,7 @@ export class Settings extends BaseClass {
     async handleButtonClick(event) {
         const getData = async () => {
             const jwtAccess = localStorage.getItem('token');
-            const response = await fetch('https://localhost:8000/users/profile/', {
+            const response = await fetch('http://localhost:8000/users/profile/', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -29,7 +29,7 @@ export class Settings extends BaseClass {
         const myObject = await getData().then(data => {
                             let objet = {}
                             objet.data = data;
-                            url = "https://localhost:8000/users/update_profile/" + objet.data.id + "/";
+                            url = "http://localhost:8000/users/update_profile/" + objet.data.id + "/";
                             console.log(url);
                             objet.url = url;
                             return objet;

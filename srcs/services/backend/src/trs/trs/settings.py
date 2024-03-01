@@ -67,14 +67,14 @@ MIDDLEWARE = [
 ]
 
 
-# HTTPS
-SECURE_SSL_REDIRECT = True
-SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
-SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
+# # HTTPS
+# SECURE_SSL_REDIRECT = True
+# SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
+# SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost:5173",
+    "http://localhost:5173",
 ]
 
 
