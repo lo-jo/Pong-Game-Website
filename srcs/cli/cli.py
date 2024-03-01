@@ -5,13 +5,13 @@ import os
 import time
 # Own classes and modules
 from classes.UserCLI import UserCLI
-from classes.Endpoints import UsersEndpoint, MatchesEndpoint
+from classes.Endpoints import UsersEndpoint, PongEndpoint
 from modules.prompt import prompt
 
 # Endpoints container dict
 endpoints = {
     '/users/': UsersEndpoint(),
-    '/matches/': MatchesEndpoint(),
+    '/pong/': PongEndpoint(),
     # '/tournaments/': UsersEndpoint(),
 }
 
@@ -26,8 +26,6 @@ def main():
     user_cli = UserCLI(username, password)
     if user_cli.authenticate() == False:
         return
-    # os.system('clear')
-    return
     # CLI main loop
     # The main endpoint, the uri and the http method are choosed for send the request
     while True:

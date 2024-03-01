@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import AllMatchesView, MatchDetailView, JoinMatchView
+from .views import PongDashboardView, AllMatchesView, MatchDetailView, JoinMatchView
 
 urlpatterns = [
-    path('', AllMatchesView.as_view()),
-    path('<int:pk>/', MatchDetailView.as_view()),
+    path('', PongDashboardView.as_view()),
+    path('matches/', AllMatchesView.as_view()),
+    path('matches/<int:pk>/', MatchDetailView.as_view()),
     path('join_match/', JoinMatchView.as_view())
 ]

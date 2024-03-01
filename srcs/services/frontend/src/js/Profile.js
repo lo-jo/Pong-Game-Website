@@ -64,7 +64,6 @@ export class Profile extends BaseClass {
             if (!response.ok) {
                 if (response.status === 401) {
                     console.error('Unauthorized access. Please log in.');
-                    document.getElementById('app').innerHTML = "You need to login to see this page."
                 } else {
                     console.error('Error:', response.status);
                 }
@@ -107,18 +106,16 @@ export class Profile extends BaseClass {
 
     getHtmlForMain() {
         return `<div class="container">
-		
-			<img src="" id="pic" class="avatar">
-		
-		<h1><div class="row" id="username"></div></h1>
-		<div class="row" id="pic"></div>
-		<div class="row" id="nb"></div>
-		<div class="row" id="email"></div>
-		<div class="row" id="bio"></div>
-        <div class="row" id="friendRequest"></div>
-        <div class="row" id="friendlist"> DISPLAY FRIEND LIST</div>
-        <div class="row" id="matchHistory">MATCH HISTORY</div>
-        <div class="row" id="matchHistory">STATS (wins, losses)</div>
-    </div>`
+			        <img src="" id="pic" class="avatar">
+                    <h1><div class="row" id="username"></div></h1>
+                    <div class="row" id="pic"></div>
+                    <div class="row" id="nb"></div>
+                    <div class="row" id="email"></div>
+                    <div class="row" id="bio"></div>
+                    <div class="row" id="friendRequest"></div>
+                    <div class="row" id="friendlist"> DISPLAY FRIEND LIST</div>
+                    <div class="row" id="matchHistory">MATCH HISTORY</div>
+                    <div class="row" id="matchHistory">STATS (wins, losses)</div>
+                </div>`
     }
 }

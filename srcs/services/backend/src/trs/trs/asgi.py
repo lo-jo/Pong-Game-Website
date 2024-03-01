@@ -15,13 +15,15 @@ django_asgi_app = get_asgi_application()
 
 from django.conf import settings
 from notification.routing import websocket_urlpatterns
+# Pong server - chelo
+from pong.routing import websocket_urlpatterns as pong_websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                websocket_urlpatterns
+                websocket_urlpatterns + pong_websocket_urlpatterns
             )
         )
     ),

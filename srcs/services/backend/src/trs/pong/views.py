@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from .models import Match
 from .serializers import MatchSerializer
 
+class PongDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
 class AllMatchesView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Match.objects.all()

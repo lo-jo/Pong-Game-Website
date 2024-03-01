@@ -34,7 +34,7 @@ body {
   width: 80%;
   height: 50rem;
   margin-left: 10%;
-  /* background-color: aquamarine; */
+  background-color: aquamarine;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,7 +42,6 @@ body {
 
 
 .avatar {
-	  /* vertical-align: middle; */
     display: block;
     max-width:100px;
     max-height:100px;

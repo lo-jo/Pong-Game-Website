@@ -4,7 +4,7 @@ export class Dashboard extends BaseClass {
     constructor() {
         super();
         // Set up click event listener on the document
-        document.addEventListener('click', this.handleButtonClick.bind(this));
+        // document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
     handleButtonClick(event) {
@@ -13,6 +13,31 @@ export class Dashboard extends BaseClass {
         }
     }
 
+    access(){
+        const jwtAccess = localStorage.getItem('token');
+        const url = 'https://localhost:8000/pong/';
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                    return false
+                } else {
+                    console.error('Error:', response.status);
+                }
+            }
+            return true;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
     // Method to join a match
     launchGame() {
         const url = 'https://localhost:8000//matches/join_match/';

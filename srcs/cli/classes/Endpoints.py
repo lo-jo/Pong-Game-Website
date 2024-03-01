@@ -41,13 +41,13 @@ class BaseEndpoint:
 
     def request_get_collection(self, endpoint_uri, http_method, token_user, host):
         url = f'{host}{endpoint_uri}'
-        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
+        command = ['curl', '-k', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
         return command
 
     def request_get_single_element(self, endpoint_uri, http_method, token_user, host):
         endpoint_uri_with_id = self.set_id(endpoint_uri, self.uri_id_question)
         url = f'{host}{endpoint_uri_with_id}'
-        command = ['curl', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
+        command = ['curl', '-k' , '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
         return command
 
     def create_temp_file(self, json_response):
@@ -101,22 +101,22 @@ class UsersEndpoint(BaseEndpoint):
     def request_post(self):
         pass
 
-class MatchesEndpoint(BaseEndpoint):
+class PongEndpoint(BaseEndpoint):
     def __init__(self):
-        super().__init__('/matches/')
+        super().__init__('/pong/')
         
         self.switch_request = {
-            '/matches/': {
+            '/pong/matches/': {
                 'GET' : self.request_get_collection,
                 'POST' : self.request_post_collection,
                 # 'PUT': self.request_put_collection,
                 # 'PATCH': self.request_patch_collection,
                 # 'DELETE': self.request_delete_collection,
             },
-            '/matches/<id>/' : {
+            '/pong/matches/<id>/' : {
                 'GET' : self.request_get_single_element
             },
-            '/matches/join_match/' : {
+            '/pong/join_match/' : {
                 'POST' : self.post_join_match
             }
         }
@@ -126,7 +126,7 @@ class MatchesEndpoint(BaseEndpoint):
         match_data = self.get_data_for_post()
         match_data_json = json.dumps(match_data)
         command = [
-            'curl', '-X', 'POST',
+            'curl', '-k', '-X', 'POST',
             '-H', f'Authorization: Bearer {token_user}',
             '-H', 'Content-Type: application/json',
             '-d', match_data_json,
@@ -157,7 +157,7 @@ class MatchesEndpoint(BaseEndpoint):
 
     def post_join_match(self, endpoint_uri, http_method, token_user, host):
         command = [
-            'curl', '-X', 'POST',
+            'curl', '-k' ,'-X', 'POST',
             '-H', f'Authorization: Bearer {token_user}',
             f'{host}{endpoint_uri}'
         ]
