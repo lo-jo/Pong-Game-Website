@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import NotifyUserView, index
 
 urlpatterns = [
-    path('', views.index, name='index')
+    path('<str:username>/', NotifyUserView.as_view(), name='notify_user'),
 ]

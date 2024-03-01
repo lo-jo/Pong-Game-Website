@@ -1,11 +1,16 @@
 import { BaseClass } from './BaseClass'
 import jwt_decode from 'jwt-decode';
+// import { router } from './Router.js';
+
+// window.PROTOCOL = import.meta.env.PROTOCOL;
 
 export class Login extends BaseClass
 {
     constructor() {
         super();
+        // this.router = router; 
         document.addEventListener('click', this.handleDocumentClick.bind(this));
+        
     }
 
     handleDocumentClick(event) {
@@ -17,8 +22,10 @@ export class Login extends BaseClass
     handleButtonClick(event) {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
+        // const protocol = window.PROTOCOL;
 
-        fetch('https://localhost:8000/users/token/', {
+        // alert(protocol);
+        fetch('http://localhost:8000/users/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,9 +43,10 @@ export class Login extends BaseClass
                 let jwtToken = localStorage.getItem('token');
                 let decoded_token = jwt_decode(jwtToken);
                 alert(decoded_token.user_id);
-                document.getElementById('app').innerHTML = "successfully logged in"
+                // this.router('/profile');
+                document.getElementById('app').innerHTML = `successfully logged in <a href="/profile">Profile</a>`
+                // document.location.href = '/profile';
                 this.connectUser();
-                // Redirect to another page or perform additional actions
             } else {
                 document.getElementById('app').innerHTML = "Invalid Credentials"
             }
@@ -51,14 +59,15 @@ export class Login extends BaseClass
 
     connectUser() {
         const token = localStorage.getItem('token');
-        const onlineSocket = new WebSocket(`wss://localhost:8000/ws/notify/?token=${token}`);
+        const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
         onlineSocket.onopen = function (e) {
-             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
+            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
             console.log('Socket successfully connected.');
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
         };
+
     }
 
     getHtmlForHeader() {
