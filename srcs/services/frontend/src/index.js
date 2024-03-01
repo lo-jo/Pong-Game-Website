@@ -1,4 +1,3 @@
-import { initGameTwoD } from './js/game.js';
 import 'bootstrap/dist/css/bootstrap.css';
 /*Import classes*/
 import { LandingPage } from './js/LandingPage.js'
@@ -7,6 +6,7 @@ import { Register } from './js/Register.js'
 import { Profile } from './js/Profile.js'
 import { Settings } from './js/Settings.js'
 import { Dashboard } from './js/Dahsboard.js';
+import { PongGame } from './js/Game.js';
 
 const routes = {
     '/' : {
@@ -33,6 +33,11 @@ const routes = {
     '/settings' : {
         path : '/settings',
         view : Settings
+    },
+    '/game' : {
+        path : '/game',
+        view : PongGame,
+        css : './css/game.css'
     },
 }
 
