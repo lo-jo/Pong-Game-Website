@@ -114,13 +114,11 @@ export class Profile extends BaseClass {
             friendRequestLink.innerText = 'Send Friend Request';
             friendRequestLink.addEventListener('click', (event) => {
                 event.preventDefault();
-                addFriend(currentUser); // Pass user ID or any necessary data to the function
+                this.addFriend(currentUser); // Pass user ID or any necessary data to the function
             });
     
             // Append the link to the 'friendRequest' div
             document.getElementById('friendRequest').appendChild(friendRequestLink);
-         
-    
           // Display attributes
             document.getElementById('username').innerText = currentUser.username;
             document.getElementById("pic").src = currentUser.getProfilePicPath();
@@ -137,6 +135,7 @@ export class Profile extends BaseClass {
                     PROFILE
                     <a href="/">HOME</a>
                     <a href="/settings">SETTINGS</a>
+                    <a href="/chat">Chat</a>
                 </nav>`;
     }
 

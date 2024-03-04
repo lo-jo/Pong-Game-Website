@@ -1,16 +1,11 @@
 import { BaseClass } from './BaseClass'
 import jwt_decode from 'jwt-decode';
-// import { router } from './Router.js';
-
-// window.PROTOCOL = import.meta.env.PROTOCOL;
 
 export class Login extends BaseClass
 {
     constructor() {
         super();
-        // this.router = router; 
         document.addEventListener('click', this.handleDocumentClick.bind(this));
-        
     }
 
     handleDocumentClick(event) {

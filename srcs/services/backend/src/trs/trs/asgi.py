@@ -1,31 +1,25 @@
 import os
-from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack
-
-# Initialize Daphne with SSL support
-from daphne.server import Server
-# from daphne.endpoints import build_ssl_options
+from channels.security.websocket import AllowedHostsOriginValidator
 from django.urls import path
+from django.core.asgi import get_asgi_application
 
+# Import WebSocket URL patterns from different modules
+from notification.routing import websocket_urlpatterns as notification_ws_urlpatterns
+from chat.routing import websocket_urlpatterns as chat_ws_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'trs.settings')
 django_asgi_app = get_asgi_application()
-
-from django.conf import settings
-from notification.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
-                websocket_urlpatterns
+                notification_ws_urlpatterns +
+                chat_ws_urlpatterns
             )
         )
     ),
 })
-
-private_key_path = '/etc/ssl/private/selfsigned.key'
-certificate_path = '/etc/ssl/private/selfsigned.crt'

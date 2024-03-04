@@ -4,6 +4,7 @@ import { Register } from './Register.js'
 import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dahsboard.js';
+import { Chat } from './Chat.js';
 
 export const routes = {
     '/' : {
@@ -31,6 +32,10 @@ export const routes = {
         path : '/settings',
         view : Settings
     },
+    '/chat' : {
+        path : '/chat',
+        view : Chat
+    }
 }
 
 export const router = () => {
