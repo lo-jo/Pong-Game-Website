@@ -55,7 +55,7 @@ const router = () => {
 
     if (!viewObject) {
         const errorView = new ErrorClass();
-        document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
+        document.getElementById('main').innerHTML = errorView.getHtmlForMainNotFound();
         return;
     }
 
@@ -64,7 +64,7 @@ const router = () => {
         if (!token) {
             const errorView = new ErrorClass();
             document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-            document.getElementById('app').innerHTML = errorView.getHtmlForMain();
+            document.getElementById('main').innerHTML = errorView.getHtmlForMain();
             return;
         }
     }
@@ -79,7 +79,7 @@ const router = () => {
     }
 
     document.getElementById('header').innerHTML = view.getHtmlForHeader();
-    document.getElementById('app').innerHTML = view.getHtmlForMain();
+    document.getElementById('main').innerHTML = view.getHtmlForMain();
 };
 
 // Initial route on page load
