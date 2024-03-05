@@ -11,11 +11,14 @@ export class Dashboard extends BaseClass {
         document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
-    handleButtonClick(event) {
-        console.log(`button clicked:[${event.target.id}]`);
+    handleButtonClick(event) {        
         if (event.target.id === 'launch-game-button') {
+            console.log('Launching game...');
             this.launchGame();
-        } else if (event.target.id === 'create-tournament') {
+        } else if (event.target.id === 'launch-tournament') {
+            document.getElementById('app').innerHTML = this.getHtmlFormTournament();
+        } else if (event.target.id === 'createTournament') {
+            event.preventDefault();
             this.createTournament();
         }
     }
@@ -75,36 +78,63 @@ export class Dashboard extends BaseClass {
 
     // Method to create tournament
     createTournament() {
-        console.log()
-        // const url = 'http://localhost:8000/pong/join_match/';
+        const tournamentName = document.getElementById("tournamentName").value;
+        const player1 = document.getElementById("player1").value;
+        const player2 = document.getElementById("player2").value;
+        const player3 = "lolo";
+        const player4 = "poco";
+        const players = [player1, player2, player3, player4];
 
-        // const jwtAccess = localStorage.getItem('token');
+        const url = 'http://localhost:8000/pong/create_tournament/';
 
-        // const options = {
-        //     method: 'POST',
-        //     headers: {
-        //         'Authorization': `Bearer ${jwtAccess}`,
-        //         'Content-Type': 'application/json',
-        //     },
-        // };
+        const jwtAccess = localStorage.getItem('token');
 
-        // // Make the request using the Fetch API
-        // fetch(url, options)
-        //     .then(response => {
-        //         // Handle response from the backend if necessary
-        //         if (!response.ok) {
-        //             throw new Error('The request was not successful');
-        //         }
-        //         return response.json(); // or response.text(), etc., depending on the response type
-        //     })
-        //     .then(data => {
-        //         // Do something with the data received from the backend if necessary
-        //         console.log('Backend response:', data);
-        //     })
-        //     .catch(error => {     
-        //         // Handle request errors
-        //         console.error('Error making request:', error);
-        //     });
+        const options = {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tournamentName: tournamentName,
+                players: players,
+            }),
+        };
+
+        fetch(url, options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('The request was not successful');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Backend response:', data);
+            })
+            .catch(error => {
+                console.error('Error making request:', error);
+            });
+
+    }
+
+    getHtmlFormTournament() {
+        return `<div id="form-tournament container-fluid">
+                    <h1>Create tournament </h1>
+                    <div class="form-group">
+                        <form id="tournamentForm">
+                            <label for="tournamentName">Tournament name:</label>
+                            <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Enter the name of the tournament">
+                            <br>
+                            <label for="player1">Participant 1:</label>
+                            <input class="form-control form-control-sm" type="text" id="player1" name="player1" required placeholder="Enter player 1">
+                            <br>
+                            <label for="player2">Participant 2:</label>
+                            <input class="form-control form-control-sm" type="text" id="player2" name="player2" required placeholder="Enter player 2">
+                            <br>
+                            <button type="submit" id="createTournament" class="btn btn-dark btn-sm">Create tournament</button>
+                        </form>
+                    </div>
+                </div>`;
     }
 
     getHtmlForHeader(){
@@ -119,7 +149,7 @@ export class Dashboard extends BaseClass {
                             <button id="launch-game-button" type="button">PLAY A MATCH</button>
                         </div>
                         <div class="game-action">
-                            <button id="create-tournament" type="button">CREATE A TOURNAMENT</button>
+                            <button id="launch-tournament" type="button">CREATE A TOURNAMENT</button>
                         </div>
                     </div>
                     <div id="game-stats">

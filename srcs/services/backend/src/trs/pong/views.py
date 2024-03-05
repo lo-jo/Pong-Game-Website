@@ -119,5 +119,31 @@ class JoinMatchView(APIView):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class CreateTournamentView(APIView):
+    permission_classes = [IsAuthenticated]
 
-       
+    def post(self, request):
+        try:
+            tournament_name = request.data.get('tournamentName')
+            players = request.data.get('players', [])
+
+            # Validate the number of players
+            if len(players) < 4 or len(players) % 2 != 0:
+                return Response({'error': 'Invalid number of players'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create tournament
+            tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user)
+
+            # Create matches for the tournament
+            for i in range(0, len(players), 2):
+                match = Match.objects.create(
+                    user_1=User.objects.get(username=players[i]),
+                    user_2=User.objects.get(username=players[i + 1]),
+                    tournament=tournament
+                )
+
+            serializer = TournamentSerializer(tournament)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
