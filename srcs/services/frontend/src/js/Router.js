@@ -5,6 +5,7 @@ import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 import { PongGame } from './Game.js';
+import { Match } from './Match.js'
 import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 
@@ -49,6 +50,11 @@ export const routes = {
     '/chat' : {
         path : '/chat',
         view : Chat,
+        auth : true
+    },
+    '/match' : {
+        path : '/match',
+        view : Match,
         auth : true
     }
 }
