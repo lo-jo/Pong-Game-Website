@@ -74,10 +74,10 @@ export class Profile extends BaseClass {
         .then(data => {
             const statusElement = document.getElementById('status');
             if (data.hasOwnProperty('error')) {
-                document.getElementById('status').innerText = 'Offline';
+                // document.getElementById('status').innerText = 'Offline';
 
             } else {
-                document.getElementById('status').innerText = 'Online';
+                // document.getElementById('status').innerText = 'Online';
                 statusElement.parentElement.querySelector('.bg-danger').classList.remove('bg-danger');
                 statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-success');
             }
@@ -87,7 +87,9 @@ export class Profile extends BaseClass {
 
     generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
+        // Clear previous content
         friendListContainer.innerHTML = '';
+    
         const ul = document.createElement('ul');
         friends.forEach(friend => {
             const li = document.createElement('li');
@@ -99,6 +101,7 @@ export class Profile extends BaseClass {
             li.textContent = friendInfo;
             ul.appendChild(li);
         });
+    
         friendListContainer.appendChild(ul);
     }
 
@@ -130,7 +133,6 @@ export class Profile extends BaseClass {
     updateAccordionContent = (user) => {
         const accordionBody = document.getElementById('friendList');
         this.getFriendList(user);
-        accordionBody.innerHTML = `<b>I H8 U,</b> u FUCKING BOOTSTRAP BITCh.`;
 
     }
 
@@ -174,8 +176,9 @@ export class Profile extends BaseClass {
             document.getElementById('email').innerText = currentUser.email;
             document.getElementById('bio').innerText = currentUser.bio;
             document.getElementById('nb').innerText = currentUser.id;
-            this.updateAccordionContent(currentUser);
             this.displayStatus(currentUser);
+            this.updateAccordionContent(currentUser);
+            
         })
         .catch(error => console.error('Error:', error));
     }
@@ -185,42 +188,89 @@ export class Profile extends BaseClass {
     }
 
     getHtmlForMain() {
-        return `<div class="container">
-        <p>
-
-        <div class="accordion accordion-flush" id="accordionFlushExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-              FRIENDLIST
-            </button>
-          </h2>
-          <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-            <div class="accordion-body" id="friendList">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
-          </div>
-        </div>
-       
-
-        <div class="position-relative">
-        <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle">
-        </span>
-        <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
-        </div>
-
-		<h1><div class="row" id="username"></div></h1>
-		<div class="row" id="pic"></div>
-		<div class="row" id="nb"></div>
-		<div class="row" id="email"></div>
-		<div class="row" id="bio"></div>
-        <div class="row" id="friendRequest"></div>
-        <div class="row" id="friendlist"> </div>
-        <div class="row" id="matchHis">MATCH HISTORY</div>
-        <div class="row" id="matchHistory">STATS (wins, losses)</div>
-        <div class="row" id="status"><div>
+        return `
         
+    <div class="container text-center">
+        <div class="row align-items-start">
+            <div class="col">
+            
+            One of three columns
+            <h1>Stats</h1>
+            </div>
 
-    </div>`
+
+            <div class="col" id="centerCol">
+            <div class="row position-absolute">
+            <span class="position-absolute top-10 start-2 p-2 bg-danger border border-light rounded-circle" id="status">
+            </span>
+            </div> 
+            <h1><div class="row justify-content-center" id="username" ></div></h1>
+            <div class="row justify-content-center">
+                    <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+            </div>
+           
+            
+            
+            <div class="row justify-content-center" id="nb"></div>
+            <div class="row justify-content-center" id="email"></div>
+            <div class="row justify-content-center" id="bio"></div>
+            <div class="row justify-content-center" id="pic"></div>
+            <div class="row justify-content-center" id="friendRequest"></div>
+            
+            
+            </div>
+
+            
+            <div class="col">
+                <div class="row">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                Friends
+                            </button>
+                        </div>
+                    <div class="collapse" id="collapseExample">
+                        <div class="card card-body" id="friendList">
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ `
     }
 }
 
+       
+// {/* <div class="container">
+// <p>
+// <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+//     Friends
+// </button>
+// </p>
+// <div class="collapse" id="collapseExample">
+// <div class="card card-body" id="friendList">
+//     Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+// </div>
+// </div>
 
+
+// <div class="position-relative">
+// <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle">
+// </span>
+// <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+// </div>
+
+// <h1><div class="row" id="username"></div></h1>
+// <div class="row" id="pic"></div>
+// <div class="row" id="nb"></div>
+// <div class="row" id="email"></div>
+// <div class="row" id="bio"></div>
+// <div class="row" id="friendRequest"></div>
+// <div class="row" id="friendlist"> </div>
+// <div class="row" id="matchHis">MATCH HISTORY</div>
+// <div class="row" id="matchHistory">STATS (wins, losses)</div>
+// <div class="row" id="status"><div>
+
+
+// </div> */}

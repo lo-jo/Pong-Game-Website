@@ -70,10 +70,8 @@ class FriendshipView(APIView):
         return Friendship.objects.filter(sender=user) | Friendship.objects.filter(recipient=user)
     #Show friend list of the target user 
     def get(self, request, username, *args, **kwargs):
-        print("THIS IS SUPPOSED TO B DELETED", username)
         user = get_object_or_404(User, username=username)
         usernombre = user.username
-        print("THIS IS SUPPOSED TO B DELETED", user.username)
         friendships = self.get_queryset(username=user.username)
         serializer = FriendUsernameSerializer(friendships, many=True)  # Use many=True since it's a queryset
 
