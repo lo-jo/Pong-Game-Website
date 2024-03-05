@@ -58,7 +58,7 @@ export class Navbar {
                                 <a href="/profile">Profile</a>
                                 <a href="/dashboard">Game</a>
                                 <a href="/chat">Chat</a>
-                                <a href="/#">Log out</a>
+                                <a href="/logout">Log out</a>
                                 </nav>`;
         } else {
             navbar.innerHTML = `<nav id="nav-bar">

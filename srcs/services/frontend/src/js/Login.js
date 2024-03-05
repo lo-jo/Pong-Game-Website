@@ -1,7 +1,7 @@
 import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
 import jwt_decode from 'jwt-decode';
-import { router } from './Router.js';
+
 
 export class Login extends BaseClass
 {
