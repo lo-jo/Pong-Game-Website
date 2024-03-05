@@ -1,9 +1,11 @@
 import { BaseClass } from './BaseClass'
+import { router } from './Router'
 import { Navbar } from './Navbar';
 
 export class Dashboard extends BaseClass {
     constructor() {
         super();
+        this.initWebSocket();
         this.navbar = new Navbar();
         // Set up click event listener on the document
         document.addEventListener('click', this.handleButtonClick.bind(this));
@@ -18,29 +20,28 @@ export class Dashboard extends BaseClass {
         }
     }
 
-    access(){
-        const jwtAccess = localStorage.getItem('token');
-        const url = 'http://localhost:8000/pong/';
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 401) {
-                    console.error('Unauthorized access. Please log in.');
-                    return false
-                } else {
-                    console.error('Error:', response.status);
-                }
-            }
-            return true;
-        })
-        .catch(error => console.error('Error:', error));
+    initWebSocket() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/pong/match`;
+    
+        const socket = new WebSocket(wsUrl);
+    
+        socket.onopen = function() {
+            console.log('WebSocket connection established.');
+        };
+    
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log('Mensaje recibido desde el servidor:', data);
+        };
+    
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    
+        socket.onclose = function() {
+            console.log('WebSocket connection closed.');
+        };
     }
 
     // Method to join a match
@@ -57,21 +58,17 @@ export class Dashboard extends BaseClass {
             },
         };
 
-        // Make the request using the Fetch API
         fetch(url, options)
             .then(response => {
-                // Handle response from the backend if necessary
                 if (!response.ok) {
                     throw new Error('The request was not successful');
                 }
-                return response.json(); // or response.text(), etc., depending on the response type
+                return response.json();
             })
             .then(data => {
-                // Do something with the data received from the backend if necessary
                 console.log('Backend response:', data);
             })
-            .catch(error => {     
-                // Handle request errors
+            .catch(error => {
                 console.error('Error making request:', error);
             });
     }
@@ -116,7 +113,7 @@ export class Dashboard extends BaseClass {
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return `<div id="main">
+        return `<div id="dashboard">
                     <div id="game-actions">
                         <div class="game-action">
                             <button id="launch-game-button" type="button">PLAY A MATCH</button>
