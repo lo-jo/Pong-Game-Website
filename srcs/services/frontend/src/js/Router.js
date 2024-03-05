@@ -6,6 +6,7 @@ import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 import { PongGame } from './Game.js';
 import { ErrorClass } from './ErrorClass.js'
+import { Chat } from './Chat.js';
 
 export const routes = {
     '/' : {
@@ -45,6 +46,11 @@ export const routes = {
         css : './css/game.css',
         auth : true
     },
+    '/chat' : {
+        path : '/chat',
+        view : Chat,
+        auth : true
+    }
 }
 
 // Use the history API to prevent full page reload

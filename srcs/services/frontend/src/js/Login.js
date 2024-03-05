@@ -20,6 +20,7 @@ export class Login extends BaseClass
     handleButtonClick(event) {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
+        // const protocol = window.PROTOCOL;
 
         fetch('http://localhost:8000/users/token/', {
             method: 'POST',
@@ -39,7 +40,9 @@ export class Login extends BaseClass
                 let jwtToken = localStorage.getItem('token');
                 let decoded_token = jwt_decode(jwtToken);
                 alert(decoded_token.user_id);
-                document.getElementById('app').innerHTML = "successfully logged in"
+                // this.router('/profile');
+                document.getElementById('app').innerHTML = `successfully logged in <a href="/profile">Profile</a>`
+                // document.location.href = '/profile';
                 this.connectUser();
                 // Redirect to another page or perform additional actions
                 history.pushState({}, '', '/dashboard');
@@ -58,12 +61,13 @@ export class Login extends BaseClass
         const token = localStorage.getItem('token');
         const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
         onlineSocket.onopen = function (e) {
-             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
+            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
             console.log('Socket successfully connected.');
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
         };
+
     }
 
     getHtmlForHeader() {

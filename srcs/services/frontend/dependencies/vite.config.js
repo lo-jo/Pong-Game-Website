@@ -3,6 +3,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: 'src',
+  define: {
+    'process.env': process.env
+  },
   server: {
     // https: {
     //   key: '/etc/ssl/private/selfsigned.key',

@@ -2,19 +2,21 @@ import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
 
 class User{
-    constructor(username, pic, id, email, bio, picpath) {
+    constructor(username, pic, id, email, bio) {
         this.username = username;
         this.pic = pic;
         this.id = id;
         this.email = email;
         this.bio = bio;
-        this.picpath = picpath;
       }
-      getProfilePicPath() {
+    getProfilePicPath() {
         return "http://localhost:8000" + this.pic;
     }
-      getFriendReq() {
+    getFriendReq() {
         return "http://localhost:8000/users/friendship/" + this.username + "/";
+    }
+    getStatus() {
+        return "http://localhost:8000/notify/" + this.username + "/";
     }
 }
 
@@ -52,9 +54,42 @@ export class Profile extends BaseClass {
         });
     }
 
+    displayStatus = (user) =>  {
+        const jwtAccess = localStorage.getItem('token');
+    
+        fetch(user.getStatus(), {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error:', response.status);
+                document.getElementById('status').innerText = 'Offline';
+                return; 
+            }
+            return response.json();
+        })
+        .then(data => {
+            const statusElement = document.getElementById('status');
+            if (data.hasOwnProperty('error')) {
+                document.getElementById('status').innerText = 'Offline';
+
+            } else {
+                document.getElementById('status').innerText = 'Online';
+                statusElement.parentElement.querySelector('.bg-danger').classList.remove('bg-danger');
+                statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-success');
+            }
+        })
+        .catch(error => console.error('Error fetching status:', error));
+    }
+
     displayProfile() {
         const jwtAccess = localStorage.getItem('token');
     
+        fetch('http://localhost:8000/users/profile/', {
         fetch('http://localhost:8000/users/profile/', {
             method: 'GET',
             headers: {
@@ -81,19 +116,18 @@ export class Profile extends BaseClass {
             friendRequestLink.innerText = 'Send Friend Request';
             friendRequestLink.addEventListener('click', (event) => {
                 event.preventDefault();
-                addFriend(currentUser); // Pass user ID or any necessary data to the function
+                this.addFriend(currentUser); // Pass user ID or any necessary data to the function
             });
     
             // Append the link to the 'friendRequest' div
             document.getElementById('friendRequest').appendChild(friendRequestLink);
-         
-    
           // Display attributes
             document.getElementById('username').innerText = currentUser.username;
             document.getElementById("pic").src = currentUser.getProfilePicPath();
             document.getElementById('email').innerText = currentUser.email;
             document.getElementById('bio').innerText = currentUser.bio;
             document.getElementById('nb').innerText = currentUser.id;
+            this.displayStatus(currentUser);
         })
         .catch(error => console.error('Error:', error));
     }
@@ -104,16 +138,24 @@ export class Profile extends BaseClass {
 
     getHtmlForMain() {
         return `<div class="container">
-			        <img src="" id="pic" class="avatar">
-                    <h1><div class="row" id="username"></div></h1>
-                    <div class="row" id="pic"></div>
-                    <div class="row" id="nb"></div>
-                    <div class="row" id="email"></div>
-                    <div class="row" id="bio"></div>
-                    <div class="row" id="friendRequest"></div>
-                    <div class="row" id="friendlist"> DISPLAY FRIEND LIST</div>
-                    <div class="row" id="matchHistory">MATCH HISTORY</div>
-                    <div class="row" id="matchHistory">STATS (wins, losses)</div>
-                </div>`
+
+        <div class="position-relative">
+        <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle">
+        </span>
+        <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+        </div>
+
+		<h1><div class="row" id="username"></div></h1>
+		<div class="row" id="pic"></div>
+		<div class="row" id="nb"></div>
+		<div class="row" id="email"></div>
+		<div class="row" id="bio"></div>
+        <div class="row" id="friendRequest"></div>
+        <div class="row" id="friendlist"> DISPLAY FRIEND LIST</div>
+        <div class="row" id="matchHistory">MATCH HISTORY</div>
+        <div class="row" id="matchHistory">STATS (wins, losses)</div>
+        <div class="row" id="status"><div>
+
+    </div>`
     }
 }
