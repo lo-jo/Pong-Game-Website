@@ -1,8 +1,10 @@
 import { BaseClass } from './BaseClass'
+import { router } from './Router'
 
 export class Dashboard extends BaseClass {
     constructor() {
         super();
+        this.initWebSocket();
         // Set up click event listener on the document
         document.addEventListener('click', this.handleButtonClick.bind(this));
     }
@@ -12,10 +14,33 @@ export class Dashboard extends BaseClass {
             this.launchGame();
         }
     }
+
+    initWebSocket() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/pong/match`;
+    
+        const socket = new WebSocket(wsUrl);
+    
+        socket.onopen = function() {
+            console.log('WebSocket connection established.');
+        };
+    
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log('Mensaje recibido desde el servidor:', data);
+        };
+    
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    
+        socket.onclose = function() {
+            console.log('WebSocket connection closed.');
+        };
+    }
     
     // Method to join a match
     launchGame() {
-
         const url = 'http://localhost:8000/pong/join_match/';
 
         const jwtAccess = localStorage.getItem('token');
@@ -54,7 +79,7 @@ export class Dashboard extends BaseClass {
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return `<div id="main">
+        return `<div id="dashboard">
                     <div id="game-actions">
                         <div class="game-action">
                             <button id="lauch-game-button" type="button">PLAY A MATCH</button>

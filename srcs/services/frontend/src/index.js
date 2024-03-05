@@ -1,111 +1,37 @@
 import 'bootstrap/dist/css/bootstrap.css';
 /*Import classes*/
-import { LandingPage } from './js/LandingPage.js'
-import { Login } from './js/Login.js'
-import { Register } from './js/Register.js'
-import { Profile } from './js/Profile.js'
-import { Settings } from './js/Settings.js'
-import { Dashboard } from './js/Dahsboard.js';
-import { PongGame } from './js/Game.js';
-import { ErrorClass } from './js/ErrorClass.js'
+import { navigateTo } from './js/Router.js'
 
-const routes = {
-    '/' : {
-        path : '/',
-        view : LandingPage,
-        auth : false
-    },
-    '/dashboard' : {
-        path : '/dashboard',
-        view : Dashboard,
-        css : './css/dashboard.css',
-        auth : true
-    },
-    '/login' : {
-        path : '/login',
-        view : Login,
-        auth : false
-    },
-    '/register' : {
-        path : '/register',
-        view : Register,
-        auth : false
-    },
-    '/profile' : {
-        path : '/profile',
-        view : Profile,
-        auth : true
-    },
-    '/settings' : {
-        path : '/settings',
-        view : Settings,
-        auth : true
-    },
-    '/game' : {
-        path : '/game',
-        view : PongGame,
-        css : './css/game.css',
-        auth : true
-    },
-}
-
-const router = () => {
-    const path = window.location.pathname;
-    const viewObject = routes[path];
-
-    if (!viewObject) {
-        const errorView = new ErrorClass();
-        document.getElementById('main').innerHTML = errorView.getHtmlForMainNotFound();
-        return;
-    }
-
-    if (viewObject.auth === true) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            const errorView = new ErrorClass();
-            document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-            document.getElementById('main').innerHTML = errorView.getHtmlForMain();
-            return;
-        }
-    }
-
-    const view = new viewObject.view();
-
-    if (viewObject.css) {
-        const styleCss = document.createElement('link');
-        styleCss.rel = 'stylesheet';
-        styleCss.href = viewObject.css;
-        document.head.appendChild(styleCss);
-    }
-
-    document.getElementById('header').innerHTML = view.getHtmlForHeader();
-    document.getElementById('main').innerHTML = view.getHtmlForMain();
-};
-
-// Initial route on page load
-document.addEventListener('DOMContentLoaded', () => {
-    router();
-
-    // Retrieve the initial state from the history
-    // const initialState = window.history.state || {};
-    // // Use the initial state to render the correct view
-    // if (initialState.view) {
-    //     renderView(initialState.view);
-    // } else {
-    //     router();
-    // }
-});
-
-// CHECK IF THIS IS NECESSARRY AT SOME POINT
-// const navigateTo = (path) => {
-//     history.pushState(null, null, path);
+/////////////////////////////////////////////////////////////
+// // TO BE FIXED: full page reload when URL is change directly
+// const handleLinkClick = (event) => {
+//     event.preventDefault();
+//     const href = event.target.getAttribute('href');
+//     history.pushState({}, '', href);
 //     router();
 // };
 
-// // Handle navigation through links
-// document.addEventListener('click', (e) => {
-//     if (e.target.tagName === 'A') {
-//         e.preventDefault();
-//         navigateTo(e.target.href);
-//     }
+// document.addEventListener('DOMContentLoaded', () => {
+//     router();
+
+//     document.body.addEventListener('click', (event) => {
+//         if (event.target.tagName === 'A') {
+//             // console.log("HERE WE MADE CLICK");
+//             handleLinkClick(event);
+//         }
+//     });
+
+//     window.addEventListener('popstate', router);
 // });
+
+///////////////////////////////////////////////////////
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') {
+            event.preventDefault();
+            console.log('navbar button clicked: ', event.target);
+            navigateTo(event.target);
+        }
+    });
+});
