@@ -56,7 +56,7 @@ export class Navbar {
         if (isAuthenticated) {
             navbar.innerHTML = `<nav id="nav-bar">
                                 <a href="/profile">Profile</a>
-                                <a href="/dashboard">Game</a>
+                                <a href="/dashboard">Dashboard</a>
                                 <a href="/chat">Chat</a>
                                 <a href="/#">Log out</a>
                                 </nav>`;

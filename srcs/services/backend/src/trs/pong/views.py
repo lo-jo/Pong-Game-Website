@@ -61,12 +61,16 @@ class MatchDetailView(RetrieveAPIView):
 #             serializer = MatchSerializer(new_match)
 #             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+# Message
+# create_join -> Create and join match
+# join_play -> Join and start the game
 
 class JoinMatchView(APIView):
     permission_classes = [IsAuthenticated]
-    # print("TRYING TO CREATE MATCH")
+
     def post(self, request):
         try:
+            # Getting latest match posted
             latest_match = Match.objects.latest('created_at')
             if latest_match.user_1 != request.user:
                 print("You are going to join the last match created")
@@ -79,7 +83,7 @@ class JoinMatchView(APIView):
                     'match_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'An existing match has been updated',
+                        'message': 'join_play',
                         'match_id': latest_match.id,
                     }
                 )
@@ -96,7 +100,7 @@ class JoinMatchView(APIView):
                     'match_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'A new match has been created',
+                        'message': 'create_join',
                         'match_id': new_match.id,
                     }
                 )
@@ -113,7 +117,7 @@ class JoinMatchView(APIView):
                 'match_group',
                 {
                     'type': 'send_match_notification',
-                    'message': 'A new match has been created',
+                    'message': 'create_join',
                     'match_id': new_match.id,
                 }
             )

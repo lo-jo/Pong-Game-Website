@@ -20,21 +20,50 @@ export class Dashboard extends BaseClass {
         }
     }
 
+    getWaitingForGameHtml()
+    {
+        return `<div class="h-25 spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>`
+    }
+
     initWebSocket() {
+        console.log('initWebSocket call()');
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws/pong/match`;
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match`;
     
+        console.log(wsUrl);
         const socket = new WebSocket(wsUrl);
-    
+
         socket.onopen = function() {
             console.log('WebSocket connection established.');
         };
     
-        socket.onmessage = function(event) {
+        // socket.onmessage = function(event) {
+        //     const data = JSON.parse(event.data);
+        //     console.log('Mensaje recibido desde el servidor:', data);
+        //     if (data.message == 'create_join')
+        //     {
+        //         console.log("Waiting for someone");
+        //         document.getElementById('app').innerHTML = this.getWaitingForGameHtml();
+        //     }
+        //     else if (data.message == 'join_play')
+        //     {
+        //         console.log("The match must be start");
+        //     }
+        // };
+
+        socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log('Mensaje recibido desde el servidor:', data);
+            if (data.message == 'create_join') {
+                console.log("Waiting for someone");
+                document.getElementById('app').innerHTML = this.getWaitingForGameHtml();
+            } else if (data.message == 'join_play') {
+                console.log("The match must be start");
+            }
         };
-    
+        
         socket.onerror = function(error) {
             console.error('WebSocket error:', error);
         };
@@ -106,6 +135,7 @@ export class Dashboard extends BaseClass {
         //         console.error('Error making request:', error);
         //     });
     }
+
 
     getHtmlForHeader(){
         return this.navbar.getHtml();
