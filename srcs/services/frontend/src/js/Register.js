@@ -49,8 +49,8 @@ export class Register extends BaseClass
             console.log("data: ", data);
             document.getElementById('app').innerHTML = "successfully signed up";
             // Redirect to another page or perform additional actions
-            history.pushState({}, '', '/dashboard');
-            router();
+            // history.pushState({}, '', '/dashboard');
+            // router();
         })
         .catch(error => {
             console.error('ERROR : ', error);

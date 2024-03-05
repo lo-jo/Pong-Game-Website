@@ -45,8 +45,8 @@ export class Login extends BaseClass
                 // document.location.href = '/profile';
                 this.connectUser();
                 // Redirect to another page or perform additional actions
-                history.pushState({}, '', '/dashboard');
-                router();
+                // history.pushState({}, '', '/dashboard');
+                // router();
             } else {
                 document.getElementById('app').innerHTML = "Invalid Credentials"
             }

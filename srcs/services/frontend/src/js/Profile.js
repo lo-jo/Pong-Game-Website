@@ -136,8 +136,7 @@ export class Profile extends BaseClass {
 
     displayProfile() {
         const jwtAccess = localStorage.getItem('token');
-    
-        fetch('http://localhost:8000/users/profile/', {
+
         fetch('http://localhost:8000/users/profile/', {
             method: 'GET',
             headers: {

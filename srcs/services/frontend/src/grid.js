@@ -83,7 +83,7 @@ function createTunnel() {
 
 
   const mainDiv = document.createElement("div");
-  mainDiv.setAttribute('id', 'main')
+  mainDiv.setAttribute('id', 'app')
   // mainDiv.style.transformStyle = "preserve-3d";
   // mainDiv.style.position = "absolute";
   // mainDiv.style.top = "calc(50%)";
@@ -105,7 +105,7 @@ function createTunnel() {
 }
 
 function initializeTunnel() {
-  const rootElement = document.getElementById("app");
+  const rootElement = document.getElementById("body");
   rootElement.appendChild(createTunnel());
 }
 
