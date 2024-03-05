@@ -39,9 +39,9 @@ body {
   background-color: #7000ff;
   top: calc(50%);
   left: calc(50%);
-  transform: translate(-50%, -36%);
+  transform: translate(-50%, -30%);
   width: 51vw;
-  height: 51vh;
+  height: 52.2vh;
 }
 
 
