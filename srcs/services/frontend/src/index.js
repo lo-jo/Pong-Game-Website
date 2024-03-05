@@ -1,5 +1,6 @@
 import { initGameTwoD } from './js/game.js';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/js/dist/collapse';
 /*Import classes*/
 // import { LandingPage } from './js/LandingPage.js'
 // import { Login } from './js/Login.js'
