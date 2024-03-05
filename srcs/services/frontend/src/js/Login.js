@@ -63,8 +63,9 @@ export class Login extends BaseClass
 
     getHtmlForHeader() {
         return `<nav id="nav-bar">
-        <a href="/register">Sign up</a>
+                    <a href="/register">Sign up</a>
                     Log in
+                    <a href="/dashboard">Dashboard</a>
                     <a href="/profile">Profile</a>
                 </nav>`;
     }

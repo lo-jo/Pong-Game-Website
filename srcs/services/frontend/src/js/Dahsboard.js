@@ -4,7 +4,7 @@ export class Dashboard extends BaseClass {
     constructor() {
         super();
         // Set up click event listener on the document
-        // document.addEventListener('click', this.handleButtonClick.bind(this));
+        document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
     handleButtonClick(event) {
@@ -12,59 +12,33 @@ export class Dashboard extends BaseClass {
             this.launchGame();
         }
     }
-
-    access(){
-        const jwtAccess = localStorage.getItem('token');
-        const url = 'http://localhost:8000/pong/';
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                if (response.status === 401) {
-                    console.error('Unauthorized access. Please log in.');
-                    return false
-                } else {
-                    console.error('Error:', response.status);
-                }
-            }
-            return true;
-        })
-        .catch(error => console.error('Error:', error));
-    }
     
     // Method to join a match
     launchGame() {
-        const url = 'http://localhost:8000//matches/join_match/';
+
+        const url = 'http://localhost:8000/pong/join_match/';
+
+        const jwtAccess = localStorage.getItem('token');
 
         const options = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ /* Request data */ })
         };
 
-        // Make the request using the Fetch API
         fetch(url, options)
             .then(response => {
-                // Handle response from the backend if necessary
                 if (!response.ok) {
                     throw new Error('The request was not successful');
                 }
-                return response.json(); // or response.text(), etc., depending on the response type
+                return response.json();
             })
             .then(data => {
-                // Do something with the data received from the backend if necessary
                 console.log('Backend response:', data);
             })
-            .catch(error => {     
-                // Handle request errors
+            .catch(error => {
                 console.error('Error making request:', error);
             });
     }
