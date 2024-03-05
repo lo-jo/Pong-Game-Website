@@ -1,9 +1,11 @@
-import { BaseClass } from './BaseClass'
+import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
 
 export class LandingPage extends BaseClass
 {
     constructor() {
         super();
+        this.navbar = new Navbar();
     }
 
     run() {
@@ -11,10 +13,7 @@ export class LandingPage extends BaseClass
     }
 
     getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    <a href="/register">Sign up</a>
-                    <a href="/login">Log in</a>
-                </nav>`;
+        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

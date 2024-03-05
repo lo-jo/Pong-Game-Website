@@ -1,10 +1,13 @@
-import { BaseClass } from './BaseClass'
+import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
 import jwt_decode from 'jwt-decode';
+import { router } from './Router.js';
 
 export class Login extends BaseClass
 {
     constructor() {
         super();
+        this.navbar = new Navbar();
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
@@ -39,6 +42,8 @@ export class Login extends BaseClass
                 document.getElementById('app').innerHTML = "successfully logged in"
                 this.connectUser();
                 // Redirect to another page or perform additional actions
+                history.pushState({}, '', '/dashboard');
+                router();
             } else {
                 document.getElementById('app').innerHTML = "Invalid Credentials"
             }
@@ -51,7 +56,7 @@ export class Login extends BaseClass
 
     connectUser() {
         const token = localStorage.getItem('token');
-        const onlineSocket = new WebSocket(`wss://localhost:8000/ws/notify/?token=${token}`);
+        const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
         onlineSocket.onopen = function (e) {
              onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
             console.log('Socket successfully connected.');
@@ -62,20 +67,16 @@ export class Login extends BaseClass
     }
 
     getHtmlForHeader() {
-        return `<nav id="nav-bar">
-        <a href="/register">Sign up</a>
-                    Log in
-                    <a href="/profile">Profile</a>
-                </nav>`;
+        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {
         return `<h1>Login</h1>
                 <form id="loginForm">
                     <label for="username">Username:</label>
-                    <input class="form-control form-control-sm" type="text" id="username" name="username" required><br>
+                    <input class="form-control form-control-sm" type="text" id="username" name="username" required autocomplete="username"><br>
                     <label for="password">Password:</label>
-                    <input class="form-control form-control-sm" type="password" id="password" name="password" required><br>
+                    <input class="form-control form-control-sm" type="password" id="password" name="password" required autocomplete="current-password"><br>
                     <button type="submit" id="loginButton" class="btn btn-dark btn-sm">Sign-in</button>
                 </form>`
     }

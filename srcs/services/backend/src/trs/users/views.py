@@ -10,6 +10,8 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+#TEST CHECK_AUTHENTICATION
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class AllUsersView(APIView):
@@ -132,3 +134,10 @@ class UserProfileView(RetrieveAPIView):
             return User.objects.get(pk=id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+class CheckAuthentication(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        return Response({'authenticated': True})

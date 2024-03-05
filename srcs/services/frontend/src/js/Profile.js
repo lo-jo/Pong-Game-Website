@@ -1,4 +1,5 @@
-import { BaseClass } from './BaseClass'
+import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
 
 class User{
     constructor(username, pic, id, email, bio, picpath) {
@@ -20,6 +21,7 @@ class User{
 export class Profile extends BaseClass {
     constructor() {
         super();
+        this.navbar = new Navbar();
         this.displayProfile();
     }
 
@@ -97,11 +99,7 @@ export class Profile extends BaseClass {
     }
 
     getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    PROFILE
-                    <a href="/">HOME</a>
-                    <a href="/settings">SETTINGS</a>
-                </nav>`;
+        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

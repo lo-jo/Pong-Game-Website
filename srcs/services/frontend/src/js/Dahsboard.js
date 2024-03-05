@@ -1,14 +1,16 @@
 import { BaseClass } from './BaseClass'
+import { Navbar } from './Navbar';
 
 export class Dashboard extends BaseClass {
     constructor() {
         super();
+        this.navbar = new Navbar();
         // Set up click event listener on the document
-        // document.addEventListener('click', this.handleButtonClick.bind(this));
+        document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
     handleButtonClick(event) {
-        if (event.target.id === 'lauch-game-button') {
+        if (event.target.id === 'launch-game-button') {
             this.launchGame();
         }
     }
@@ -37,10 +39,10 @@ export class Dashboard extends BaseClass {
         })
         .catch(error => console.error('Error:', error));
     }
-    
+
     // Method to join a match
     launchGame() {
-        const url = 'http://localhost:8000//matches/join_match/';
+        const url = 'http://localhost:8000/pong/join_match/';
 
         const options = {
             method: 'POST',
@@ -70,12 +72,7 @@ export class Dashboard extends BaseClass {
     }
 
     getHtmlForHeader(){
-        return `<nav id="nav-bar">
-                    <a href="/profile">Profile</a>
-                    <a href="/game">Game</a>
-                    <a href="/chat">Chat</a>
-                    <a href="/logout">Log out</a>
-                </nav>`
+        return this.navbar.getHtml();
     }
 
     /*Method to get the HTML of the dashboard*/
@@ -83,7 +80,7 @@ export class Dashboard extends BaseClass {
         return `<div id="main">
                     <div id="game-actions">
                         <div class="game-action">
-                            <button id="lauch-game-button" type="button">PLAY A MATCH</button>
+                            <button id="launch-game-button" type="button">PLAY A MATCH</button>
                         </div>
                         <div class="game-action">
                             <button type="button">CREATE A TOURNAMENT</button>

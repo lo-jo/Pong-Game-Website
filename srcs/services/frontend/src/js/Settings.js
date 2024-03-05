@@ -1,8 +1,10 @@
-import { BaseClass } from './BaseClass'
+import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
 
 export class Settings extends BaseClass {
     constructor() {
         super();
+        this.navbar = new Navbar();
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
     handleDocumentClick(event) {
@@ -97,11 +99,7 @@ export class Settings extends BaseClass {
     // }
 
     getHtmlForHeader() {
-        return `<nav id="nav-bar">
-        <a href="/register">Register</a>
-                    Log in
-        <a href="/profile">Profile</a>
-                </nav>`;
+        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

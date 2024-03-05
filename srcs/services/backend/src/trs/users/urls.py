@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import UserView, RegisterUserView, AllUsersView, UpdateProfileView, FriendshipView, UserDetailView, UserProfileView
+from .views import UserView, RegisterUserView, AllUsersView, UpdateProfileView, FriendshipView, UserDetailView, UserProfileView, CheckAuthentication
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -19,4 +19,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('update_profile/<int:pk>/', UpdateProfileView.as_view(), name='update_profile'),
     path('friendship/<str:username>/', FriendshipView.as_view(), name='friendship'),
+    # TEST is authenticated for navbar
+    path('check-authentication/', CheckAuthentication.as_view(), name='check-authentication'),
 ]

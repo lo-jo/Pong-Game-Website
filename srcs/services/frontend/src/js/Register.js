@@ -1,9 +1,12 @@
-import { BaseClass } from './BaseClass'
+import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
+import { router } from './Router';
 
 export class Register extends BaseClass
 {
     constructor() {
         super();
+        this.navbar = new Navbar();
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
@@ -45,6 +48,9 @@ export class Register extends BaseClass
             console.log('Succesfully signed up', data);
             console.log("data: ", data);
             document.getElementById('app').innerHTML = "successfully signed up";
+            // Redirect to another page or perform additional actions
+            history.pushState({}, '', '/dashboard');
+            router();
         })
         .catch(error => {
             console.error('ERROR : ', error);
@@ -52,23 +58,20 @@ export class Register extends BaseClass
     }
 
     getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    Sign-up
-                    <a href="/login">Log in</a>
-                </nav>`;
+        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {
         return `<h1>Sign-up </h1><div class="form-group">
         <form id="loginForm">
             <label for="username">Username:</label>
-            <input class="form-control form-control-sm" type="text" id="username" name="username" required placeholder="Enter username">
+            <input class="form-control form-control-sm" type="text" id="username" name="username" required placeholder="Enter username" autocomplete="username">
             <br>
             <label for="email">E-mail:</label>
             <input class="form-control form-control-sm" type="email" id="email" name="email" required placeholder="Enter e-mail">
             <br>
             <label for="password">Password:</label>
-            <input class="form-control form-control-sm" type="password" id="password" name="password" required placeholder="Password">
+            <input class="form-control form-control-sm" type="password" id="password" name="password" required placeholder="Password" autocomplete="current-password">
             <br>
             <button type="submit" id="register" class="btn btn-dark btn-sm">Sign-up</button>
         </form>

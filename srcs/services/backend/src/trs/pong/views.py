@@ -31,7 +31,7 @@ class MatchDetailView(RetrieveAPIView):
 
 class JoinMatchView(APIView):
     permission_classes = [IsAuthenticated]
-
+    # print("TRYING TO CREATE MATCH")
     def post(self, request):
         try:
             # Try to get the last match available
@@ -57,5 +57,5 @@ class JoinMatchView(APIView):
             new_match.save()
             serializer = MatchSerializer(new_match)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+    
        
