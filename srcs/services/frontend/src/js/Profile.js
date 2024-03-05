@@ -1,5 +1,6 @@
 import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
+// import 'bootstrap/js/dist/collapse';
 
 class User{
     constructor(username, pic, id, email, bio) {
@@ -26,7 +27,6 @@ export class Profile extends BaseClass {
         this.navbar = new Navbar();
         this.displayProfile();
     }
-
     addFriend = (user) => {
         const jwtAccess = localStorage.getItem('token');
         fetch(user.getFriendReq(), {
@@ -53,7 +53,6 @@ export class Profile extends BaseClass {
             alert("ERRRRRRROR");
         });
     }
-
     displayStatus = (user) =>  {
         const jwtAccess = localStorage.getItem('token');
     
@@ -86,6 +85,55 @@ export class Profile extends BaseClass {
         .catch(error => console.error('Error fetching status:', error));
     }
 
+    generateFriendElements(friends) {
+        const friendListContainer = document.getElementById('friendList');
+        friendListContainer.innerHTML = '';
+        const ul = document.createElement('ul');
+        friends.forEach(friend => {
+            const li = document.createElement('li');
+            let friendInfo = '';
+            for (const property in friend) {
+                friendInfo += `${friend[property]}, `;
+            }
+            friendInfo = friendInfo.slice(0, -2);
+            li.textContent = friendInfo;
+            ul.appendChild(li);
+        });
+        friendListContainer.appendChild(ul);
+    }
+
+    getFriendList = (user) => {
+        const jwtAccess = localStorage.getItem('token');
+        fetch(user.getFriendReq(), {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle successful login, e.g., store token in local storage;
+            console.log("data: ", data);
+            this.generateFriendElements(data);
+        })
+        .catch(error => {
+            console.error('Error fetching friendlist : ', error);
+        });
+    }
+
+    updateAccordionContent = (user) => {
+        const accordionBody = document.getElementById('friendList');
+        this.getFriendList(user);
+        accordionBody.innerHTML = `<b>I H8 U,</b> u FUCKING BOOTSTRAP BITCh.`;
+
+    }
+
     displayProfile() {
         const jwtAccess = localStorage.getItem('token');
     
@@ -109,6 +157,7 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
+
             const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
             
             const friendRequestLink = document.createElement('a');
@@ -118,7 +167,6 @@ export class Profile extends BaseClass {
                 event.preventDefault();
                 this.addFriend(currentUser); // Pass user ID or any necessary data to the function
             });
-    
             // Append the link to the 'friendRequest' div
             document.getElementById('friendRequest').appendChild(friendRequestLink);
           // Display attributes
@@ -127,6 +175,7 @@ export class Profile extends BaseClass {
             document.getElementById('email').innerText = currentUser.email;
             document.getElementById('bio').innerText = currentUser.bio;
             document.getElementById('nb').innerText = currentUser.id;
+            this.updateAccordionContent(currentUser);
             this.displayStatus(currentUser);
         })
         .catch(error => console.error('Error:', error));
@@ -138,6 +187,20 @@ export class Profile extends BaseClass {
 
     getHtmlForMain() {
         return `<div class="container">
+        <p>
+
+        <div class="accordion accordion-flush" id="accordionFlushExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+              FRIENDLIST
+            </button>
+          </h2>
+          <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+            <div class="accordion-body" id="friendList">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
+          </div>
+        </div>
+       
 
         <div class="position-relative">
         <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle">
@@ -151,11 +214,14 @@ export class Profile extends BaseClass {
 		<div class="row" id="email"></div>
 		<div class="row" id="bio"></div>
         <div class="row" id="friendRequest"></div>
-        <div class="row" id="friendlist"> DISPLAY FRIEND LIST</div>
-        <div class="row" id="matchHistory">MATCH HISTORY</div>
+        <div class="row" id="friendlist"> </div>
+        <div class="row" id="matchHis">MATCH HISTORY</div>
         <div class="row" id="matchHistory">STATS (wins, losses)</div>
         <div class="row" id="status"><div>
+        
 
     </div>`
     }
 }
+
+
