@@ -3,7 +3,7 @@ import { Login } from './Login.js'
 import { Register } from './Register.js'
 import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
-import { Dashboard } from './Dahsboard.js';
+import { Dashboard } from './Dashboard.js';
 import { PongGame } from './Game.js';
 import { ErrorClass } from './ErrorClass.js'
 
