@@ -1,6 +1,5 @@
 import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
-// import 'bootstrap/js/dist/collapse';
 
 class User{
     constructor(username, pic, id, email, bio) {
@@ -87,7 +86,6 @@ export class Profile extends BaseClass {
 
     generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
-        // Clear previous content
         friendListContainer.innerHTML = '';
     
         const ul = document.createElement('ul');
@@ -121,7 +119,6 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
-            // Handle successful login, e.g., store token in local storage;
             console.log("data: ", data);
             this.generateFriendElements(data);
         })
@@ -162,15 +159,13 @@ export class Profile extends BaseClass {
             const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
             
             const friendRequestLink = document.createElement('a');
-            friendRequestLink.href = '#';  // Set the href as needed
+            friendRequestLink.href = '#';
             friendRequestLink.innerText = 'Send Friend Request';
             friendRequestLink.addEventListener('click', (event) => {
                 event.preventDefault();
-                this.addFriend(currentUser); // Pass user ID or any necessary data to the function
+                this.addFriend(currentUser);
             });
-            // Append the link to the 'friendRequest' div
             document.getElementById('friendRequest').appendChild(friendRequestLink);
-          // Display attributes
             document.getElementById('username').innerText = currentUser.username;
             document.getElementById("pic").src = currentUser.getProfilePicPath();
             document.getElementById('email').innerText = currentUser.email;
@@ -189,88 +184,40 @@ export class Profile extends BaseClass {
 
     getHtmlForMain() {
         return `
-        
     <div class="container text-center">
         <div class="row align-items-start">
-            <div class="col">
-            
-            One of three columns
-            <h1>Stats</h1>
-            </div>
-
-
-            <div class="col" id="centerCol">
-            <div class="row position-absolute">
-            <span class="position-absolute top-10 start-2 p-2 bg-danger border border-light rounded-circle" id="status">
-            </span>
-            </div> 
-            <h1><div class="row justify-content-center" id="username" ></div></h1>
-            <div class="row justify-content-center">
-                    <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
-            </div>
-           
-            
-            
-            <div class="row justify-content-center" id="nb"></div>
-            <div class="row justify-content-center" id="email"></div>
-            <div class="row justify-content-center" id="bio"></div>
-            <div class="row justify-content-center" id="pic"></div>
-            <div class="row justify-content-center" id="friendRequest"></div>
-            
-            
-            </div>
-
-            
-            <div class="col">
-                <div class="row">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                Friends
-                            </button>
-                        </div>
-                    <div class="collapse" id="collapseExample">
-                        <div class="card card-body" id="friendList">
-                    </div>
-                    </div>
+            <div class="col" id="leftCol">
+                <h1><div class="row justify-content-center" id="username" >
+                </div></h1>
+                <div class="row position-absolute" style="right: 80%;">
+                    <span class="position-relative top-10 end-0 p-2 bg-danger border border-light rounded-circle" id="status">
+                    </span>
                 </div>
+                <div class="row justify-content-center">
+                    <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+                </div>
+                <div class="row justify-content-center" id="nb"></div>
+                <div class="row justify-content-center" id="email"></div>
+                <div class="row justify-content-center" id="bio"></div>
+                <div class="row justify-content-center" id="pic"></div>
+                <div class="row justify-content-center" id="friendRequest"></div>    
+            </div>
+            <div class="col">
+            <h1>Stats</h1>
+                    <div class="row">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            Friends
+                        </button>
+                    </div>
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body" id="friendList">
+                </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>
-
- `
+    `
     }
 }
-
-       
-// {/* <div class="container">
-// <p>
-// <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-//     Friends
-// </button>
-// </p>
-// <div class="collapse" id="collapseExample">
-// <div class="card card-body" id="friendList">
-//     Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-// </div>
-// </div>
-
-
-// <div class="position-relative">
-// <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle">
-// </span>
-// <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
-// </div>
-
-// <h1><div class="row" id="username"></div></h1>
-// <div class="row" id="pic"></div>
-// <div class="row" id="nb"></div>
-// <div class="row" id="email"></div>
-// <div class="row" id="bio"></div>
-// <div class="row" id="friendRequest"></div>
-// <div class="row" id="friendlist"> </div>
-// <div class="row" id="matchHis">MATCH HISTORY</div>
-// <div class="row" id="matchHistory">STATS (wins, losses)</div>
-// <div class="row" id="status"><div>
-
-
-// </div> */}

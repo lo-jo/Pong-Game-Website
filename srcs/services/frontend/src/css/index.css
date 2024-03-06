@@ -56,6 +56,6 @@ body {
 
 .card-body {
     opacity : .4;
-    height: 50px !important; /* Adjust the height as needed */
+    height: 120% !important; /* Adjust the height as needed */
     overflow-y: auto;
 }
