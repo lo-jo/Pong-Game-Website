@@ -79,8 +79,10 @@ class FriendSerializer(serializers.ModelSerializer):
 
 class FriendUsernameSerializer(serializers.ModelSerializer):
     sender_username = serializers.ReadOnlyField(source='sender.username')
+    sender_id = serializers.ReadOnlyField(source='sender.id')
     recipient_username = serializers.ReadOnlyField(source='recipient.username')
+    recipient_id = serializers.ReadOnlyField(source='recipient.id')
 
     class Meta:
         model = Friendship
-        fields = ('sender_username', 'recipient_username')
+        fields = ('sender_username', 'sender_id', 'recipient_username', 'recipient_id')

@@ -61,17 +61,19 @@ export const routes = {
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
+    console.log("connect user func");
     if (token){
         
         const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
-
+        
         onlineSocket.onopen = function (e) {
             localStorage.setItem('sessionSocket', "ONLINE");
             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
         };
         onlineSocket.onclose = function (e) {
-            localStorage.setItem('sessionSocket', "OFFLINE");
             console.log('Socket closed unexpectedly');
+            localStorage.setItem('sessionSocket', "OFFLINE");
+            
         }; 
     }
     
@@ -88,6 +90,7 @@ export const navigateTo = (url) => {
 
 export const router = () => {
     const status = localStorage.getItem('sessionSocket');
+    console.log("STATUS:", status);
     if (status != "ONLINE")
     {
         connectUser();

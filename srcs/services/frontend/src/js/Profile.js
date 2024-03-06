@@ -84,6 +84,48 @@ export class Profile extends BaseClass {
         .catch(error => console.error('Error fetching status:', error));
     }
 
+    displayFriendProfile(friendId) {
+        // console.log("DISPLAY ATTRIBUTES", event.target.getAttribute('value'));
+        console.log("FRIEND ID", friendId);
+        const jwtAccess = localStorage.getItem('token');
+
+        fetch(`http://localhost:8000/users/${friendId}/profile/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            return response.json();
+        })
+        .then(data => {
+
+
+            document.getElementById('app').innerHTML = `<h1>I HATE UUUUUUUUUU</h1>`;
+            document.getElementById('username').innerText = data.username;
+            console.log("TARGET USER", data.username);
+            history.pushState('','', `/profile`);
+            // document.getElementById("pic").src = currentUser.getProfilePicPath();
+            // document.getElementById('email').innerText = currentUser.email;
+            // document.getElementById('bio').innerText = currentUser.bio;
+            // document.getElementById('nb').innerText = currentUser.id;
+            // this.displayStatus(currentUser);
+            // this.updateAccordionContent(currentUser);
+            
+        })
+        .catch(error => console.error('Error:', error));
+        
+    }
+
     generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
         friendListContainer.innerHTML = '';
@@ -91,13 +133,30 @@ export class Profile extends BaseClass {
         const ul = document.createElement('ul');
         friends.forEach(friend => {
             const li = document.createElement('li');
-            let friendInfo = '';
-            for (const property in friend) {
-                friendInfo += `${friend[property]}, `;
-            }
-            friendInfo = friendInfo.slice(0, -2);
-            li.textContent = friendInfo;
+            const friendUsername = friend[Object.keys(friend)[0]];
+            const friendId = friend[Object.keys(friend)[1]];
+            // const link = document.createElement('a');
+            const butt = document.createElement('button');
+            butt.setAttribute('class', 'btn btn-link');
+            butt.innerText = `${friendUsername}`;
+            li.appendChild(butt);
+            // link.href = '#';
+            // link.setAttribute('value', `${friendId}`);
+            // link.innerText = `${friendUsername} + ${friendId}`;
+            // li.appendChild(link);
+            // li.textContent = `${friendUsername} + ${friendId}`;
+            // link.addEventListener('click', (event) => {
+            //     if (event.target.tagName === 'A') {
+            //         event.preventDefault();
+            //         this.displayFriendProfile(friendId);
+            //     }
+            // });
+            butt.addEventListener('click', (event) => {
+                event.preventDefault();
+                this.displayFriendProfile(friendId);
+            });
             ul.appendChild(li);
+
         });
     
         friendListContainer.appendChild(ul);

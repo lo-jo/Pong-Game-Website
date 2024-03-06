@@ -81,8 +81,10 @@ class FriendshipView(APIView):
             if usernombre in entry.values():
                 if (entry['sender_username'] == usernombre):
                     del entry['sender_username']
+                    del entry['sender_id']
                 elif (entry['recipient_username'] == usernombre):
                     del entry['recipient_username']
+                    del entry['recipient_id']
             modified_data.append(entry)
         return Response(modified_data, status=status.HTTP_200_OK)
 
