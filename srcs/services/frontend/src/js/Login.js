@@ -1,6 +1,7 @@
 import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
 import jwt_decode from 'jwt-decode';
+import { connectUser, router } from './Router';
 
 
 export class Login extends BaseClass
@@ -40,13 +41,12 @@ export class Login extends BaseClass
                 let jwtToken = localStorage.getItem('token');
                 let decoded_token = jwt_decode(jwtToken);
                 alert(decoded_token.user_id);
-                // this.router('/profile');
-                document.getElementById('app').innerHTML = `successfully logged in <a href="/profile">Profile</a>`
-                // document.location.href = '/profile';
-                this.connectUser();
-                // Redirect to another page or perform additional actions
-                // history.pushState({}, '', '/dashboard');
-                // router();
+                // // this.router('/profile');
+                // document.getElementById('app').innerHTML = `successfully logged in <a href="/profile">Profile</a>`
+                // // document.location.href = '/profile';
+                connectUser();
+                history.pushState({}, '', '/dashboard');
+                router();
             } else {
                 document.getElementById('app').innerHTML = "Invalid Credentials"
             }
@@ -55,19 +55,6 @@ export class Login extends BaseClass
             console.error('Error:', error);
             document.getElementById("message").innerText = 'Error during login';
         });
-    }
-
-    connectUser() {
-        const token = localStorage.getItem('token');
-        const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
-        onlineSocket.onopen = function (e) {
-            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
-            console.log('Socket successfully connected.');
-        };
-        onlineSocket.onclose = function (e) {
-            console.log('Socket closed unexpectedly');
-        };
-
     }
 
     getHtmlForHeader() {

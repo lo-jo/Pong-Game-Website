@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/js/dist/collapse';
 /*Import classes*/
 import { navigateTo } from './js/Router.js'
+import { Navbar } from './js/Navbar.js';
 
 /////////////////////////////////////////////////////////////
 // // TO BE FIXED: full page reload when URL is change directly

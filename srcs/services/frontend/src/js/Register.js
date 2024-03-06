@@ -45,12 +45,12 @@ export class Register extends BaseClass
         })
         .then(data => {
             // Handle successful login, e.g., store token in local storage
-            console.log('Succesfully signed up', data);
-            console.log("data: ", data);
-            document.getElementById('app').innerHTML = "successfully signed up";
+            // console.log('Succesfully signed up', data);
+            // console.log("data: ", data);
+            // document.getElementById('app').innerHTML = "successfully signed up";
             // Redirect to another page or perform additional actions
-            // history.pushState({}, '', '/dashboard');
-            // router();
+            history.pushState({}, '', '/login');
+            router();
         })
         .catch(error => {
             console.error('ERROR : ', error);

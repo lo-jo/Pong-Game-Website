@@ -9,8 +9,11 @@ export class Logout extends BaseClass{
     }
     clearToken() {
         const token = localStorage.getItem('jwt_token');
+        const status = localStorage.getItem('sessionSocket');
         localStorage.removeItem('jwt_token');
         sessionStorage.removeItem(token);
+        localStorage.removeItem('sessionSocket');
+        sessionStorage.removeItem(status);
         window.localStorage.clear();
     }
 

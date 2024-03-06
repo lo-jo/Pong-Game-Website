@@ -59,6 +59,26 @@ export const routes = {
     },
 }
 
+export const connectUser = () => {
+    const token = localStorage.getItem('token');
+    if (token){
+        
+        const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
+
+        onlineSocket.onopen = function (e) {
+            localStorage.setItem('sessionSocket', "ONLINE");
+            onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
+        };
+        onlineSocket.onclose = function (e) {
+            localStorage.setItem('sessionSocket', "OFFLINE");
+            console.log('Socket closed unexpectedly');
+        }; 
+    }
+    
+
+    
+}
+
 // Use the history API to prevent full page reload
 export const navigateTo = (url) => {
     history.pushState(null, null, url);
@@ -67,6 +87,12 @@ export const navigateTo = (url) => {
 };
 
 export const router = () => {
+    const status = localStorage.getItem('sessionSocket');
+    if (status != "ONLINE")
+    {
+        connectUser();
+    }
+
     const path = window.location.pathname;
     console.log(`router path[${path}]`);
     const viewObject = routes[path];
@@ -104,5 +130,5 @@ export const router = () => {
 window.addEventListener("popstate", router);
 
 document.addEventListener('DOMContentLoaded', () => {
-  router();
+    router();
 });
