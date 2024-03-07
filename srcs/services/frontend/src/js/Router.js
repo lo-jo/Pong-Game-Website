@@ -58,27 +58,33 @@ export const routes = {
         auth : true
     },
 }
+let onlineSocket = null;
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
     console.log("connect user func");
+
+    if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN) {
+        console.log('WebSocket connection already open.');
+        return;
+    }
+
     if (token){
         
-        const onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
+        onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
         
         onlineSocket.onopen = function (e) {
-            localStorage.setItem('sessionSocket', "ONLINE");
+            // localStorage.setItem('sessionSocket', "ONLINE");
             onlineSocket.send(JSON.stringify({ type: 'authenticate', token: token }));
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
-            localStorage.setItem('sessionSocket', "OFFLINE");
+            // localStorage.setItem('sessionSocket', "OFFLINE");
+            onlinesocket = null;
+            setTimeout(connect, 5000)
             
         }; 
     }
-    
-
-    
 }
 
 // Use the history API to prevent full page reload
@@ -90,11 +96,11 @@ export const navigateTo = (url) => {
 
 export const router = () => {
     const status = localStorage.getItem('sessionSocket');
-    console.log("STATUS:", status);
-    if (status != "ONLINE")
-    {
+    // console.log("STATUS:", status);
+    // if (status != "ONLINE")
+    // {
         connectUser();
-    }
+    // }
 
     const path = window.location.pathname;
     console.log(`router path[${path}]`);
