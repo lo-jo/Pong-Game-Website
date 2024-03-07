@@ -6,8 +6,11 @@ from .models import Notification
 
 @receiver(post_save, sender=Notification)
 def notification_created(sender, instance, created, **kwargs):
+    print("A NOTIFICATION HAS BEEN CREATED")
     if created:
+        print("####INSTANCE.MESSAGE", instance.message)
         channel_layer = get_channel_layer()
+        print("********** CHANNEL LAYER", channel_layer)
         async_to_sync(channel_layer.group_send)(
             'public_room',
             {
