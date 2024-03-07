@@ -5,9 +5,18 @@ from django.utils import timezone
 from users.models import User
 
 class Tournament(models.Model):
+    id = models.AutoField(primary_key=True)
     creator_id = models.ForeignKey(
         User, related_name='creator_id', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(default=timezone.now)
+
+class Participant(models.Model):
+    id = models.AutoField(primary_key=True)
+    tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='participants')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    # Created_at: when the participant was added to the tournament or the same info as created at in tournament?
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Match(models.Model):
     

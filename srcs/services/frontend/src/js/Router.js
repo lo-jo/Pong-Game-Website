@@ -5,6 +5,7 @@ import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 import { PongGame } from './Game.js';
+import { Tournament } from './Tournament.js';
 import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 
@@ -50,8 +51,19 @@ export const routes = {
         path : '/chat',
         view : Chat,
         auth : true
+    },
+    '/tournament' : {
+        path : '/tournament',
+        view :Tournament,
+        auth : true
     }
 }
+
+// '/tournament/:id/match/:id' : {
+//     path : '/tournament',
+//     view :Tournament,
+//     auth : true
+// }
 
 // Use the history API to prevent full page reload
 export const navigateTo = (url) => {
