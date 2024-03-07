@@ -5,73 +5,51 @@ import { Navbar } from './Navbar';
 export class Dashboard extends BaseClass {
     constructor() {
         super();
-        this.initWebSocket();
+        // this.initWebSocket();
         this.navbar = new Navbar();
         // Set up click event listener on the document
         document.addEventListener('click', this.handleButtonClick.bind(this));
     }
 
     handleButtonClick(event) {
-        console.log(`button clicked:[${event.target.id}]`);
+        // console.log(`button clicked:[${event.target.id}]`);
         if (event.target.id === 'launch-game-button') {
-            this.launchGame();
+            history.pushState({}, '', '/match_lobby');
+            router();
         } else if (event.target.id === 'create-tournament') {
             this.createTournament();
         }
     }
+   
 
-    initWebSocket() {
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${window.location.host}/ws/pong/match`;
-    
-        const socket = new WebSocket(wsUrl);
-    
-        socket.onopen = function() {
-            console.log('WebSocket connection established.');
-        };
-    
-        socket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            console.log('Mensaje recibido desde el servidor:', data);
-        };
-    
-        socket.onerror = function(error) {
-            console.error('WebSocket error:', error);
-        };
-    
-        socket.onclose = function() {
-            console.log('WebSocket connection closed.');
-        };
-    }
+    // // Method to join a match
+    // launchGame() {
+    //     const url = 'http://localhost:8000/pong/join_match/';
 
-    // Method to join a match
-    launchGame() {
-        const url = 'http://localhost:8000/pong/join_match/';
+    //     const jwtAccess = localStorage.getItem('token');
 
-        const jwtAccess = localStorage.getItem('token');
+    //     const options = {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': `Bearer ${jwtAccess}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     };
 
-        const options = {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-        };
-
-        fetch(url, options)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('The request was not successful');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Backend response:', data);
-            })
-            .catch(error => {
-                console.error('Error making request:', error);
-            });
-    }
+    //     fetch(url, options)
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('The request was not successful');
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             console.log('Backend response:', data);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error making request:', error);
+    //         });
+    // }
 
     // Method to create tournament
     createTournament() {
@@ -106,6 +84,7 @@ export class Dashboard extends BaseClass {
         //         console.error('Error making request:', error);
         //     });
     }
+
 
     getHtmlForHeader(){
         return this.navbar.getHtml();

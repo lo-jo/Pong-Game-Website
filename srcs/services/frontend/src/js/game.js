@@ -63,15 +63,15 @@ export const initGameTwoD = () => {
 	score.appendChild(message);
 	score.appendChild(score_2);
 	box.appendChild(score);
-	document.getElementById('app').appendChild(box);
+	// document.getElementById('app').appendChild(box);
 
     board = createBoard('board');
 	document.getElementById('app').appendChild(board);
 
 	// Ball movement
-	paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
-	paddle_2_coord = document.getElementById('app').querySelector('.paddle_2').getBoundingClientRect();
-    paddle_common = document.getElementById('app').querySelector('.paddle').getBoundingClientRect();
+	// paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
+	// paddle_2_coord = document.getElementById('app').querySelector('.paddle_2').getBoundingClientRect();
+    // paddle_common = document.getElementById('app').querySelector('.paddle').getBoundingClientRect();
 	
 	initial_ball = document.getElementById('app').querySelector('.ball'); 
     initial_ball_coord = initial_ball.getBoundingClientRect();
@@ -288,9 +288,9 @@ const createBoard = (className) => {
     paddle_2 = createPaddle('paddle_2');
 	
     boardContainer.appendChild(ball);
-    boardContainer.appendChild(paddle_1);
-    boardContainer.appendChild(paddle_2);
-	boardContainer.appendChild(dottedLine);
+    // boardContainer.appendChild(paddle_1);
+    // boardContainer.appendChild(paddle_2);
+	// boardContainer.appendChild(dottedLine);
 
     return (boardContainer);
 };

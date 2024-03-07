@@ -61,12 +61,16 @@ class MatchDetailView(RetrieveAPIView):
 #             serializer = MatchSerializer(new_match)
 #             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+# Message
+# create_join -> Create and join match
+# join_play -> Join and start the game
 
 class JoinMatchView(APIView):
     permission_classes = [IsAuthenticated]
-    # print("TRYING TO CREATE MATCH")
+
     def post(self, request):
         try:
+            # Getting latest match posted
             latest_match = Match.objects.latest('created_at')
             if latest_match.user_1 != request.user:
                 print("You are going to join the last match created")
@@ -76,10 +80,10 @@ class JoinMatchView(APIView):
                 # Send message using the WebSocket when the match is update
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
-                    'match_group',
+                    'matches_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'An existing match has been updated',
+                        'action': 'join_play',
                         'match_id': latest_match.id,
                     }
                 )
@@ -93,10 +97,10 @@ class JoinMatchView(APIView):
                 # Sends a message via WebSocket when a new match is created.
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
-                    'match_group',
+                    'matches_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'A new match has been created',
+                        'action': 'create_join',
                         'match_id': new_match.id,
                     }
                 )
@@ -106,14 +110,15 @@ class JoinMatchView(APIView):
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user
             new_match.save()
+            
             serializer = MatchSerializer(new_match)
             # Sends a message via WebSocket when a new match is created.
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                'match_group',
+                'matches_group',
                 {
                     'type': 'send_match_notification',
-                    'message': 'A new match has been created',
+                    'action': 'create_join',
                     'match_id': new_match.id,
                 }
             )

@@ -4,7 +4,7 @@ from .models import Match
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ('status', 'user_1', 'user_2', 'winner', 'loser', 'tournament', 'created_at')
+        fields = ('id', 'status', 'user_1', 'user_2', 'winner', 'loser', 'tournament', 'created_at')
 
     def validate(self, data):
         if 'status' not in data or not data['status']:

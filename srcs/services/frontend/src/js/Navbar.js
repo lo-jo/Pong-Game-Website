@@ -57,7 +57,7 @@ export class Navbar {
             navbar.innerHTML = `<nav id="nav-bar">
                                 <a href="/profile">Profile</a>
                                 <a href="/settings">Settings</a>
-                                <a href="/dashboard">Game</a>
+                                <a href="/dashboard">Dashboard</a>
                                 <a href="/chat">Chat</a>
                                 <a href="/logout">Log out</a>
                                 </nav>`;
