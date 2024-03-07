@@ -1,82 +1,50 @@
 import { BaseClass } from './BaseClass'
 import { Navbar } from './Navbar';
+import { initGameTwoD } from './game';
 
 export class Match extends BaseClass {
-    constructor() {
+    constructor(id) {
         super();
         this.navbar = new Navbar();
-        this.postMatch();
+        this.id = id;
+        this.css = './css/game.css',
+        // this.insertCssLink();
         this.initWebSocket();
     }
 
-    postMatch()
-    {
-        const httpProtocol = window.location.protocol;
-        const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
-        alert(url);
-
-        const jwtAccess = localStorage.getItem('token');
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-        };
-
-        fetch(url, options)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('The request was not successful');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Backend response:', data);
-            })
-            .catch(error => {
-                console.error('Error making request:', error);
-            });
-    }
-
     initWebSocket() {
-        console.log('initWebSocket in Match class call()');
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match`;
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match/${this.id}`;
     
-        console.log(wsUrl);
         const socket = new WebSocket(wsUrl);
 
-        socket.onopen = function() {
-            console.log('WebSocket connection established.');
+        socket.onopen = () => {
+            console.log('WebSocket(match game) connection established.');
+            // socket.send(JSON.stringify(this.getScreenParams()));
         };
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log('Mensaje recibido desde el servidor:', data);
-            if (data.message == 'create_join') {
-                console.log("Waiting for someone");
-                document.getElementById('app').innerHTML = this.getWaitingForGameHtml();
-            } else if (data.message == 'join_play') {
-                console.log("The match must be start");
-            }
+            const { game_state } = data;
+            this.updateGameState(game_state);
         };
-        
+
         socket.onerror = function(error) {
             console.error('WebSocket error:', error);
         };
     
         socket.onclose = function() {
-            console.log('WebSocket connection closed.');
+            console.log('WebSocket (match game) connection closed.');
         };
     }
 
-    getWaitingForGameHtml()
+    insertCssLink()
     {
-        return `<div class="h-25 spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>`
+        console.log("Here");
+        const styleCss = document.createElement('link');
+        styleCss.rel = 'stylesheet';
+        styleCss.href = this.css;
+        document.head.appendChild(styleCss);
     }
 
     getHtmlForHeader(){
@@ -85,6 +53,29 @@ export class Match extends BaseClass {
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return `<p>Match</p>`;
+        return `<p>Game</p>`
+    }
+
+    getScreenParams()
+    {
+        const appDiv = document.getElementById('app');
+        const screenParams = {
+            offsetWidth: appDiv.offsetWidth,
+            offsetHeight: appDiv.offsetHeight,
+            clientWidth: appDiv.clientWidth,
+            clientHeight: appDiv.clientHeight
+        };
+        return screenParams;
+    }
+
+    updateGameState(game_state)
+    {
+        // console.log(game_state);
+        if (game_state === 'draw_board')
+        {
+            initGameTwoD();
+        }
     }
 }
+
+

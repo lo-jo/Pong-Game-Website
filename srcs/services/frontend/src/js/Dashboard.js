@@ -12,11 +12,9 @@ export class Dashboard extends BaseClass {
     }
 
     handleButtonClick(event) {
-        console.log(`button clicked:[${event.target.id}]`);
+        // console.log(`button clicked:[${event.target.id}]`);
         if (event.target.id === 'launch-game-button') {
-            // this.launchGame();
-            // Redirect to another page or perform additional actions
-            history.pushState({}, '', '/match');
+            history.pushState({}, '', '/match_lobby');
             router();
         } else if (event.target.id === 'create-tournament') {
             this.createTournament();

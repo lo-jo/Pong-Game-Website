@@ -80,10 +80,10 @@ class JoinMatchView(APIView):
                 # Send message using the WebSocket when the match is update
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
-                    'match_group',
+                    'matches_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'join_play',
+                        'action': 'join_play',
                         'match_id': latest_match.id,
                     }
                 )
@@ -97,10 +97,10 @@ class JoinMatchView(APIView):
                 # Sends a message via WebSocket when a new match is created.
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.group_send)(
-                    'match_group',
+                    'matches_group',
                     {
                         'type': 'send_match_notification',
-                        'message': 'create_join',
+                        'action': 'create_join',
                         'match_id': new_match.id,
                     }
                 )
@@ -110,14 +110,15 @@ class JoinMatchView(APIView):
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user
             new_match.save()
+            
             serializer = MatchSerializer(new_match)
             # Sends a message via WebSocket when a new match is created.
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                'match_group',
+                'matches_group',
                 {
                     'type': 'send_match_notification',
-                    'message': 'create_join',
+                    'action': 'create_join',
                     'match_id': new_match.id,
                 }
             )
