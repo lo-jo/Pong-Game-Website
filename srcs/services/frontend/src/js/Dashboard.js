@@ -1,6 +1,7 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
 import { Navbar } from './Navbar';
+import jwt_decode from 'jwt-decode';
 
 export class Dashboard extends BaseClass {
     constructor() {
@@ -26,15 +27,18 @@ export class Dashboard extends BaseClass {
                 router();
             }
         } else if (event.target.id === 'join-tournament') {
+            event.preventDefault();
             await this.displayOpenTournaments();
         }
     }
 
     async displayOpenTournaments() {
+        console.log('HERE IN THE DISPLAY OPEN TOURNAMENT FUNC')
         const openTournaments = await this.fetchOpenTournaments();
         const gameStatsDiv = document.getElementById('game-stats');
     
         gameStatsDiv.innerHTML = '';
+        gameStatsDiv.innerHTML = '<h2>Tournaments:</h2>';
 
         if (openTournaments.length === 0) {
             gameStatsDiv.innerHTML = '<h2>No open tournaments available 🧐</h2>';
@@ -44,30 +48,60 @@ export class Dashboard extends BaseClass {
         const tournamentList = document.createElement('ul');
         tournamentList.setAttribute('class', 'list-group');
 
-        openTournaments.forEach(tournament => {
+        const currentUserId =  jwt_decode(localStorage.getItem('token'));
+    
+        await Promise.all(openTournaments.map(async tournament => {
+            // console.log(tournament);
             const listItem = document.createElement('li');
             listItem.setAttribute('class', 'list-group-item');
-            listItem.textContent = `Creator: ${tournament.creator_id}, Name: ${tournament.name}`;
-
+    
             const joinButton = document.createElement('button');
             joinButton.setAttribute('class', 'btn btn-info');
             joinButton.textContent = 'Join';
-
-            // Set IDs for the button and spinner
+    
             joinButton.id = `join-button-${tournament.id}`;
             const spinner = document.createElement('span');
             spinner.id = `spinner-${tournament.id}`;
             spinner.className = 'spinner-border spinner-border-sm text-light';
             spinner.style.display = 'none';
-
-            joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
-            joinButton.appendChild(spinner);
+    
+            const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
+            const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
+            const usernames = players.map(player => player.username);
+            listItem.textContent = `${tournament.name} Players: ${usernames.join(', ')}`;
+    
+            if (userAlreadyJoined) {
+                joinButton.disabled = true;
+                joinButton.textContent = 'Joined';
+            } else {
+                joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
+                joinButton.appendChild(spinner);
+            }
+    
             listItem.appendChild(joinButton);
-
             tournamentList.appendChild(listItem);
-        });
+        }));
 
         gameStatsDiv.appendChild(tournamentList);
+    }
+
+    async getParticipants(userId) {
+        const jwtAccess = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8000/users/${userId}/profile/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            return userData;
+        } else {
+            console.error('Error fetching username');
+            return 'Unknown User';
+        }
     }
 
     async joinTournament(tournamentId) {
@@ -76,11 +110,10 @@ export class Dashboard extends BaseClass {
         
         try {
             spinner.style.display = 'inline-block';
-            // joinButton.innerHTML = '&nbsp;';
             joinButton.disabled = true;
     
-            // await this.fetchJoinTournament(tournamentId);
-            // await this.displayOpenTournaments();
+            await this.fetchJoinTournament(tournamentId);
+            await this.displayOpenTournaments();
         } catch (error) {
             console.error('Error joining tournament:', error);
         }
@@ -104,6 +137,7 @@ export class Dashboard extends BaseClass {
         };
         const response = await fetch(`${httpProtocol}//localhost:8000/pong/tournaments/`, options);
         const data = await response.json();
+        console.log("tournament list", data);
         return data;
     }
 

@@ -55,16 +55,16 @@ export class Navbar {
 
         if (isAuthenticated) {
             navbar.innerHTML = `<nav id="nav-bar">
-                                <a href="/profile">Profile</a>
-                                <a href="/settings">Settings</a>
-                                <a href="/dashboard">Dashboard</a>
-                                <a href="/chat">Chat</a>
-                                <a href="/logout">Log out</a>
+                                <a class="navbar-link" href="/profile">Profile</a>
+                                <a class="navbar-link" href="/settings">Settings</a>
+                                <a class="navbar-link" href="/dashboard">Dashboard</a>
+                                <a class="navbar-link" href="/chat">Chat</a>
+                                <a class="navbar-link" href="/logout">Log out</a>
                                 </nav>`;
         } else {
             navbar.innerHTML = `<nav id="nav-bar">
-                                    <a href="/register">Sign up</a>
-                                    <a href="/login">Log in</a>
+                                    <a class="navbar-link" href="/register">Sign up</a>
+                                    <a class="navbar-link" href="/login">Log in</a>
                                 </nav>`;
         }
     }

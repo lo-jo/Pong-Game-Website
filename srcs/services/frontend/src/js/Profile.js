@@ -24,7 +24,7 @@ export class Profile extends BaseClass {
     constructor() {
         super();
         this.navbar = new Navbar();
-        this.displayProfile();
+        // this.displayProfile();
     }
     addFriend = (user) => {
         const jwtAccess = localStorage.getItem('token');
@@ -242,6 +242,7 @@ export class Profile extends BaseClass {
     }
 
     getHtmlForMain() {
+        this.displayProfile();
         return `
     <div class="container text-center">
         <div class="row align-items-start">

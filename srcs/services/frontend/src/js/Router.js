@@ -172,7 +172,6 @@ function findMatchingRoute(url) {
     return null;
 }
 
-
 export const router = async () => {
     const status = localStorage.getItem('sessionSocket');
     // console.log("STATUS:", status);
@@ -182,6 +181,7 @@ export const router = async () => {
     // }
 
     const path = window.location.pathname;
+    console.log(`path[${path}]`);
     const matchedRoute = findMatchingRoute(path);
 
     const viewObject = routes[matchedRoute];
@@ -224,8 +224,8 @@ export const router = async () => {
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
 }
 
-window.addEventListener("popstate", router);
+// window.addEventListener("popstate", router);
 
-document.addEventListener('DOMContentLoaded', () => {
-    router();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     router();
+// });
