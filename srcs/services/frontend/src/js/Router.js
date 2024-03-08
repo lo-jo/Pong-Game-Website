@@ -5,6 +5,7 @@ import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 // import { PongGame } from './Game.js';
+import { Tournament } from './Tournament.js';
 import { MatchLobby } from './MatchLobby.js'
 import { Match } from './Match.js'
 import { ErrorClass } from './ErrorClass.js'
@@ -53,6 +54,11 @@ export const routes = {
     '/chat' : {
         path : '/chat',
         view : Chat,
+        auth : true
+    },
+    '/tournament' : {
+        path : '/tournament',
+        view :Tournament,
         auth : true
     },
     '/match_lobby' : {
@@ -133,6 +139,12 @@ export const connectUser = () => {
         }
     }
 }
+
+// '/tournament/:id/match/:id' : {
+//     path : '/tournament',
+//     view :Tournament,
+//     auth : true
+// }
 
 // Use the history API to prevent full page reload
 export const navigateTo = (url) => {

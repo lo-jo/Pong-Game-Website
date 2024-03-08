@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # Own imports
-from .models import Match
-from .serializers import MatchSerializer
+from .models import Match, Tournament, Participant
+from .serializers import MatchSerializer, TournamentSerializer, ParticipantSerializer
+from django.db.models import Count
 
 class PongDashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -24,7 +25,7 @@ class MatchDetailView(RetrieveAPIView):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_object(self):
         id = self.kwargs['pk']
         try:
@@ -124,5 +125,68 @@ class JoinMatchView(APIView):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+# TOURNAMENT STUFF
+class OpenTournamentsView(APIView):
+    permission_classes = [IsAuthenticated]
 
-       
+    def get(self, request):
+        open_tournaments = Tournament.objects.all()
+        # open_tournaments = Tournament.objects.annotate(num_participants=Count('participants')).filter(num_participants__lt=4)
+        serializer = TournamentSerializer(open_tournaments, many=True)
+        return Response(serializer.data)
+
+class CreateTournamentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            print("=> Creating new tournament")
+            tournament_name = request.data.get('tournamentName')
+
+            # Create tournament
+            tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user)
+
+            # Add creator of the tournament to the actual tournament DUH
+            participant = Participant.objects.create(tournament_id=tournament, user_id=request.user)
+
+            serializer = TournamentSerializer(tournament)
+
+            return Response({
+                'id': serializer.data['id'],
+                'creator_id': serializer.data['creator_id'],
+                'name': serializer.data['name'],
+                'created_at': serializer.data['created_at'],
+                'participants': ParticipantSerializer(participant).data,
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class JoinTournamentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, tournament_id):
+        try:
+            print("TOURNAMENT ID", tournament_id)
+            user = request.user
+            tournament = Tournament.objects.get(id=tournament_id)
+
+            # Check if the user is already a participant in the tournament
+            if tournament.participants.filter(user_id=user).exists():
+                return Response({'error': 'You are already a participant in this tournament.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the tournament is full (has 4 participants)
+            if tournament.participants.count() >= 4:
+                return Response({'error': 'This tournament is already full.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create participant entry for the user in the tournament
+            Participant.objects.create(tournament_id=tournament, user_id=user)
+
+            serializer = TournamentSerializer(tournament)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Tournament.DoesNotExist:
+            return Response({'error': 'Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
