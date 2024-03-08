@@ -15,7 +15,7 @@ export class Dashboard extends BaseClass {
         if (event.target.id === 'launch-game-button') {
             history.pushState({}, '', '/match_lobby');
             router();
-        else if (event.target.id === 'launch-tournament') {
+        } else if (event.target.id === 'launch-tournament') {
             history.pushState({}, '', '/dashboard');
             document.getElementById('app').innerHTML = this.getHtmlFormTournament();
         } else if (event.target.id === 'createTournament') {
