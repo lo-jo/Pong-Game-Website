@@ -24,7 +24,7 @@ export class Profile extends BaseClass {
     constructor() {
         super();
         this.navbar = new Navbar();
-        this.displayProfile();
+        // this.displayProfile();
     }
     addFriend = (user) => {
         const jwtAccess = localStorage.getItem('token');
@@ -74,11 +74,11 @@ export class Profile extends BaseClass {
             const statusElement = document.getElementById('status');
             if (data.hasOwnProperty('error')) {
                 // document.getElementById('status').innerText = 'Offline';
-
+                statusElement.parentElement.querySelector('.bg-danger').classList.remove('bg-success');
+                statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-danger')
             } else {
                 // document.getElementById('status').innerText = 'Online';
-                statusElement.parentElement.querySelector('.bg-danger').classList.remove('bg-danger');
-                statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-success');
+;
             }
         })
         .catch(error => console.error('Error fetching status:', error));
@@ -108,9 +108,6 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
-
-
-            document.getElementById('app').innerHTML = `<h1>I HATE UUUUUUUUUU</h1>`;
             document.getElementById('username').innerText = data.username;
             console.log("TARGET USER", data.username);
             history.pushState('','', `/profile`);
@@ -135,26 +132,17 @@ export class Profile extends BaseClass {
             const li = document.createElement('li');
             const friendUsername = friend[Object.keys(friend)[0]];
             const friendId = friend[Object.keys(friend)[1]];
-            // const link = document.createElement('a');
-            const butt = document.createElement('button');
-            butt.setAttribute('class', 'btn btn-link');
-            butt.innerText = `${friendUsername}`;
-            li.appendChild(butt);
-            // link.href = '#';
-            // link.setAttribute('value', `${friendId}`);
-            // link.innerText = `${friendUsername} + ${friendId}`;
-            // li.appendChild(link);
-            // li.textContent = `${friendUsername} + ${friendId}`;
-            // link.addEventListener('click', (event) => {
-            //     if (event.target.tagName === 'A') {
-            //         event.preventDefault();
-            //         this.displayFriendProfile(friendId);
-            //     }
+            const link = document.createElement('a');
+            link.href = `/test/${friendId}`;
+            //const butt = document.createElement('button');
+            //butt.setAttribute('class', 'btn btn-link');
+            link.innerText = `${friendUsername}`;
+            // li.appendChild(butt);
+            li.appendChild(link);
+            // butt.addEventListener('click', (event) => {
+            //     event.preventDefault();
+            //     this.displayFriendProfile(friendId);
             // });
-            butt.addEventListener('click', (event) => {
-                event.preventDefault();
-                this.displayFriendProfile(friendId);
-            });
             ul.appendChild(li);
 
         });
@@ -216,7 +204,13 @@ export class Profile extends BaseClass {
         .then(data => {
 
             const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
-            
+            document.getElementById('username').innerText = currentUser.username;
+            document.getElementById("pic").src = currentUser.getProfilePicPath();
+            document.getElementById('email').innerText = currentUser.email;
+            document.getElementById('bio').innerText = currentUser.bio;
+            document.getElementById('nb').innerText = currentUser.id;
+            this.displayStatus(currentUser);
+            this.updateAccordionContent(currentUser);
             const friendRequestLink = document.createElement('a');
             friendRequestLink.href = '#';
             friendRequestLink.innerText = 'Send Friend Request';
@@ -225,13 +219,6 @@ export class Profile extends BaseClass {
                 this.addFriend(currentUser);
             });
             document.getElementById('friendRequest').appendChild(friendRequestLink);
-            document.getElementById('username').innerText = currentUser.username;
-            document.getElementById("pic").src = currentUser.getProfilePicPath();
-            document.getElementById('email').innerText = currentUser.email;
-            document.getElementById('bio').innerText = currentUser.bio;
-            document.getElementById('nb').innerText = currentUser.id;
-            this.displayStatus(currentUser);
-            this.updateAccordionContent(currentUser);
             
         })
         .catch(error => console.error('Error:', error));
@@ -242,6 +229,7 @@ export class Profile extends BaseClass {
     }
 
     getHtmlForMain() {
+        this.displayProfile();
         return `
     <div class="container text-center">
         <div class="row align-items-start">
@@ -249,7 +237,7 @@ export class Profile extends BaseClass {
                 <h1><div class="row justify-content-center" id="username" >
                 </div></h1>
                 <div class="row position-absolute" style="right: 80%;">
-                    <span class="position-relative top-10 end-0 p-2 bg-danger border border-light rounded-circle" id="status">
+                    <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status">
                     </span>
                 </div>
                 <div class="row justify-content-center">

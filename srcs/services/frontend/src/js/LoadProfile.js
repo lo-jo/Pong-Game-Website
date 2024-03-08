@@ -1,5 +1,6 @@
 import { BaseClass } from './BaseClass';
 import { Navbar } from './Navbar';
+import jwt_decode from 'jwt-decode';
 
 export class LoadProfile
 {
@@ -7,14 +8,12 @@ export class LoadProfile
         this.id = id;
         this.navbar = new Navbar();
     }
-    
     getHtmlForHeader() {
         return this.navbar.getHtml();
     }
 
-    async displayProfile() {
+    async getUserData() {
         const jwtAccess = localStorage.getItem('token');
-
         try {
             const response = await fetch(`http://localhost:8000/users/${this.id}/`, {
                 method: 'GET',
@@ -39,41 +38,130 @@ export class LoadProfile
             throw error;
         }
     }
-
-    async getHtmlForMain() {
-        const profileData = await this.displayProfile();
-        return `<div class="container">
-                    <div class="accordion accordion-flush" id="accordionFlushExample">
-                        <div class="accordion-item">
-                        <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                            FRIENDLIST
-                        </button>
-                        </h2>
-        
-                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                            <div class="accordion-body" id="friendList">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
-                        </div>
-                    </div>
-                    <div class="position-relative">
-                        <span class="position-absolute top-0 start-0 p-2 bg-danger border border-light rounded-circle"></span>
-                        <img src="${profileData.profile_pic}" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
-                    </div>
-
-		        <h1><div class="row" id="username">${profileData.username}</div></h1>
-		            <div class="row" id="pic"></div>
-		            <div class="row" id="nb"></div>
-		            <div class="row" id="email">${profileData.email}</div>
-		            <div class="row" id="bio"></div>
-                    <div class="row" id="friendRequest"></div>
-                    <div class="row" id="friendlist"> </div>
-                    <div class="row" id="matchHis">MATCH HISTORY</div>
-                    <div class="row" id="matchHistory">STATS (wins, losses)</div>
-                    <div class="row" id="status"><div>
-                </div>`
+    
+    async getFriendshipStatus(user) {
+        const jwtAccess = localStorage.getItem('token');
+        let decoded_token = jwt_decode(jwtAccess);
+        fetch(`http://localhost:8000/users/friendship/${user.username}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const hasValue = data.some(item => (
+                (item.hasOwnProperty("recipient_id") && item.recipient_id === decoded_token.user_id) ||
+                (item.hasOwnProperty("sender_id") && item.sender_id === decoded_token.user_id)
+              ));
+            if (hasValue){
+                console.log("already friends");
+                const friendRequestLink = document.createElement('text');
+                friendRequestLink.innerText = `You and ${user.username} are friends :)`;
+                document.getElementById('friendRequest').appendChild(friendRequestLink);
+            }
+                
+            else{
+                const friendRequestLink = document.createElement('button');
+                friendRequestLink.setAttribute('class', 'btn btn-dark');
+                friendRequestLink.href = '#';
+                friendRequestLink.innerText = 'Send Friend Request';
+                friendRequestLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    this.addFriend(user);
+                });
+                document.getElementById('friendRequest').appendChild(friendRequestLink);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching friendlist : ', error);
+        });
     }
 
-    // getHtmlForMainNotFound() {
-    //     return `<h1>Not found</h1>`
-    // }
+    displayStatus = (user) => {
+        const jwtAccess = localStorage.getItem('token');
+        fetch(`http://localhost:8000/notify/${user.username}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error:', response.status);
+                return; 
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.hasOwnProperty('error')) {
+                document.getElementById('status').classList.remove('bg-success');
+                document.getElementById('status').classList.add('bg-danger');
+            } else {
+                document.getElementById('status').innerText = 'ON';
+            }
+            this.getFriendshipStatus(user);
+        })
+        .catch(error => console.error('Error fetching status:', error));
+    }
+
+    addFriend = (user) => {
+        const jwtAccess = localStorage.getItem('token');
+        fetch(`http://localhost:8000/users/friendship/${user.id}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert("SUCCESFULLY ADDED AS FRIEND")
+        })
+        .catch(error => {
+            console.error('Impossible friendship : ', error);
+        });
+
+    }
+
+    async getHtmlForMain() {
+        const profileData = await this.getUserData();
+        this.displayStatus(profileData);
+        return `<div class="container text-center">
+        <div class="row align-items-start">
+            <div class="col" id="leftCol">
+                <h1><div class="row justify-content-center" id="username" >
+                </div>${profileData.username}</h1>
+                <div class="row position-absolute" style="right: 80%;">
+                    <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status">
+                    </span>
+                </div>
+                <div class="row justify-content-center">
+                    <img src="${profileData.profile_pic}" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+                </div>
+                <div class="row justify-content-center" id="nb">${profileData.id}</div>
+                <div class="row justify-content-center" id="email">${profileData.email}</div>
+                <div class="row justify-content-center" id="bio">${profileData.bio}</div>
+                <div  id="friendRequest"></div> 
+            </div>
+            <div class="col">
+            <h1>Stats</h1>
+                    
+            </div>
+            </div>
+        </div>
+    </div>`
+    };
 }

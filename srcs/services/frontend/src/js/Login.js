@@ -38,12 +38,9 @@ export class Login extends BaseClass
             if (data.access) {
                 // Store the JWT token in localStorage
                 localStorage.setItem('token', data.access);
-                let jwtToken = localStorage.getItem('token');
-                let decoded_token = jwt_decode(jwtToken);
-                alert(decoded_token.user_id);
-                // // this.router('/profile');
-                // document.getElementById('app').innerHTML = `successfully logged in <a href="/profile">Profile</a>`
-                // // document.location.href = '/profile';
+                // let jwtToken = localStorage.getItem('token');
+                // let decoded_token = jwt_decode(jwtToken);
+                // alert(decoded_token.user_id);
                 connectUser();
                 history.pushState({}, '', '/dashboard');
                 router();
