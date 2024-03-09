@@ -62,8 +62,6 @@ export class MatchLobby extends BaseClass {
                 history.pushState({ match_id }, '', `/match/${match_id}`);
                 router();
             }
-            // // Sending match id for join the match in channels
-            // socket.send(JSON.stringify({action : "add_me_to_match", match_id : match_id}));
         };
 
         socket.onerror = function(error) {

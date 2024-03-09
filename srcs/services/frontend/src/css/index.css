@@ -61,10 +61,9 @@ body {
 }/* Game styles */
 
 .board {
-  height: 85vh; 
-  width: 80vw;
-  border: 2px solid #7000ff;
-  box-sizing: border-box;
+  height: 100%; 
+  width: 100%;
+  border: 2px solid #ff003d;
 }
 
 .ball {

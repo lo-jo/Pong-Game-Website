@@ -26,6 +26,7 @@ export class Match extends BaseClass {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { game_state } = data;
+            console.log(game_state);
             this.updateGameState(game_state);
         };
 
@@ -53,7 +54,7 @@ export class Match extends BaseClass {
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return `<p>Game</p>`
+        return ``;
     }
 
     getScreenParams()
@@ -71,8 +72,9 @@ export class Match extends BaseClass {
     updateGameState(game_state)
     {
         // console.log(game_state);
-        if (game_state === 'draw_board')
+        if (game_state === 'init_pong_game')
         {
+            console.log('Draw board in frontend!')
             initGameTwoD();
         }
     }

@@ -43,25 +43,36 @@ class PongConsumer(AsyncWebsocketConsumer):
         message = json.loads(text_data)
         print(message)
 
+    async def send_to_group(self, param):
+        print("send to group")
+        await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    'type': 'send_game_state',
+                    'game_state': param
+                }
+            )
+
+    async def send_to_connection(self, event):
+        await self.send(text_data=json.dumps(event))
+
     async def send_game_state(self, event):
         await self.send(text_data=json.dumps(event))
 
     async def game_loop(self):
-        print("Sleep")
-        param = 1
-        await asyncio.sleep(2)
-        while True:
-            game_state = get_game_state(param)
-            param = 2
-            print(game_state)
-            await self.channel_layer.group_send(
-                self.group_name,
-                {
-                    'type': 'send_game_state',
-                    'game_state': game_state
-                }
-            )
-            await asyncio.sleep(0.1)
+        await self.send_to_connection({'game_state' : 'init_pong_game'})
+        # while True:
+        #     game_state = get_game_state(param)
+        #     param = 2
+        #     print(game_state)
+        #     await self.channel_layer.group_send(
+        #         self.group_name,
+        #         {
+        #             'type': 'send_game_state',
+        #             'game_state': game_state
+        #         }
+        #     )
+        #     await asyncio.sleep(0.1)
 
 class MatchConsumer(AsyncWebsocketConsumer):
     # groups = ["broadcast"]

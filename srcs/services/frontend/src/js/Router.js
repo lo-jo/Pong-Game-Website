@@ -55,11 +55,6 @@ export const routes = {
         view : Chat,
         auth : true
     },
-    '/match_lobby' : {
-        path : '/match',
-        view : MatchLobby,
-        auth : true
-    },
     '/match/:id' : {
         view : Match,
         dinamic : true,
