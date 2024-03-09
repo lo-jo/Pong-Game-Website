@@ -31,7 +31,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
 
-        asyncio.create_task(self.game_loop())
+        # asyncio.create_task(self.game_loop())
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -82,6 +82,10 @@ class MatchConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+
+    async def websocket_disconnect(self, close_code):
+        # Manejar el cierre de la conexión WebSocket
+        print(f"Conexión cerrada con código de cierre:   {close_code}")
 
     async def receive(self, text_data):
         pass
