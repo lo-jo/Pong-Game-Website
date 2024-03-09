@@ -19,12 +19,13 @@ export class Match extends BaseClass {
         const socket = new WebSocket(wsUrl);
 
         socket.onopen = () => {
-            console.log('WebSocket(match game) connection established.');
-            // socket.send(JSON.stringify(this.getScreenParams()));
+            console.log('WebSocket(match gameeee) connection established.');
+            socket.send(JSON.stringify({ 'match_id' : this.id}));
         };
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             const { game_state } = data;
             console.log(game_state);
             this.updateGameState(game_state);
@@ -71,11 +72,15 @@ export class Match extends BaseClass {
 
     updateGameState(game_state)
     {
-        // console.log(game_state);
+        console.log(game_state);
         if (game_state === 'init_pong_game')
         {
             console.log('Draw board in frontend!')
             initGameTwoD();
+        }
+        else if (game_state === 'someone_left')
+        {
+            alert('here');
         }
     }
 }

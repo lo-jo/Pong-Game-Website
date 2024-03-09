@@ -3,30 +3,10 @@
         "id": 1,
         "status": "pending",
         "user_1": 1,
-        "user_2": null,
+        "user_2": 2,
         "winner": null,
         "loser": null,
         "tournament": null,
-        "created_at": "2024-03-09T13:52:34.834025Z"
-    },
-    {
-        "id": 2,
-        "status": "pending",
-        "user_1": 1,
-        "user_2": null,
-        "winner": null,
-        "loser": null,
-        "tournament": null,
-        "created_at": "2024-03-09T13:54:23.948411Z"
-    },
-    {
-        "id": 3,
-        "status": "pending",
-        "user_1": 1,
-        "user_2": null,
-        "winner": null,
-        "loser": null,
-        "tournament": null,
-        "created_at": "2024-03-09T13:54:23.950568Z"
+        "created_at": "2024-03-09T16:47:42.657971Z"
     }
 ]
