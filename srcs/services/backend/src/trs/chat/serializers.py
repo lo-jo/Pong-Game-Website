@@ -1,4 +1,7 @@
 from django.core.serializers.json import Serializer
+from rest_framework import serializers
+from chat.models import BlackList
+
 JSON_ALLOWED_OBJECTS = (dict, list, tuple, str, int, bool)
 
 
@@ -22,3 +25,8 @@ class CustomSerializer(Serializer):
                 except AttributeError:
                     pass
         super(CustomSerializer, self).end_object(obj)
+
+class BlackListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlackList
+        fields = '__all__'

@@ -14,3 +14,7 @@ class Message(models.Model):
 
     def __str__(self) -> str:
         return f'{self.sender.username}-{self.thread_name}' if self.sender else f'{self.message}-{self.thread_name}'
+
+class BlackList(models.Model):
+    blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocked_user')
+    blocking_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocking_user')

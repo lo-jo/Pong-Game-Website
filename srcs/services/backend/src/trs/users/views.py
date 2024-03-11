@@ -97,7 +97,7 @@ class FriendshipView(APIView):
 
             # target_user = username
             # print("TARGET username:", target_user)
-            target_user = get_object_or_404(User, username=username)
+            target_user = get_object_or_404(User, id=username)
             print("TARGET username:", target_user.username)
 
             # Check if the users are the same

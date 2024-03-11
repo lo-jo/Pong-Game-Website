@@ -52,6 +52,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message = data['message']
                 sender_username = user.username
                 sender = await self.get_user(sender_username.replace('"', ''))
+                if self.is_blocked(sender, self.room_group_name):
+                # Handle the situation where users are blocked (e.g., ignore the message)
+                    return
                 await self.save_message(sender=sender, message=message, thread_name=self.room_group_name)
                 messages = await self.get_messages()
                 await self.channel_layer.group_send(
@@ -126,3 +129,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return None  # Token has expired
         except (jwt.InvalidTokenError, User.DoesNotExist):
             return None  # Invalid token or user not found
+
+    @database_sync_to_async
+    def is_blocked(self, user, thread_name):
+        sender_blocked = BlackList.objects.filter(
+            blocked_user=user,
+            # Double underscore is used to traverse the relationship
+            # between Blacklist model and the User model.
+            blocking_user__username=self.scope['url_route']['kwargs']['id']
+        ).exists()
+
+        receiver_blocked = BlackList.objects.filter(
+            blocked_user__username=self.scope['url_route']['kwargs']['id'],
+            blocking_user=user
+        ).exists()
+
+        return sender_blocked or receiver_blocked
