@@ -77,7 +77,7 @@ export const routes = {
         auth : true
     },
 }
-let onlineSocket = null;
+export let onlineSocket = null;
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
@@ -106,7 +106,7 @@ export const connectUser = () => {
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
             // onlinesocket = null;
-            setTimeout(connect, 5000)
+            setTimeout(connectUser(), 1000)
         }; 
         function setMessage(message) {
             // Create a new li element
