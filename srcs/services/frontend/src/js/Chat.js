@@ -1,8 +1,10 @@
 import { BaseClass } from './BaseClass';
+import { Navbar } from './Navbar';
 
 export class Chat extends BaseClass {
     constructor() {
         super();
+        this.navbar = new Navbar();
         this.chatSocket = null;
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
@@ -32,6 +34,7 @@ export class Chat extends BaseClass {
                 const data = JSON.parse(e.data);
                 console.log(e.data);
                 document.querySelector('#chat-log').value += (data.senderUsername + ": " + data.message + '\n');
+
             }.bind(this);
             this.chatSocket.onclose = function (e) {
                 console.log('Socket closed unexpectedly');

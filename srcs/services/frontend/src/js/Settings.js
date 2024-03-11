@@ -5,14 +5,22 @@ export class Settings extends BaseClass {
     constructor() {
         super();
         this.navbar = new Navbar();
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.boundHandleDocumentClick = this.handleDocumentClick.bind(this);
+        document.addEventListener('click', this.boundHandleDocumentClick);
+        // document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
+
     handleDocumentClick(event) {
         if (event.target.id === 'editButton') {
             event.preventDefault();
             this.handleButtonClick(event);
         }
     }
+
+    removeEventListeners() {
+        document.removeEventListener('click', this.boundHandleDocumentClick);
+    }
+
     async handleButtonClick(event) {
         const getData = async () => {
             const jwtAccess = localStorage.getItem('token');
@@ -89,6 +97,7 @@ export class Settings extends BaseClass {
         })
         .then(data => {
             document.getElementById('app').innerHTML = "Profile succesfully updated";
+            this.removeEventListeners();
         })
         .catch(error => {
             console.error('Failed to update profile', error);

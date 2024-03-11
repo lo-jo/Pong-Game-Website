@@ -26,32 +26,32 @@ export class Profile extends BaseClass {
         this.navbar = new Navbar();
         // this.displayProfile();
     }
-    addFriend = (user) => {
-        const jwtAccess = localStorage.getItem('token');
-        fetch(user.getFriendReq(), {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Handle successful login, e.g., store token in local storage
-            console.log('Succesfully signed up', data);
-            console.log("data: ", data);
-            alert("SUCCESFULLY ADDED AS FRIEND")
-        })
-        .catch(error => {
-            console.error('Impossible friendship : ', error);
-            alert("ERRRRRRROR");
-        });
-    }
+    // addFriend = (user) => {
+    //     const jwtAccess = localStorage.getItem('token');
+    //     fetch(user.getFriendReq(), {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': `Bearer ${jwtAccess}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Error');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         // Handle successful login, e.g., store token in local storage
+    //         console.log('Succesfully signed up', data);
+    //         console.log("data: ", data);
+    //         alert("SUCCESFULLY ADDED AS FRIEND")
+    //     })
+    //     .catch(error => {
+    //         console.error('Impossible friendship : ', error);
+    //         alert("ERRRRRRROR");
+    //     });
+    // }
     displayStatus = (user) =>  {
         const jwtAccess = localStorage.getItem('token');
     
@@ -211,14 +211,14 @@ export class Profile extends BaseClass {
             document.getElementById('nb').innerText = currentUser.id;
             this.displayStatus(currentUser);
             this.updateAccordionContent(currentUser);
-            const friendRequestLink = document.createElement('a');
-            friendRequestLink.href = '#';
-            friendRequestLink.innerText = 'Send Friend Request';
-            friendRequestLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                this.addFriend(currentUser);
-            });
-            document.getElementById('friendRequest').appendChild(friendRequestLink);
+            // const friendRequestLink = document.createElement('a');
+            // friendRequestLink.href = '#';
+            // friendRequestLink.innerText = 'Send Friend Request';
+            // friendRequestLink.addEventListener('click', (event) => {
+            //     event.preventDefault();
+            //     this.addFriend(currentUser);
+            // });
+            // document.getElementById('friendRequest').appendChild(friendRequestLink);
             
         })
         .catch(error => console.error('Error:', error));

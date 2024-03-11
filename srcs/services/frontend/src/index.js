@@ -27,14 +27,28 @@ import { Navbar } from './js/Navbar.js';
 // });
 
 ///////////////////////////////////////////////////////
+// export let eventtt;
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.body.addEventListener('click', (event) => {
+//         if (event.target.tagName === 'A') {
+//             event.preventDefault();
+//             // console.log('navbar button clicked: ', event.target);
+//             navigateTo(event.target);
+            
+//         }
+//     });
+// });
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.body.addEventListener('click', (event) => {
-        if (event.target.tagName === 'A') {
-            event.preventDefault();
-            // console.log('navbar button clicked: ', event.target);
-            navigateTo(event.target);
-        }
-    });
-});
+// const clickHandler = (event) => {
+//     let navLink = document.getElementById("nav-bar");
+//     if (navLink){
+//         if (event.target.tagName === 'A' && navLink) {
+//             event.preventDefault();
+//             navigateTo(event.target);
+//         }
+//     }
+ 
+// };
+
+// document.body.addEventListener('click', clickHandler);
 

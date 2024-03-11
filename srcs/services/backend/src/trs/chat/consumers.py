@@ -7,6 +7,7 @@ from urllib.parse import parse_qs
 from users.models import User
 from chat.models import Message
 from chat.serializers import CustomSerializer
+from chat.models import BlackList
 
 User = get_user_model()
 
@@ -35,11 +36,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'message': welcome_message,
                     'senderUsername': bot,
                 }
+            # store the last connection time to the group in database
     )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         await super().disconnect(close_code)
+        # store the disconnection time to the group in database
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -50,19 +53,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if user:
                 print("RECEIVING", data)
                 message = data['message']
-                sender_username = user.username
-                sender = await self.get_user(sender_username.replace('"', ''))
-                if self.is_blocked(sender, self.room_group_name):
-                # Handle the situation where users are blocked (e.g., ignore the message)
+                receiver_id = user.username
+                sender = await self.get_user(receiver_id.replace('"', ''))
+                print(self.room_group_name)
+                if await self.is_blocked(sender, self.room_group_name):
+                    print("YOU HAVE BLOCKED THIS USER")
                     return
                 await self.save_message(sender=sender, message=message, thread_name=self.room_group_name)
+                # find the queued messages in the db
                 messages = await self.get_messages()
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
                         'type': 'message',
                         'message': message,
-                        'senderUsername': sender_username,
+                        'senderUsername': receiver_id,
                         'messages': messages,
                     },
                 )
@@ -132,16 +137,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def is_blocked(self, user, thread_name):
-        sender_blocked = BlackList.objects.filter(
-            blocked_user=user,
-            # Double underscore is used to traverse the relationship
-            # between Blacklist model and the User model.
-            blocking_user__username=self.scope['url_route']['kwargs']['id']
-        ).exists()
+        print("THREAD NAME", thread_name)
+        receiver_id = self.scope['url_route']['kwargs']['id']
+        print("RECEIVER USERNAME", receiver_id)
+        print("SENDER USERNAME", user)
+        user = user.id
+        print("SENDER userid", user)
 
-        receiver_blocked = BlackList.objects.filter(
-            blocked_user__username=self.scope['url_route']['kwargs']['id'],
-            blocking_user=user
-        ).exists()
+        blocked_users = BlackList.objects.filter(blocked_user=user)
+
+        receiver_blocked = any(user.blocking_user.username == receiver_id for user in blocked_users)
+        
+        sender_blocked = any(user.blocked_user.username == receiver_id for user in blocked_users)
 
         return sender_blocked or receiver_blocked
+
+    # @database_sync_to_async
+    # def is_blocked(self, user, thread_name):
+    #     print("THREAD NAME", thread_name)
+    #     receiver_id = self.scope['url_route']['kwargs']['id']
+    #     print("SENDER USERNAME", receiver_id)
+    #     print("TARGET", user)
+    #     user_id = user.id
+    #     print("current userid", user)
+
+    #     blocked_users = BlackList.objects.filter(blocked_user=user_id)
+
+    #     receiver_blocked = any(user.blocking_user.username == receiver_id for user_id in blocked_users)
+        
+    #     sender_blocked = any(user.blocked_user.username == sender_id for user_id in blocked_users)
+
+    #     return sender_blocked or receiver_blocked

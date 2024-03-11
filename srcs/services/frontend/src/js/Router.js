@@ -135,9 +135,19 @@ export const connectUser = () => {
 }
 
 // Use the history API to prevent full page reload
-export const navigateTo = (url) => {
-    history.pushState(null, null, url);
+// export const navigateTo = (event) => {
+//     history.pushState(null, null, event.target);
+
+//     router();
+
+// };
+
+export const navigateTo = (target) => {
+    history.pushState(null, null, target);
     router();
+
+    // Remove the event listener using the same function reference
+    
 };
 
 
@@ -210,6 +220,7 @@ export const router = async () => {
 
     document.getElementById('header').innerHTML = await view.getHtmlForHeader();
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
+    // document.body.removeEventListener('click', clickHandler);
 }
 
 window.addEventListener("popstate", router);

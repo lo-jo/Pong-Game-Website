@@ -9,8 +9,8 @@ export class Logout extends BaseClass{
         this.clearToken();
     }
     clearToken() {
-        if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN)
-            onlineSocket.close();
+        // if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN)
+        //     onlineSocket.close();
         const token = localStorage.getItem('jwt_token');
         localStorage.removeItem('jwt_token');
         sessionStorage.removeItem(token);
