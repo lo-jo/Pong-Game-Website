@@ -169,7 +169,7 @@ function findMatchingRoute(url) {
 }
 
 const navbar = new Navbar();
-navbar.getHtml();
+// navbar.getHtml();
 
 export const router = async () => {
     const status = localStorage.getItem('sessionSocket');
@@ -189,17 +189,17 @@ export const router = async () => {
     if (!viewObject) {
         const errorView = new ErrorClass();
         // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-        document.getElementById('header').innerHTML = navbar.getHtml();
+        await navbar.getHtml();
         document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
         return;
     }
 
     if (viewObject.auth === true) {
         const token = localStorage.getItem('token');
-        if (!token) {
+        if (!token || navbar.checkAuthentication() === false) {
             const errorView = new ErrorClass();
             // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-            document.getElementById('header').innerHTML = navbar.getHtml();
+            await navbar.getHtml();
             document.getElementById('app').innerHTML = errorView.getHtmlForMain();
             return;
         }
@@ -222,7 +222,7 @@ export const router = async () => {
     }
 
     // document.getElementById('header').innerHTML = await view.getHtmlForHeader();
-    document.getElementById('header').innerHTML = await navbar.getHtml();
+    await navbar.getHtml();
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
 }
 

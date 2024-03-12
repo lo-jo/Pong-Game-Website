@@ -1,10 +1,10 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
+// import { Navbar } from './Navbar';
 
 export class Logout extends BaseClass{
     constructor() {
         super();
-        this.navbar = new Navbar();
+        // this.navbar = new Navbar();
         this.clearToken();
     }
     clearToken() {
