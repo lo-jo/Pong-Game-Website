@@ -9,14 +9,17 @@ export class Chat extends BaseClass {
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
-    handleDocumentClick(event) {
-        if (event.target.id === 'sendButton') {
+    async handleDocumentClick(event) {
+        this.sendButton = document.getElementById('sendButton');
+        if (event.target.id === 'sendButton' && this.sendButton && this.sendButton.disabled == false) {
             event.preventDefault();
+            this.sendButton.disabled = true;
             this.handleButtonClick(event);
+            this.sendButton.disabled = false;
         }
     }
 
-    handleButtonClick() {
+    async handleButtonClick() {
         const token = localStorage.getItem('token');
         const chatId = document.getElementById("target").value
         // Check if the WebSocket connection already exists
@@ -70,6 +73,10 @@ export class Chat extends BaseClass {
 
     getHtmlForMain() {
         return `<div class="container">
+        <div class="row align-items-start">
+        <div class="col">
+        </div>
+        <div class="col">
             <div class="row" id="ChatHeader"><h1>Messages</h1></div>
             <div class="row">
                 <textarea class="form-control form-control-sm" id="chat-log" cols="40" rows="10"></textarea><br>
@@ -81,6 +88,8 @@ export class Chat extends BaseClass {
                 <input class="form-control form-control-sm" id="target" placeholder="Who do you want to send a msg to ?" type="text">
                 <button type="submit" id="sendButton" class="btn btn-dark btn-sm">JOIN</button></div>
             </div>
+        </div>
+        </div>
             `;
     }
 
