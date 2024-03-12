@@ -26,7 +26,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def receive(self, text_data):
-        print("WHY ARE YOU NOT RECEIVING THIS SHIT", text_data)
+        print("receiving")
+        # print("WHY ARE YOU NOT RECEIVING THIS SHIT", text_data)
 
     async def disconnect(self, close_code):
         user = self.scope.get("user")

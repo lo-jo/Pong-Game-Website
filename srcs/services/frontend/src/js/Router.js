@@ -111,29 +111,29 @@ export const connectUser = () => {
             // onlinesocket = null;
             setTimeout(connectUser(), 1000)
         }; 
-        function setMessage(message) {
-            // Create a new li element
-            var newLi = document.createElement('li');
+        // function setMessage(message) {
+        //     // Create a new li element
+        //     var newLi = document.createElement('li');
     
-            // Create a new anchor element
-            var newAnchor = document.createElement('a');
-            newAnchor.className = 'dropdown-item text-wrap';
-            newAnchor.href = '#';
-            newAnchor.textContent = message;
+        //     // Create a new anchor element
+        //     var newAnchor = document.createElement('a');
+        //     newAnchor.className = 'dropdown-item text-wrap';
+        //     newAnchor.href = '#';
+        //     newAnchor.textContent = message;
     
-            // Append the anchor element to the li element
-            newLi.appendChild(newAnchor);
+        //     // Append the anchor element to the li element
+        //     newLi.appendChild(newAnchor);
     
-            // Get the ul element with the id "notify"
-            var ulElement = document.getElementById('notify');
+        //     // Get the ul element with the id "notify"
+        //     var ulElement = document.getElementById('notify');
     
-            // Append the new li element to the ul element
-            ulElement.appendChild(newLi);
+        //     // Append the new li element to the ul element
+        //     ulElement.appendChild(newLi);
     
-            // getting object of count
-            count = document.getElementById('bellCount').getAttribute('data-count');
-            document.getElementById('bellCount').setAttribute('data-count', parseInt(count) + 1);
-        }
+        //     // getting object of count
+        //     count = document.getElementById('bellCount').getAttribute('data-count');
+        //     document.getElementById('bellCount').setAttribute('data-count', parseInt(count) + 1);
+        // }
     }
 }
 
@@ -154,9 +154,6 @@ export const connectUser = () => {
 export const navigateTo = (target) => {
     history.pushState(null, null, target);
     router();
-
-    // Remove the event listener using the same function reference
-    
 };
 
 
@@ -183,13 +180,7 @@ const navbar = new Navbar();
 // navbar.getHtml();
 
 export const router = async () => {
-    const status = localStorage.getItem('sessionSocket');
-    // console.log("STATUS:", status);
-    // if (status != "ONLINE")
-    // {
-        connectUser();
-    // }
-
+    connectUser();
     const path = window.location.pathname;
     console.log(`path[${path}]`);
     const matchedRoute = findMatchingRoute(path);
@@ -221,7 +212,9 @@ export const router = async () => {
         id = path.split('/')[2];
     }
 
+    
     const view = new viewObject.view(id);
+    
 
     if (viewObject.css) {
         const styleCss = document.createElement('link');

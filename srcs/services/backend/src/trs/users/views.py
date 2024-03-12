@@ -77,7 +77,7 @@ class FriendshipView(APIView):
 
         modified_data = []
         for entry in serializer.data:
-            print("is it looping thru : ", list(entry.values()))
+            # print("is it looping thru : ", list(entry.values()))
             if usernombre in entry.values():
                 if (entry['sender_username'] == usernombre):
                     del entry['sender_username']
