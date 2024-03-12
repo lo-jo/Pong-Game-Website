@@ -1,54 +1,32 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/js/dist/collapse';
 /*Import classes*/
-import { navigateTo } from './js/Router.js'
-import { Navbar } from './js/Navbar.js';
+import { router, navigateTo } from './js/Router.js';
 
-/////////////////////////////////////////////////////////////
-// // TO BE FIXED: full page reload when URL is change directly
-// const handleLinkClick = (event) => {
-//     event.preventDefault();
-//     const href = event.target.getAttribute('href');
-//     history.pushState({}, '', href);
-//     router();
-// };
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     router();
-
-//     document.body.addEventListener('click', (event) => {
-//         if (event.target.tagName === 'A') {
-//             // console.log("HERE WE MADE CLICK");
-//             handleLinkClick(event);
-//         }
-//     });
-
-//     window.addEventListener('popstate', router);
-// });
-
-///////////////////////////////////////////////////////
-// export let eventtt;
 // document.addEventListener('DOMContentLoaded', () => {
 //     document.body.addEventListener('click', (event) => {
 //         if (event.target.tagName === 'A') {
 //             event.preventDefault();
 //             // console.log('navbar button clicked: ', event.target);
 //             navigateTo(event.target);
-            
 //         }
 //     });
 // });
 
-// const clickHandler = (event) => {
-//     let navLink = document.getElementById("nav-bar");
-//     if (navLink){
-//         if (event.target.tagName === 'A' && navLink) {
+// window.addEventListener('DOMContentLoaded', () => {
+//     // router();
+//     document.body.addEventListener('click', (event) => {
+//         if (event.target.classList.contains('navbar-link')) {
+//             console.log(`navbar-link[${event.target}]`);
 //             event.preventDefault();
 //             navigateTo(event.target);
 //         }
-//     }
- 
-// };
+//     });
+// });
 
-// document.body.addEventListener('click', clickHandler);
+// window.addEventListener("popstate", router);
 
+// document.addEventListener('DOMContentLoaded', () => {
+//     router();
+// });

@@ -8,22 +8,22 @@ export class Login extends BaseClass
 {
     constructor() {
         super();
-        this.navbar = new Navbar();
+        // this.navbar = new Navbar();
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
-    handleDocumentClick(event) {
+    async handleDocumentClick(event) {
         if (event.target.id === 'loginButton') {
             event.preventDefault();
-            this.handleButtonClick(event);
+            await this.handleButtonClick(event);
         }
     }
-    handleButtonClick(event) {
+    async handleButtonClick(event) {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
         // const protocol = window.PROTOCOL;
 
-        fetch('http://localhost:8000/users/token/', {
+        await fetch('http://localhost:8000/users/token/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

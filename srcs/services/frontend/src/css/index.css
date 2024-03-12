@@ -22,12 +22,18 @@ body {
   justify-content: space-around;
 }
 
-#nav-bar a{
+#nav-bar button{
   text-decoration: none;
 }
 
-.btn-nav-bar{
-  color: white;
+#nav-bar .btn.btn-link:hover{
+  color: rgb(214, 210, 210);
+  text-decoration: underline;
+}
+
+#nav-bar .btn.btn-link{
+  color: #ffff;
+  /* font-weight: bold; */
 }
 
 #app {

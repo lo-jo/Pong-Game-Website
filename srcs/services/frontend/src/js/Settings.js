@@ -1,15 +1,12 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
+// import { Navbar } from './Navbar';
 
 export class Settings extends BaseClass {
     constructor() {
         super();
-        this.navbar = new Navbar();
-        this.boundHandleDocumentClick = this.handleDocumentClick.bind(this);
-        document.addEventListener('click', this.boundHandleDocumentClick);
-        // document.addEventListener('click', this.handleDocumentClick.bind(this));
+        // this.navbar = new Navbar();
+        document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
-
     async handleDocumentClick(event) {
         this.editButton = document.getElementById('editButton');
         if (event.target.id === 'editButton' && this.editButton && this.editButton.disabled == false) {

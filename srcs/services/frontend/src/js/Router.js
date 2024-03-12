@@ -5,12 +5,14 @@ import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 // import { PongGame } from './Game.js';
+import { Tournament } from './Tournament.js';
 import { MatchLobby } from './MatchLobby.js'
 import { Match } from './Match.js'
 import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
+import { Navbar } from './Navbar.js';
 
 
 export const routes = {
@@ -135,6 +137,12 @@ export const connectUser = () => {
     }
 }
 
+// '/tournament/:id/match/:id' : {
+//     path : '/tournament',
+//     view :Tournament,
+//     auth : true
+// }
+
 // Use the history API to prevent full page reload
 // export const navigateTo = (event) => {
 //     history.pushState(null, null, event.target);
@@ -171,6 +179,8 @@ function findMatchingRoute(url) {
     return null;
 }
 
+const navbar = new Navbar();
+navbar.getHtml();
 
 export const router = async () => {
     const status = localStorage.getItem('sessionSocket');
@@ -181,6 +191,7 @@ export const router = async () => {
     // }
 
     const path = window.location.pathname;
+    console.log(`path[${path}]`);
     const matchedRoute = findMatchingRoute(path);
 
     const viewObject = routes[matchedRoute];
@@ -188,7 +199,8 @@ export const router = async () => {
     
     if (!viewObject) {
         const errorView = new ErrorClass();
-        document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+        // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+        document.getElementById('header').innerHTML = navbar.getHtml();
         document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
         return;
     }
@@ -197,7 +209,8 @@ export const router = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             const errorView = new ErrorClass();
-            document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+            // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+            document.getElementById('header').innerHTML = navbar.getHtml();
             document.getElementById('app').innerHTML = errorView.getHtmlForMain();
             return;
         }
@@ -219,7 +232,8 @@ export const router = async () => {
         document.head.appendChild(styleCss);
     }
 
-    document.getElementById('header').innerHTML = await view.getHtmlForHeader();
+    // document.getElementById('header').innerHTML = await view.getHtmlForHeader();
+    document.getElementById('header').innerHTML = await navbar.getHtml();
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
     // document.body.removeEventListener('click', clickHandler);
 }

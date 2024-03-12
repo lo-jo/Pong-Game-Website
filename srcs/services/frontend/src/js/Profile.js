@@ -1,5 +1,5 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
+// import { Navbar } from './Navbar';
 
 class User{
     constructor(username, pic, id, email, bio) {
@@ -23,7 +23,7 @@ class User{
 export class Profile extends BaseClass {
     constructor() {
         super();
-        this.navbar = new Navbar();
+        // this.navbar = new Navbar();
         // this.displayProfile();
     }
     // addFriend = (user) => {
