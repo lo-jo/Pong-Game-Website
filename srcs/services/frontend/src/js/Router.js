@@ -12,6 +12,7 @@ import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
+import { Navbar } from './Navbar.js';
 
 export const routes = {
     '/' : {
@@ -54,11 +55,6 @@ export const routes = {
     '/chat' : {
         path : '/chat',
         view : Chat,
-        auth : true
-    },
-    '/tournament' : {
-        path : '/tournament',
-        view :Tournament,
         auth : true
     },
     '/match_lobby' : {
@@ -172,6 +168,9 @@ function findMatchingRoute(url) {
     return null;
 }
 
+const navbar = new Navbar();
+navbar.getHtml();
+
 export const router = async () => {
     const status = localStorage.getItem('sessionSocket');
     // console.log("STATUS:", status);
@@ -189,7 +188,8 @@ export const router = async () => {
     
     if (!viewObject) {
         const errorView = new ErrorClass();
-        document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+        // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+        document.getElementById('header').innerHTML = navbar.getHtml();
         document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
         return;
     }
@@ -198,7 +198,8 @@ export const router = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             const errorView = new ErrorClass();
-            document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+            // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+            document.getElementById('header').innerHTML = navbar.getHtml();
             document.getElementById('app').innerHTML = errorView.getHtmlForMain();
             return;
         }
@@ -220,12 +221,13 @@ export const router = async () => {
         document.head.appendChild(styleCss);
     }
 
-    document.getElementById('header').innerHTML = await view.getHtmlForHeader();
+    // document.getElementById('header').innerHTML = await view.getHtmlForHeader();
+    document.getElementById('header').innerHTML = await navbar.getHtml();
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
 }
 
-// window.addEventListener("popstate", router);
+window.addEventListener("popstate", router);
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     router();
-// });
+document.addEventListener('DOMContentLoaded', () => {
+    router();
+});

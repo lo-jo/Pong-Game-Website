@@ -14,16 +14,19 @@ import { router, navigateTo } from './js/Router.js';
 //     });
 // });
 
-window.addEventListener('DOMContentLoaded', () => {
-    router();
-    document.body.addEventListener('click', (event) => {
-        if (event.target.classList.contains('navbar-link')) {
-            console.log(`navbar-link[${event.target}]`);
-            event.preventDefault();
-            navigateTo(event.target);
-        }
-    });
-});
+// window.addEventListener('DOMContentLoaded', () => {
+//     // router();
+//     document.body.addEventListener('click', (event) => {
+//         if (event.target.classList.contains('navbar-link')) {
+//             console.log(`navbar-link[${event.target}]`);
+//             event.preventDefault();
+//             navigateTo(event.target);
+//         }
+//     });
+// });
 
-window.addEventListener("popstate", router);
+// window.addEventListener("popstate", router);
 
+// document.addEventListener('DOMContentLoaded', () => {
+//     router();
+// });
