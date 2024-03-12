@@ -13,9 +13,12 @@ export class Login extends BaseClass
     }
 
     async handleDocumentClick(event) {
-        if (event.target.id === 'loginButton') {
+        this.loginButton = document.getElementById('loginButton');
+        if (event.target.id === 'loginButton'  && this.loginButton && this.loginButton.disabled == false) {
             event.preventDefault();
+            this.loginButton.disabled = true;
             await this.handleButtonClick(event);
+            this.loginButton.disabled = false;
         }
     }
     async handleButtonClick(event) {
