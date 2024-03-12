@@ -12,6 +12,7 @@ import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
 
+
 export const routes = {
     '/' : {
         path : '/',
