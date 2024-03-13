@@ -8,6 +8,7 @@ export class Match extends BaseClass {
         this.navbar = new Navbar();
         this.id = id;
         this.css = './css/game.css',
+        document.addEventListener('click', this.handleButtonClick.bind(this));
         // this.insertCssLink();
         this.initWebSocket();
     }
@@ -28,7 +29,7 @@ export class Match extends BaseClass {
             console.log(data);
             const { game_state } = data;
             console.log(game_state);
-            this.updateGameState(game_state);
+            this.updateGameState(game_state, data);
         };
 
         socket.onerror = function(error) {
@@ -38,6 +39,12 @@ export class Match extends BaseClass {
         socket.onclose = function() {
             console.log('WebSocket (match game) connection closed.');
         };
+    }
+
+    async handleButtonClick(event) {
+        if (event.target.id === 'confirm-match') {
+            socket.send(JSON.stringify({ 'message' : 'confirm'}));
+        }
     }
 
     insertCssLink()
@@ -55,7 +62,7 @@ export class Match extends BaseClass {
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return ``;
+        return `<button id="confirm-match">Ready</button>`;
     }
 
     getScreenParams()
@@ -70,7 +77,7 @@ export class Match extends BaseClass {
         return screenParams;
     }
 
-    updateGameState(game_state)
+    updateGameState(game_state, data)
     {
         console.log(game_state);
         if (game_state === 'init_pong_game')
@@ -80,8 +87,24 @@ export class Match extends BaseClass {
         }
         else if (game_state === 'someone_left')
         {
-            alert('here');
+            alert('Someone left');
         }
+        else if (game_state === 'timer')
+        {
+            let { timer } = data;
+            console.log(timer)
+            this.updateTimer(timer);
+        }
+    }
+
+    updateTimer(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+        document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
 }
 

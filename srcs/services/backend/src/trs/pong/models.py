@@ -13,6 +13,8 @@ class Match(models.Model):
     
     STATUS_CHOICES = [
         ('pending', 'Pending'),
+        ('joined', 'Joined'),
+        ('playing','Playing'),
         ('completed', 'Completed'),
     ]
 
@@ -23,3 +25,6 @@ class Match(models.Model):
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='matches_won')
     tournament = models.ForeignKey(Tournament, on_delete=models.SET_NULL, null=True, related_name='matches')
     created_at = models.DateTimeField(default=timezone.now)
+    timer_started = models.BooleanField(default=False)
+    time_elapsed = models.IntegerField(default=0)
+

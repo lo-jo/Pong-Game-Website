@@ -118,6 +118,9 @@ class PongEndpoint(BaseEndpoint):
             },
             '/pong/join_match/' : {
                 'POST' : self.post_join_match
+            },
+            '/pong/delete-all-items/' : {
+                'POST' : self.delete_all_items
             }
         }
         self.uri_id_question = "Enter the match ID: "
@@ -156,6 +159,14 @@ class PongEndpoint(BaseEndpoint):
         return match_data
 
     def post_join_match(self, endpoint_uri, http_method, token_user, host):
+        command = [
+            'curl', '-k' ,'-X', 'POST',
+            '-H', f'Authorization: Bearer {token_user}',
+            f'{host}{endpoint_uri}'
+        ]
+        return command
+
+    def delete_all_items(self, endpoint_uri, http_method, token_user, host):
         command = [
             'curl', '-k' ,'-X', 'POST',
             '-H', f'Authorization: Bearer {token_user}',

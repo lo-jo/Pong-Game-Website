@@ -143,4 +143,8 @@ class JoinMatchView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-       
+class DeleteAllMatches(APIView):
+    def post(self, request, format=None):
+        Match.objects.all().delete()
+        return Response({'message': 'All items have been deleted'}, status=status.HTTP_204_NO_CONTENT)
+

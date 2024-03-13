@@ -51,6 +51,9 @@ export const initGameTwoD = () => {
 	gameState = 'start';
 	// document.getElementById('app').innerHTML = '';
 	// document.getElementById('app').className = 'container';
+	let timer = document.createElement('div');
+	timer.setAttribute('id', 'timer');
+
 	let box = document.createElement('div');
 	box.className = 'container';
 
@@ -67,6 +70,7 @@ export const initGameTwoD = () => {
 
     board = createBoard('board');
 	document.getElementById('app').appendChild(board);
+	board.appendChild(timer);
 
 	// Ball movement
 	// paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
