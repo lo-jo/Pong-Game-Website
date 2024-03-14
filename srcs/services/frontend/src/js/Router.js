@@ -15,6 +15,7 @@ import { Logout } from './Logout.js';
 import { Navbar } from './Navbar.js';
 
 
+
 export const routes = {
     '/' : {
         path : '/',
@@ -177,7 +178,9 @@ function findMatchingRoute(url) {
 }
 
 const navbar = new Navbar();
-// navbar.getHtml();
+
+// await navbar.getHtml();
+
 
 export const router = async () => {
     connectUser();
@@ -212,9 +215,9 @@ export const router = async () => {
         id = path.split('/')[2];
     }
 
-    
-    const view = new viewObject.view(id);
-    
+    navbar.removeClickEventsAndListeners();
+
+    let view = new viewObject.view(id);
 
     if (viewObject.css) {
         const styleCss = document.createElement('link');
@@ -227,6 +230,7 @@ export const router = async () => {
 
     // document.getElementById('header').innerHTML = await view.getHtmlForHeader();
     await navbar.getHtml();
+    // document.getElementById('app').innerHTML = '';
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
     // document.body.removeEventListener('click', clickHandler);
 }
@@ -234,5 +238,6 @@ export const router = async () => {
 window.addEventListener("popstate", router);
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM CONTETN LOADED");
     router();
 });

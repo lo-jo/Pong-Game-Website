@@ -2,17 +2,35 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import BlackList
+from rest_framework import status
+from rest_framework.views import APIView
 from .serializers import BlackListSerializer
+from django.shortcuts import get_object_or_404
+from users.models import User
+from rest_framework.response import Response
 
-class BlockUserView(generics.CreateAPIView):
-    queryset = BlackList.objects.all()
-    serializer_class = BlackListSerializer
+class BlockUserView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer, pk):
+    def post(self, request, pk):
         blocked_user = get_object_or_404(User, pk=pk)
-        serializer.save(blocking_user=self.request.user, blocked_user=blocked_user)
+        blocking_user = request.user.id
+        if blocking_user == blocked_user:
+            return Response({"error": "You cannot block yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if BlackList.objects.filter(blocking_user=blocking_user, blocked_user=blocked_user).exists():
+            print("already blocked this bitch")
+            return Response({"error": "You have already blocked this user."}, status=status.HTTP_400_BAD_REQUEST)
+        if Friendship.objects.filter(blocking_user=blocked_user, blocked_user=blocking_user).exists():
+            return Response({"error": "The user you're trying to block has already blocked you."}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+        serializer = BlackListSerializer(data={'blocking_user': request.user.id, 'blocked_user': blocked_user.id})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UnblockUserView(generics.DestroyAPIView):
     queryset = BlackList.objects.all()

@@ -1,9 +1,10 @@
 import jwt_decode from 'jwt-decode';
-import { navigateTo } from './Router.js';
+import { navigateTo} from './Router.js';
 
 export class Navbar {
     constructor() {
-        this.updateNavbar();
+        // this.updateNavbar();
+        this.clickEvents = [];
     }
     
     async checkAuthentication() {
@@ -49,16 +50,27 @@ export class Navbar {
         }
     }
 
+    removeClickEventsAndListeners() {
+        this.clickEvents.forEach(eventObj => {
+            eventObj.target.removeEventListener('click', this.handleButtonClick);
+        });
+        this.clickEvents = [];
+    }
+
+
     handleButtonClick(event, path) {
-        console.log(`click to: ${path}`);
         event.preventDefault();
+        event.stopImmediatePropagation();
+        const buttonElement = event.currentTarget;
+        this.clickEvents.push({ event, path, target: buttonElement  });
+        console.log(`click to: ${path}`);
         navigateTo(path);
     }
 
     async updateNavbar() {
         const isAuthenticated = await this.checkAuthentication();
         const navbar = document.getElementById('header');
-
+        console.log("UPDATENNAVBAR");
         if (isAuthenticated) {
             navbar.innerHTML = `<nav id="nav-bar">
                                 <button class="btn btn-link" id="profileBtn">Profile</button>
@@ -68,12 +80,13 @@ export class Navbar {
                                 <button class="btn btn-link" id="logoutBtn">Log out</button>
                                 </nav>`;
 
+            document.getElementById('chatBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/chat'));
             document.getElementById('profileBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/profile'));
             document.getElementById('settingsBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/settings'));
             document.getElementById('dashboardBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/dashboard'));
-            document.getElementById('chatBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/chat'));
             document.getElementById('logoutBtn').addEventListener('click', (event) => this.handleButtonClick(event, '/logout'));
-        } else {
+        }
+        else {
             navbar.innerHTML = `<nav id="nav-bar">
                                     <button class="btn btn-link" id="registerBtn">Sign up</button>
                                     <button class="btn btn-link" id="loginBtn">Log in</button>

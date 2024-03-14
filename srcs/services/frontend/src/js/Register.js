@@ -16,20 +16,23 @@ export class Register extends BaseClass
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 
-    handleDocumentClick(event) {
-        if (event.target.id === 'register') {
+    async handleDocumentClick(event) {
+        this.registerButton = document.getElementById('register');
+        if (event.target.id === 'register' && this.registerButton && this.registerButton.disabled == false) {
             event.preventDefault();
-            this.handleButtonClick(event);
+            this.registerButton.disabled = true;
+            await this.handleButtonClick(event);
+            this.registerButton.disabled = false;
         }
     }
-    handleButtonClick(event) {
+    async handleButtonClick(event) {
         console.log("We are at submitRegister!");
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const email = document.getElementById('email').value;
         console.log(`username ${username} password: ${password} email: ${email}`);
         
-        fetch('http://localhost:8000/users/register/', {
+        await fetch('http://localhost:8000/users/register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -39,7 +42,9 @@ export class Register extends BaseClass
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Invalid credentials');
+                document.getElementById('app').innerHTML = "Invalid Credentials";
+                // throw new Error('Invalid credentials');
+                
             }
             return response.json();
         })
