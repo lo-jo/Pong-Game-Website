@@ -9,9 +9,7 @@ export class Settings extends BaseClass {
         this.editButton = document.getElementById('editButton');
         if (event.target.id === 'editButton' && this.editButton && this.editButton.disabled == false) {
             event.preventDefault();
-            this.editButton.disabled = true;
             await this.handleButtonClick(event);
-            this.editButton.disabled = false;
         }
     }
 

@@ -6,10 +6,12 @@ export class Dashboard extends BaseClass {
     constructor() {
         super();
         this.tournament = new Tournament(this);
-        document.getElementById('app').addEventListener('click', this.handleButtonClick.bind(this));
+        // this.handleDocumentClickBound = this.handleButtonClick.bind(this);
+        // document.getElementById('app').addEventListener('click', this.handleDocumentClickBound);
+        // document.getElementById('app').addEventListener('click', this.handleButtonClick.bind(this));
     }
 
-    async handleButtonClick(event) {
+    async handleDocumentClick(event) {
         console.log(`button clicked:[${event.target.id}]`);
 
         this.createTournamentButton = document.getElementById('createTournament');

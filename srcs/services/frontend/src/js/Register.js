@@ -5,8 +5,6 @@ export class Register extends BaseClass
 {
     constructor() {
         super();
-        this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
-        document.addEventListener('click', this.handleDocumentClickBound );
     }
 
     getCookie(name) {
@@ -36,37 +34,24 @@ export class Register extends BaseClass
             },
             body: JSON.stringify({ username, email, password }),
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.access) {
-                history.pushState({}, '', '/login');
-                router();
-            } else {
-                console.log("Invalid Credentials");
-                // document.getElementById('app').innerHTML = "Invalid Credentials"
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Invalid credentials');
             }
+            return response.json();
+        })
+        .then(data => {
+            // Handle successful login, e.g., store token in local storage
+            // console.log('Succesfully signed up', data);
+            // console.log("data: ", data);
+            // document.getElementById('app').innerHTML = "successfully signed up";
+            // Redirect to another page or perform additional actions
+            history.pushState({}, '', '/login');
+            router();
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('ERROR : ', error);
         });
-        // .then(response => {
-        //     if (!response.ok) {
-        //         throw new Error('Invalid credentials');
-        //     }
-        //     return response.json();
-        // })
-        // .then(data => {
-        //     // Handle successful login, e.g., store token in local storage
-        //     // console.log('Succesfully signed up', data);
-        //     // console.log("data: ", data);
-        //     // document.getElementById('app').innerHTML = "successfully signed up";
-        //     // Redirect to another page or perform additional actions
-        //     history.pushState({}, '', '/login');
-        //     router();
-        // })
-        // .catch(error => {
-        //     console.error('ERROR : ', error);
-        // });
     }
 
     async getHtmlForMain() {
@@ -86,7 +71,4 @@ export class Register extends BaseClass
         </div>`
     }
 
-    cleanup() {
-        document.removeEventListener('click', this.handleDocumentClickBound);
-    }
 }

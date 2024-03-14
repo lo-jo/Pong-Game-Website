@@ -2,76 +2,12 @@ import { BaseClass } from './BaseClass';
 import jwt_decode from 'jwt-decode';
 import { connectUser, router } from './Router';
 
-// export class Login extends BaseClass
-// {
-//     constructor() {
-//         super();
-//         document.addEventListener('click', this.handleDocumentClick.bind(this));
-//     }
-
-//     async handleDocumentClick(event) {
-//         this.loginButton = document.getElementById('loginButton');
-//         if (event.target.id === 'loginButton'  && this.loginButton && this.loginButton.disabled == false) {
-//             event.preventDefault();
-//             // this.loginButton.disabled = true;
-//             await this.handleButtonClick(event);
-//             // this.loginButton.disabled = false;
-//         }
-//     }
-//     async handleButtonClick(event) {
-//         const username = document.getElementById("username").value;
-//         const password = document.getElementById("password").value;
-//         // const protocol = window.PROTOCOL;
-
-//         await fetch('http://localhost:8000/users/token/', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//                 username: username,
-//                 password: password,
-//             }),
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.access) {
-//                 // Store the JWT token in localStorage
-//                 localStorage.setItem('token', data.access);
-//                 // let jwtToken = localStorage.getItem('token');
-//                 // let decoded_token = jwt_decode(jwtToken);
-//                 // alert(decoded_token.user_id);
-//                 connectUser();
-//                 history.pushState({}, '', '/dashboard');
-//                 router();
-//             } else {
-//                 console.log("Invalid Credentials");
-//                 // document.getElementById('app').innerHTML = "Invalid Credentials"
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//             document.getElementById("message").innerText = 'Error during login';
-//         });
-//     }
-
-//     async getHtmlForMain() {
-//         return `<h1>Login</h1>
-//                 <form id="loginForm">
-//                     <label for="username">Username:</label>
-//                     <input class="form-control form-control-sm" type="text" id="username" name="username" required autocomplete="username"><br>
-//                     <label for="password">Password:</label>
-//                     <input class="form-control form-control-sm" type="password" id="password" name="password" required autocomplete="current-password"><br>
-//                     <button type="submit" id="loginButton" class="btn btn-dark btn-sm">Sign-in</button>
-//                 </form>`
-//     }
-// }
-
 export class Login extends BaseClass {
     constructor() {
         super();
-        this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
-        document.addEventListener('click', this.handleDocumentClickBound);
+        this.addDocumentClickListener();
+        // this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
+        // document.getElementById('app').addEventListener('click', this.handleDocumentClickBound);
     }
 
     async handleDocumentClick(event) {
@@ -127,7 +63,8 @@ export class Login extends BaseClass {
                 </form>`
     }
 
-    cleanup() {
-        document.removeEventListener('click', this.handleDocumentClickBound);
-    }
+    // cleanup() {
+    //     super.cleanup();
+    //     // document.getElementById('app').removeEventListener('click', this.handleDocumentClickBound);
+    // }
 }

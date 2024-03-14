@@ -11,9 +11,9 @@ export class Chat extends BaseClass {
         this.sendButton = document.getElementById('sendButton');
         if (event.target.id === 'sendButton' && this.sendButton && this.sendButton.disabled == false) {
             event.preventDefault();
-            this.sendButton.disabled = true;
+            // this.sendButton.disabled = true;
             this.handleButtonClick(event);
-            this.sendButton.disabled = false;
+            // this.sendButton.disabled = false;
         }
     }
 

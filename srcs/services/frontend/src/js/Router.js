@@ -176,6 +176,7 @@ export const router = async () => {
     let id = null;
 
     if (previousView && typeof previousView.cleanup === 'function') {
+        console.log("CLEANING UP SHITTY EVENT LISTENERS");
         previousView.cleanup();
     }
 
@@ -216,13 +217,9 @@ export const router = async () => {
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
         styleCss.href = viewObject.css;
-        console.log(viewObject.css)
-        console.log(styleCss.href);
         document.head.appendChild(styleCss);
     }
 
-    // document.getElementById('app').innerHTML = '';
-    // document.getElementById('header').innerHTML = '';
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
     (viewObject.path === '/logout') ? navbar.setIsAuthenticated(false) : navbar.setIsAuthenticated(auth);
     navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
@@ -278,10 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM content loaded (Router.js)");
     router();
     document.getElementById('header').innerHTML = navbar.getHtml();
-    
     document.getElementById('header').addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.classList.contains('navbar-link')) {
-            console.log('LISTENER (index.js) navbar button clicked: ', event.target);
+            console.log('LISTENER (Router.js) navbar button clicked: ', event.target);
             event.preventDefault();
             navigateTo(event.target);
         }
