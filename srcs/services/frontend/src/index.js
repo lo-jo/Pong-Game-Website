@@ -29,6 +29,7 @@ import { Navbar } from './js/Navbar.js';
 ///////////////////////////////////////////////////////
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Veo esto?");
     document.body.addEventListener('click', (event) => {
         if (event.target.tagName === 'A') {
             event.preventDefault();

@@ -55,11 +55,11 @@ export class Navbar {
 
         if (isAuthenticated) {
             navbar.innerHTML = `<nav id="nav-bar">
-                                <a href="/profile">Profile</a>
-                                <a href="/settings">Settings</a>
-                                <a href="/dashboard">Dashboard</a>
-                                <a href="/chat">Chat</a>
-                                <a href="/logout">Log out</a>
+                                    <a href="/profile">Profile</a>
+                                    <a href="/settings">Settings</a>
+                                    <a href="/dashboard">Dashboard</a>
+                                    <a href="/chat">Chat</a>
+                                    <a href="/logout">Log out</a>
                                 </nav>`;
         } else {
             navbar.innerHTML = `<nav id="nav-bar">

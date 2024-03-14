@@ -36,8 +36,12 @@ class UserCLI:
             return False
 
         # uri = endpoint_class.set_id(endpoint_uri, endpoint_class.uri_id_question)
-        if endpoint_class.handle_request(endpoint_uri, http_method, self.token, self.host) != False:
+        if endpoint_class.handle_http_request(endpoint_uri, http_method, self.token, self.host) != False:
             print("A JSON file has been created with the response from the API")
         input("Press any to continue ...")
         os.system('clear')
+        return True
+
+    def send_wss_request(self, endpoint_class, endpoint_wss):
+        endpoint_class.handle_wss_request(endpoint_wss, self.token, self.token)
         return True

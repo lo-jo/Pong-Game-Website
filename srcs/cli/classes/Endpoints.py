@@ -15,9 +15,9 @@ class BaseEndpoint:
         return self.endpoint
 
     # Methods
-    def handle_request(self, endpoint_uri, http_method, token_user, host):
-        if endpoint_uri in self.switch_request:
-            endpoint_methods = self.switch_request[endpoint_uri]
+    def handle_http_request(self, endpoint_uri, http_method, token_user, host):
+        if endpoint_uri in self.switch_request_http:
+            endpoint_methods = self.switch_request_http[endpoint_uri]
             if http_method in endpoint_methods:
                 func = endpoint_methods[http_method]
             else:
@@ -37,6 +37,9 @@ class BaseEndpoint:
         except subprocess.CalledProcessError as e:
             print(f"Error to execute request: {e}")
             return False
+
+    def handle_wss_request(self, endpoint_wss, token_user, host):
+        print("Handling wss request!")
 
 
     def request_get_collection(self, endpoint_uri, http_method, token_user, host):
@@ -76,7 +79,10 @@ class BaseEndpoint:
 class UsersEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/users/')
-        self.switch_request = {
+
+        self.switch_request = ['HTTPS']
+
+        self.switch_request_http = {
             '/users/': {
                 'GET' : self.request_get_collection,
                 # 'POST' : self.request_post_collection,
@@ -104,8 +110,12 @@ class UsersEndpoint(BaseEndpoint):
 class PongEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/pong/')
+
+        self.switch_request = ['HTTPS', 'WSS']
         
-        self.switch_request = {
+        self.switch_request_wss = ['ws/pong/match/<id>']
+
+        self.switch_request_http = {
             '/pong/matches/': {
                 'GET' : self.request_get_collection,
                 'POST' : self.request_post_collection,
@@ -138,7 +148,7 @@ class PongEndpoint(BaseEndpoint):
         return command
     
     def get_data_for_post(self):
-        print("This CLI only supports match initializations as pending, users to play and tournament id are optional.")
+        print("This CLI only supports match initializations as pending, match users and tournament id are optional.")
         
         match_data = {
             'status': 'pending',
