@@ -1,13 +1,12 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
 import { router } from './Router';
 
 export class Register extends BaseClass
 {
     constructor() {
         super();
-        this.navbar = new Navbar();
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
+        document.addEventListener('click', this.handleDocumentClickBound );
     }
 
     getCookie(name) {
@@ -16,20 +15,20 @@ export class Register extends BaseClass
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 
-    handleDocumentClick(event) {
+    async handleDocumentClick(event) {
         if (event.target.id === 'register') {
             event.preventDefault();
             this.handleButtonClick(event);
         }
     }
-    handleButtonClick(event) {
+    async handleButtonClick(event) {
         console.log("We are at submitRegister!");
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const email = document.getElementById('email').value;
         console.log(`username ${username} password: ${password} email: ${email}`);
         
-        fetch('http://localhost:8000/users/register/', {
+        await fetch('http://localhost:8000/users/register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,31 +36,40 @@ export class Register extends BaseClass
             },
             body: JSON.stringify({ username, email, password }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Invalid credentials');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            // Handle successful login, e.g., store token in local storage
-            // console.log('Succesfully signed up', data);
-            // console.log("data: ", data);
-            // document.getElementById('app').innerHTML = "successfully signed up";
-            // Redirect to another page or perform additional actions
-            history.pushState({}, '', '/login');
-            router();
+            if (data.access) {
+                history.pushState({}, '', '/login');
+                router();
+            } else {
+                console.log("Invalid Credentials");
+                // document.getElementById('app').innerHTML = "Invalid Credentials"
+            }
         })
         .catch(error => {
-            console.error('ERROR : ', error);
+            console.error('Error:', error);
         });
+        // .then(response => {
+        //     if (!response.ok) {
+        //         throw new Error('Invalid credentials');
+        //     }
+        //     return response.json();
+        // })
+        // .then(data => {
+        //     // Handle successful login, e.g., store token in local storage
+        //     // console.log('Succesfully signed up', data);
+        //     // console.log("data: ", data);
+        //     // document.getElementById('app').innerHTML = "successfully signed up";
+        //     // Redirect to another page or perform additional actions
+        //     history.pushState({}, '', '/login');
+        //     router();
+        // })
+        // .catch(error => {
+        //     console.error('ERROR : ', error);
+        // });
     }
 
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
-    }
-
-    getHtmlForMain() {
+    async getHtmlForMain() {
         return `<h1>Sign-up </h1><div class="form-group">
         <form id="loginForm">
             <label for="username">Username:</label>
@@ -76,5 +84,9 @@ export class Register extends BaseClass
             <button type="submit" id="register" class="btn btn-dark btn-sm">Sign-up</button>
         </form>
         </div>`
+    }
+
+    cleanup() {
+        document.removeEventListener('click', this.handleDocumentClickBound);
     }
 }

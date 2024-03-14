@@ -1,10 +1,8 @@
 import { BaseClass } from './BaseClass';
-// import { Navbar } from './Navbar';
 
 export class Settings extends BaseClass {
     constructor() {
         super();
-        // this.navbar = new Navbar();
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
     async handleDocumentClick(event) {
@@ -106,10 +104,6 @@ export class Settings extends BaseClass {
     // run() {
     //     throw new Error("Method 'run()' must be implemented.");
     // }
-
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
-    }
 
     getHtmlForMain() {
         return `<h1>Edit profile</h1>

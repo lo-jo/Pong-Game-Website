@@ -2,8 +2,13 @@ import { BaseClass } from './BaseClass'
 import jwt_decode from 'jwt-decode';
 
 export class Tournament extends BaseClass {
-    constructor() {
+    // constructor() {
+    //     super();
+    // }
+
+    constructor(dashboardInstance) {
         super();
+        this.dashboard = dashboardInstance;
     }
 
     async createTournament(tournamentName) {
@@ -40,7 +45,6 @@ export class Tournament extends BaseClass {
         }
     }
 
-
     async fetchOpenTournaments() {
         const httpProtocol = window.location.protocol;
         const jwtAccess = localStorage.getItem('token');
@@ -58,30 +62,31 @@ export class Tournament extends BaseClass {
         return data;
     }
 
-    async fetchJoinTournament(tournamentId) {
+    async fetchTournamentData(tournamentId) {
         const httpProtocol = window.location.protocol;
         const jwtAccess = localStorage.getItem('token');
-      
+    
         const options = {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${jwtAccess}`,
-            'Content-Type': 'application/json',
-          },
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
         };
-
+    
         try {
-            const response = await fetch(`${httpProtocol}//localhost:8000/pong/join_tournament/${tournamentId}/`, options);
-            
+            const response = await fetch(`${httpProtocol}//localhost:8000/pong/tournaments/${tournamentId}/`, options);
+    
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Error joining tournament:', errorData.error);
+                console.error('Error fetching tournament data:', errorData.error);
             } else {
                 const tournamentData = await response.json();
-                console.log('Successfully joined tournament:', tournamentData);
+                console.log('Successfully fetched tournament data:', tournamentData);
+                return tournamentData;
             }
         } catch (error) {
-            console.error('Error joining tournament:', error);
+            console.error('Error fetching tournament data:', error);
         }
     }
 
@@ -95,16 +100,28 @@ export class Tournament extends BaseClass {
             spinner.style.display = 'inline-block';
             joinButton.disabled = true;
     
-            await this.fetchJoinTournament(tournamentId);
+            // await this.fetchJoinTournament(tournamentId);
             // await this.displayOpenTournaments();
+            await this.fetchJoinTournament(tournamentId);
+            const tournamentData = await this.fetchTournamentData(tournamentId);
+            await this.displayOpenTournaments();
+
+            if (tournamentData.participants.length === 4) {
+                console.log("TOURNAMENT IS FULL");
+                this.dashboard.displayPlayButton();
+                // this.displayPlayButton();
+            }
+
         } catch (error) {
             console.error('Error joining tournament:', error);
+            spinner.style.display = 'none';
+            joinButton.textContent = 'Join';
+            joinButton.disabled = false;
+        } finally {
+            // spinner.style.display = 'none';
+            joinButton.textContent = 'Joined';
+            joinButton.disabled =true;
         }
-        // } finally {
-        //     // Hide spinner and enable the button
-        //     spinner.style.display = 'none';
-        //     joinButton.disabled = false;
-        // }
     }
 
     async fetchJoinTournament(tournamentId) {
@@ -203,26 +220,13 @@ export class Tournament extends BaseClass {
                 joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
                 joinButton.appendChild(spinner);
             }
-
-            // if (userAlreadyJoined) {
-            //     joinButton.disabled = true;
-            //     joinButton.textContent = 'Joined';
-            // } else {
-            //     joinButton.addEventListener('click', async () => {
-            //         const spinner = document.getElementById(`spinner-${tournament.id}`);
-            //         if (spinner) {
-            //             spinner.style.display = 'inline-block';
-            //             joinButton.disabled = true;
-            //             await this.joinTournament(tournament.id);
-            //         } else {
-            //             console.error('Spinner element not found');
-            //         }
-            //     });
-            //     joinButton.appendChild(spinner);
-            // }
-    
+  
             listItem.appendChild(joinButton);
             tournamentList.appendChild(listItem);
+
+            // if (tournament.participants.length === 4) {
+            //     this.displayPlayButton();
+            // }
         }));
 
         gameStatsDiv.appendChild(tournamentList);
@@ -233,10 +237,6 @@ export class Tournament extends BaseClass {
         return `<div class="spinner-border" style="color: #fff; width: 3rem; height: 3rem;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>`
-    }
-
-    async getHtmlForHeader(){
-        return this.navbar.getHtml();
     }
 
     async getHtmlForMain() {

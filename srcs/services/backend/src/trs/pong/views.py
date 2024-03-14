@@ -134,6 +134,18 @@ class OpenTournamentsView(APIView):
         # open_tournaments = Tournament.objects.annotate(num_participants=Count('participants')).filter(num_participants__lt=4)
         serializer = TournamentSerializer(open_tournaments, many=True)
         return Response(serializer.data)
+    
+class TournamentView(APIView):
+    def get(self, request, tournament_id):
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            serializer = TournamentSerializer(tournament)
+            # return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data)
+        except Tournament.DoesNotExist:
+            return Response({"error": "Tournament not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CreateTournamentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -144,7 +156,7 @@ class CreateTournamentView(APIView):
             tournament_name = request.data.get('tournamentName')
 
             # Create tournament
-            tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user)
+            tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user, status='pending')
 
             # Add creator of the tournament to the actual tournament DUH
             participant = Participant.objects.create(tournament_id=tournament, user_id=request.user)
@@ -156,6 +168,7 @@ class CreateTournamentView(APIView):
                 'creator_id': serializer.data['creator_id'],
                 'name': serializer.data['name'],
                 'created_at': serializer.data['created_at'],
+                'status': serializer.data['status'],
                 'participants': ParticipantSerializer(participant).data,
             }, status=status.HTTP_201_CREATED)
 
@@ -181,9 +194,14 @@ class JoinTournamentView(APIView):
 
             # Create participant entry for the user in the tournament
             Participant.objects.create(tournament_id=tournament, user_id=user)
+            # participant = Participant.objects.create(tournament_id=tournament, user_id=user)
 
             serializer = TournamentSerializer(tournament)
             return Response(serializer.data, status=status.HTTP_200_OK)
+            # return Response({
+            #     'tournament': serializer.data,
+            #     'participant': ParticipantSerializer(participant).data,
+            # }, status=status.HTTP_200_OK)
 
         except Tournament.DoesNotExist:
             return Response({'error': 'Tournament not found'}, status=status.HTTP_404_NOT_FOUND)

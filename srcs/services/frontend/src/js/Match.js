@@ -1,11 +1,9 @@
 import { BaseClass } from './BaseClass'
-import { Navbar } from './Navbar';
 import { initGameTwoD } from './game';
 
 export class Match extends BaseClass {
     constructor(id) {
         super();
-        this.navbar = new Navbar();
         this.id = id;
         this.css = './css/game.css',
         // this.insertCssLink();
@@ -45,10 +43,6 @@ export class Match extends BaseClass {
         styleCss.rel = 'stylesheet';
         styleCss.href = this.css;
         document.head.appendChild(styleCss);
-    }
-
-    getHtmlForHeader(){
-        return this.navbar.getHtml();
     }
 
     /*Method to get the HTML of the dashboard*/

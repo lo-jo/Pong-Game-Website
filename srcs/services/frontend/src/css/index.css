@@ -22,7 +22,7 @@ body {
   justify-content: space-around;
 }
 
-#nav-bar button{
+#nav-bar a{
   text-decoration: none;
 }
 

@@ -1,13 +1,11 @@
-import { BaseClass } from './BaseClass'
 import { router } from './Router'
-// import { Navbar } from './Navbar';
+import { BaseClass } from './BaseClass'
 import { Tournament } from './Tournament';
 
 export class Dashboard extends BaseClass {
     constructor() {
         super();
-        // this.navbar = new Navbar();
-        this.tournament = new Tournament();
+        this.tournament = new Tournament(this);
         document.getElementById('app').addEventListener('click', this.handleButtonClick.bind(this));
     }
 
@@ -16,9 +14,6 @@ export class Dashboard extends BaseClass {
 
         this.createTournamentButton = document.getElementById('createTournament');
         this.joinTournamentButton = document.getElementById('join-tournament');
-        if (event.target.id === 'dashboard') {
-            return;
-        }
         if (event.target.id === 'launch-game-button') {
             history.pushState({}, '', '/match_lobby');
             router();
@@ -31,13 +26,30 @@ export class Dashboard extends BaseClass {
             this.createTournamentButton.disabled = true;
             await this.tournament.createTournament(tournamentName);
             this.createTournamentButton.disabled = false;
+            this.updateView();
             document.getElementById('app').innerHTML = await this.getHtmlForMain();
         } else if (event.target.id === 'join-tournament' && this.joinTournamentButton && this.joinTournamentButton.disabled == false) {
             event.preventDefault();
-            this.joinTournamentButton.disabled = true;
+            // this.joinTournamentButton.disabled = true;
             await this.tournament.displayOpenTournaments();
-            this.joinTournamentButton.disabled = false;
+            // this.joinTournamentButton.disabled = false;
         }
+    }
+
+    displayPlayButton() {
+        let playButton = document.getElementById('play-button');
+        if (!playButton) {
+            const gameStatsDiv = document.getElementById('game-stats');
+            playButton = document.createElement('button');
+            playButton.id = 'play-button';
+            playButton.textContent = 'PLAY';
+            playButton.addEventListener('click', this.startTournament.bind(this));
+            gameStatsDiv.appendChild(playButton);
+        }
+    }
+
+    async startTournament() {
+        console.log('Starting tournament...');
     }
 
     async getHtmlFormTournament() {
@@ -52,10 +64,6 @@ export class Dashboard extends BaseClass {
                         </form>
                     </div>
                 </div>`;
-    };
-
-    async getHtmlForHeader() {
-        return this.navbar.getHtml();
     };
 
     async getHtmlForMain() {
@@ -76,5 +84,4 @@ export class Dashboard extends BaseClass {
                     </div>
                 </div>`;
     };
-
 }

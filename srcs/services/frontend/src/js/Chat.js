@@ -1,10 +1,8 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
 
 export class Chat extends BaseClass {
     constructor() {
         super();
-        this.navbar = new Navbar();
         this.chatSocket = null;
         document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
@@ -61,14 +59,6 @@ export class Chat extends BaseClass {
             }));
             messageInputDom.value = '';
         }.bind(this);
-    }
-
-    getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    PROFILE
-                    <a href="/">HOME</a>
-                    <a href="/settings">SETTINGS</a>
-                </nav>`;
     }
 
     getHtmlForMain() {
