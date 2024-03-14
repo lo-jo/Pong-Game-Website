@@ -28,14 +28,10 @@ import { Navbar } from './js/Navbar.js';
 
 ///////////////////////////////////////////////////////
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Veo esto?");
-    document.body.addEventListener('click', (event) => {
-        if (event.target.tagName === 'A') {
-            event.preventDefault();
-            // console.log('navbar button clicked: ', event.target);
-            navigateTo(event.target);
-        }
-    });
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     console.log("DOMContentLoaded called() in index.js");
+//     // alert('Here');
+//     // navigateTo('/');
+// });
 
+// console.log("Here");

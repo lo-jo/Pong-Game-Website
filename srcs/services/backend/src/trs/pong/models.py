@@ -19,10 +19,12 @@ class Match(models.Model):
     ]
 
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')
-    loser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='matches_lost')
     user_1 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='matches_as_player_1')
     user_2 = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='matches_as_player_2')
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='matches_won')
+    loser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='matches_lost')
+    score_user_1 = models.IntegerField(default=0)
+    score_user_2 = models.IntegerField(default=0)
     tournament = models.ForeignKey(Tournament, on_delete=models.SET_NULL, null=True, related_name='matches')
     created_at = models.DateTimeField(default=timezone.now)
     timer_started = models.BooleanField(default=False)

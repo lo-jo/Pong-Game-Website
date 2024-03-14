@@ -241,8 +241,8 @@ class MatchConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        pass
-        # message = json.loads(text_data)
+        message = json.loads(text_data)
+        print(message)
 
         # action = message.get("action")
 
