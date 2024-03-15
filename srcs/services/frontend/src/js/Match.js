@@ -1,14 +1,14 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
-import { Navbar } from './Navbar';
 import { initGameTwoD } from './game';
 
 export class Match extends BaseClass {
     constructor(id) {
         super();
         this.id = id;
-        this.css = './css/game.css',
-        document.addEventListener('click', this.handleButtonClick.bind(this));
+        this.css = './css/game.css';
+        this.addDocumentClickListener();
+        // document.addEventListener('click', this.handleButtonClick.bind(this));
         // this.insertCssLink();
         this.initWebSocket();
     }
@@ -39,7 +39,7 @@ export class Match extends BaseClass {
         };
     }
 
-    async handleButtonClick(event) {
+    async handleDocumentClick(event) {
         if (event.target.id === 'confirm-match') {
             socket.send(JSON.stringify({ 'message' : 'confirm'}));
         }

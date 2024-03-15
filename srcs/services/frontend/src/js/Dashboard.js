@@ -48,6 +48,85 @@ export class Dashboard extends BaseClass {
         }
     }
 
+    async postMatch() {
+        const httpProtocol = window.location.protocol;
+        const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
+        const jwtAccess = localStorage.getItem('token');
+        
+        const options = {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        };
+        
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            // Add action ? 
+            const data = await response.json();
+            console.log('Backend response:', data);
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+
+        // fetch(url, options)
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('The request was not successful');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         console.log('Backend response:', data);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error making request:', error);
+        //     });
+    }
+
+    initWebSocketLobby() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+
+        const socket = new WebSocket(wsUrl);
+
+        socket.onopen = function() {
+            console.log('WebSocket(match lobby) connection established.');
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const { action, match_id } = data;
+            console.log(action, match_id);
+            if (action == 'create_join') {
+                console.log('here');
+                this.getHtmlForWaitingSpinner();
+            } else if (action == 'join_play') {
+                socket.close();
+                history.pushState({ match_id }, '', `/match/${match_id}`);
+                router();
+            }
+        };
+
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+        };
+    
+        socket.onclose = function() {
+            console.log('WebSocket (match lobby) connection closed.');
+        };
+    }
+
     displayPlayButton() {
         let playButton = document.getElementById('play-button');
         if (!playButton) {
