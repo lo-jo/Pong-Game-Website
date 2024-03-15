@@ -90,7 +90,6 @@ export class Dashboard extends BaseClass {
         };
 
         socket.onmessage = (event) => {
-            console.log('hereeee');
             const data = JSON.parse(event.data);
             const { action, match_id } = data;
             console.log(action, match_id);

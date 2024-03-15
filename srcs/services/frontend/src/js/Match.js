@@ -87,13 +87,17 @@ export class Match extends BaseClass {
         }
         else if (game_state === 'someone_left')
         {
-            alert('Someone left');
+            console.log('Someone left');
         }
         else if (game_state === 'timer')
         {
             let { timer } = data;
             console.log(timer)
             this.updateTimer(timer);
+        }
+        else if (game_state === 'welcome')
+        {
+            console.log("Welcome to this match")
         }
     }
 

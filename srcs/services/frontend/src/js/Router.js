@@ -18,12 +18,12 @@ export const routes = {
         view : LandingPage,
         auth : false
     },
-    // '/dashboard' : {
-    //     path : '/dashboard',
-    //     view : Dashboard,
-    //     css : './css/dashboard.css',
-    //     auth : true
-    // },
+    '/dashboard' : {
+        path : '/dashboard',
+        view : Dashboard,
+        css : './css/dashboard.css',
+        auth : true
+    },
     '/login' : {
         path : '/login',
         view : Login,
@@ -34,49 +34,49 @@ export const routes = {
         view : Register,
         auth : false
     },
-    // '/profile' : {
-    //     path : '/profile',
-    //     view : Profile,
-    //     auth : true
-    // },
-    // '/settings' : {
-    //     path : '/settings',
-    //     view : Settings,
-    //     auth : true
-    // },
+    '/profile' : {
+        path : '/profile',
+        view : Profile,
+        auth : true
+    },
+    '/settings' : {
+        path : '/settings',
+        view : Settings,
+        auth : true
+    },
     // '/game' : {
     //     path : '/game',
     //     view : PongGame,
     //     css : './css/game.css',
     //     auth : true
     // },
-    // '/chat' : {
-    //     path : '/chat',
-    //     view : Chat,
-    //     auth : true
-    // },
-    // '/match/:id' : {
-    //     view : Match,
-    //     dinamic : true,
-    //     // css : './css/game.css',
-    //     auth : true
-    // },
-    // '/test/:id' : {
-    //     view : LoadProfile,
-    //     dinamic : true,
-    //     auth : true
-    // },
-    // '/logout' : {
-    //     path : '/logout',
-    //     view : Logout,
-    //     auth : true
-    // },
+    '/chat' : {
+        path : '/chat',
+        view : Chat,
+        auth : true
+    },
+    '/match/:id' : {
+        view : Match,
+        dinamic : true,
+        // css : './css/game.css',
+        auth : true
+    },
+    '/test/:id' : {
+        view : LoadProfile,
+        dinamic : true,
+        auth : true
+    },
+    '/logout' : {
+        path : '/logout',
+        view : Logout,
+        auth : true
+    },
 }
 let onlineSocket = null;
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
-    console.log("connect user func");
+    // console.log("connect user func");
 
     if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN) {
         console.log('WebSocket connection already open.');
@@ -168,7 +168,6 @@ export const router = async () => {
     const matchedRoute = findMatchingRoute(path);
 
     const viewObject = routes[matchedRoute];
-    console.log(viewObject);
     let id = null;
     
     if (!viewObject) {
@@ -199,8 +198,8 @@ export const router = async () => {
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
         styleCss.href = viewObject.css;
-        console.log(viewObject.css)
-        console.log(styleCss.href);
+        // console.log(viewObject.css)
+        // console.log(styleCss.href);
         document.head.appendChild(styleCss);
     }
 

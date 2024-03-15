@@ -88,6 +88,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         
         # Accepting connection
         await self.accept()
+        await self.send_to_connection({'game_state' : 'welcome'})
         # if not match.timer_started:
         #     print("if not match.timer_started")
         #     match.timer_started = True
@@ -124,6 +125,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             elif match_json.data['status'] == 'joined':
                 match.status = 'playing'
                 await sync_to_async(match.save)()
+        elif message == 'score':
+            print("Someone wants to know the score")
             
 
     async def send_to_group(self, param):

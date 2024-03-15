@@ -43,8 +43,14 @@ class BaseEndpoint:
             return False
 
     def handle_wss_request(self, endpoint_wss, token_user, host, ws):
-        self.ws_client = WebSocketClient(f"{ws}{host}/{endpoint_wss}")
-        self.ws_client.run_client()
+        if endpoint_wss in self.switch_request_wss:
+            func = self.switch_request_wss[endpoint_wss]
+            endpoint_wss_connection = func(endpoint_wss)
+            print(endpoint_wss_connection)
+            self.ws_client = WebSocketClient(f"{ws}{host}/{endpoint_wss_connection}")
+            self.ws_client.run_client()
+        else:
+            print("Error searching the correct function!")
 
     # HTTP Methods
     def request_get_collection(self, endpoint_uri, http_method, token_user, host, http):
@@ -119,7 +125,11 @@ class PongEndpoint(BaseEndpoint):
 
         self.switch_request = ['HTTPS', 'WSS']
         
-        self.switch_request_wss = ['ws/pong/lobby', 'ws/pong/match/<id>']
+        # self.switch_request_wss = ['ws/pong/lobby', 'ws/pong/match/<id>']
+        self.switch_request_wss = {
+            'ws/pong/match/<id>' : self.request_join_match,
+            'ws/pong/lobby' : self.request_join_lobby
+        }  
 
         self.switch_request_http = {
             '/pong/matches/': {
@@ -189,4 +199,11 @@ class PongEndpoint(BaseEndpoint):
             f'{host}{endpoint_uri}'
         ]
         return command
+
+    def request_join_match(self, endpoint_wss):
+        final_endpoint_wss = self.set_id(endpoint_wss, self.uri_id_question)
+        return final_endpoint_wss
+
+    def request_join_lobby(self, endpoint_wss):
+        print("Request join lobby for match!")
 
