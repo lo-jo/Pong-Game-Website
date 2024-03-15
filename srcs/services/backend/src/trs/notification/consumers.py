@@ -53,9 +53,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             user_id = payload['user_id']
             return User.objects.get(pk=user_id)
         except jwt.ExpiredSignatureError:
-            return None  # Token has expired
+            return None
         except (jwt.InvalidTokenError, User.DoesNotExist):
-            return None  # Invalid token or user not found
+            return None
 
     @database_sync_to_async
     def handle_user_connection(self, user):
@@ -69,27 +69,3 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         print("DELETING ", user.username)
         PublicRoom.objects.filter(user=user).delete()
         self.close()
-
-
-    # async def chat_message(self, event):
-    #     message = event["message"]
-    #     await self.send(text_data=json.dumps({"message": message}))
-
-
-    # async def receive(self, text_data):
-    #         data = json.loads(text_data)
-    #         token = data.get('token', None)
-    #         if token:
-    #             # Decode and verify the JWT token
-    #             user = await self.get_user_from_token(token)
-    #             if user:
-    #                 message = {'message': 'YOURE SENDIN A MESSAGE! @'}
-    #                 json_data = json.dumps({'message': message['message'] + user.username})
-    #                 await self.send(text_data=json_data)
-    #                 # await sync_to_async(self.handle_user_connection)(user)
-    #             else:
-    #                 await self.send(text_data=json.dumps({'message': 'Authentication failed'}))
-    #                 self.close()
-    #         else:
-    #             await self.send(text_data=json.dumps({'message': 'Token not provided'}))
-    #             self.close()

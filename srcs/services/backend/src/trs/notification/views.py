@@ -14,9 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import PublicRoom
 from .serializers import PublicRoomSerializer
-# Create your views here.
-def index(request):
-    return render(request, "notification/index.html")
+
 
 class NotifyUserView(APIView):
     def get(self, request, username):

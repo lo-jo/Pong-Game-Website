@@ -56,7 +56,6 @@ export class LoadProfile
                 (item.hasOwnProperty("sender_id") && item.sender_id === decoded_token.user_id)
               ));
             if (hasValue){
-                console.log("already friends");
                 const friendRequestLink = document.createElement('text');
                 friendRequestLink.innerText = `You and ${user.username} are friends :)`;
                 document.getElementById('friendRequest').appendChild(friendRequestLink);
@@ -66,7 +65,7 @@ export class LoadProfile
                 const friendRequestLink = document.createElement('button');
                 friendRequestLink.setAttribute('class', 'btn btn-dark');
                 friendRequestLink.href = '#';
-                friendRequestLink.innerText = 'Send Friend Request';
+                friendRequestLink.innerText = 'Add as friend';
                 friendRequestLink.addEventListener('click', (event) => {
                     event.preventDefault();
                     this.addFriend(user);
