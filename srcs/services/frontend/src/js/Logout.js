@@ -1,10 +1,8 @@
 import { BaseClass } from './BaseClass';
-// import { Navbar } from './Navbar';
 
 export class Logout extends BaseClass{
     constructor() {
         super();
-        // this.navbar = new Navbar();
         this.clearToken();
     }
     clearToken() {
@@ -15,10 +13,6 @@ export class Logout extends BaseClass{
         sessionStorage.removeItem(token);
         localStorage.removeItem('sessionSocket');
         window.localStorage.clear();
-    }
-
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

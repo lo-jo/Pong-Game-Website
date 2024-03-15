@@ -1,19 +1,17 @@
 import { BaseClass } from './BaseClass';
-// import { Navbar } from './Navbar';
 
 export class Settings extends BaseClass {
     constructor() {
         super();
-        // this.navbar = new Navbar();
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.addDocumentClickListener();
+        // document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
+
     async handleDocumentClick(event) {
         this.editButton = document.getElementById('editButton');
         if (event.target.id === 'editButton' && this.editButton && this.editButton.disabled == false) {
             event.preventDefault();
-            this.editButton.disabled = true;
             await this.handleButtonClick(event);
-            this.editButton.disabled = false;
         }
     }
 
@@ -106,10 +104,6 @@ export class Settings extends BaseClass {
     // run() {
     //     throw new Error("Method 'run()' must be implemented.");
     // }
-
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
-    }
 
     getHtmlForMain() {
         return `<h1>Edit profile</h1>

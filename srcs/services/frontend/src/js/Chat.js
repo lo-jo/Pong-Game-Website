@@ -4,11 +4,21 @@ import { navigateTo } from './Router';
 export class Chat extends BaseClass {
     constructor() {
         super();
-        // this.navbar = new Navbar();
         this.chatSocket = null;
         this.token = localStorage.getItem('token');
-        this.navbar = document.getElementById('nav-bar');
-        this.chatBtn = document.getElementById('chatBtn');
+        this.addDocumentClickListener();
+    }
+
+    async handleDocumentClick(event) {
+        const target = event.target;
+        console.log(`event.target.id: ${event.srcElement}`);
+        // if (target.className === 'btn btn-dark btn-small') 
+        if (target.tagName === 'BUTTON') 
+        {
+            event.preventDefault();
+            console.log('clicked send message', target.id);
+            this.initChatWindow(target.id, target.nextSibling.innerText, event);
+        }
     }
 
     async blockFriendUser(targetId){
@@ -35,9 +45,11 @@ export class Chat extends BaseClass {
     }
 
     async startConvo(targetId) {
-        if (this.chatSocket && this.chatSocket.readyState === WebSocket.OPEN) {
+        if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
             // this.chatSocket.close();
+            console.log("CLOSEEEEEE here");
             this.chatSocket.close();
+            this.chatSocket = null;
         }
         this.chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         this.chatSocket.onopen = function (e) {
@@ -45,7 +57,7 @@ export class Chat extends BaseClass {
             const authenticateMessage = {
                 type: 'authenticate',
                 token: this.token,
-                };
+            };
         }
         this.chatSocket.onmessage = function (e) {
             console.log("ON MESSAGE EVENT", e);
@@ -76,7 +88,7 @@ export class Chat extends BaseClass {
 
     async initChatWindow(targetId, targetUsername, event) {
         console.log("CLICK SEND EVENT", event);
-        event.stopPropagation();
+        // event.stopPropagation();
         const chatWindow = document.getElementById('chatWindow');
         chatWindow.innerHTML = '';
         const chatLog = document.createElement('textarea');
@@ -109,16 +121,6 @@ export class Chat extends BaseClass {
         await this.startConvo(targetId);
     }
 
-    // async addClickEvent(friendId, friendUsername){
-    //     const sendTarget = document.getElementById(`${friendId}`);
-    //     console.log("are we adding events here", sendTarget);
-
-    //     sendTarget.addEventListener('click', (event) => {
-    //         event.preventDefault();
-    //         console.log('clicked send message', `${friendId}`);
-    //         this.initChatWindow(friendId, friendUsername, event);
-    //     });
-    // }
     async generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
         friendListContainer.innerHTML = '';
@@ -135,6 +137,13 @@ export class Chat extends BaseClass {
             messageButton.innerText = "send";
             li.appendChild(messageButton);
             const link = document.createElement('a');
+            link.addEventListener('click', (event) => {
+                if (event.target.tagName === 'A') {
+                    console.log('chatjsdklsjfsdkljf', event.target);
+                    event.preventDefault();
+                    navigateTo(event.target.href);
+                }
+            });
             link.href = `/test/${friendId}`;
             link.innerText = `${friendUsername}`;
             li.appendChild(link);
@@ -142,31 +151,23 @@ export class Chat extends BaseClass {
             // this.addClickEvent(`${friendId}`, `${friendUsername}`);
         });
         friendListContainer.appendChild(ul);
-        ul.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.tagName === 'BUTTON') {
-                event.preventDefault();
-                console.log('clicked send message', target.id);
-                this.initChatWindow(target.id, target.nextSibling.innerText, event);
-            }
-        });
-    }
-
-    handleNavbarClick(event){
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const buttonElement = event.currentTarget;
-            // this.clickEvents.push({ event, path, target: buttonElement  });
-            console.log(`click to: ${path}`);
-            navigateTo(path);
+        // ul.addEventListener('click', (event) => {
+        //     console.log("click ul");
+        //     const target = event.target;
+        //     if (target.tagName === 'BUTTON') {
+        //         event.preventDefault();
+        //         console.log('clicked send message', target.id);
+        //         this.initChatWindow(target.id, target.nextSibling.innerText, event);
+        //     }
+        // });
     }
 
     async displayFriendList() {
-        this.chatBtn = document.getElementById('chatBtn');
-        this.chatBtn.removeEventListener('click', this.handleNavbarClick);
+        // this.chatBtn = document.getElementById('chatBtn');
+        // this.chatBtn.removeEventListener('click', this.handleNavbarClick);
 
         const friendList = document.getElementById('friendList');
-        await fetch('http://localhost:8000/users/friendship/loren/', {
+        await fetch('http://localhost:8000/users/friendship/sock/', {
             method : 'GET',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -218,6 +219,14 @@ export class Chat extends BaseClass {
             `;
     }
 
+    cleanup() {
+        console.log("Chat cleanup");
+        this.removeDocumentClickListener();
+        if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
+            this.chatSocket.close();
+            this.chatSocket = null;
+        }
+    }
 } 
 /* <input class="form-control form-control-sm" id="target" placeholder="Who do you want to send a msg to ?" type="text">
 <button type="submit" id="sendButton" class="btn btn-dark btn-sm">JOIN</button></div> */

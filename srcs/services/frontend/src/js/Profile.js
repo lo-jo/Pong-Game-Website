@@ -1,5 +1,4 @@
 import { BaseClass } from './BaseClass';
-// import { Navbar } from './Navbar';
 
 class User{
     constructor(username, pic, id, email, bio) {
@@ -23,7 +22,6 @@ class User{
 export class Profile extends BaseClass {
     constructor() {
         super();
-        // this.navbar = new Navbar();
         // this.displayProfile();
     }
     // addFriend = (user) => {
@@ -222,10 +220,6 @@ export class Profile extends BaseClass {
             
         })
         .catch(error => console.error('Error:', error));
-    }
-
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

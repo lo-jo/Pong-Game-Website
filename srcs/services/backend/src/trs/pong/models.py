@@ -10,6 +10,7 @@ class Tournament(models.Model):
         User, related_name='creator_id', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=20, default='pending')
 
 class Participant(models.Model):
     id = models.AutoField(primary_key=True)

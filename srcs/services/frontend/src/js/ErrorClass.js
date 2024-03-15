@@ -1,15 +1,9 @@
 import { BaseClass } from './BaseClass'
-import { Navbar } from './Navbar';
 
 export class ErrorClass extends BaseClass
 {
     constructor() {
         super();
-        this.navbar = new Navbar();
-    }
-    
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
     }
 
     getHtmlForMain() {

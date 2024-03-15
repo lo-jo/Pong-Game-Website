@@ -4,17 +4,14 @@ import { Register } from './Register.js'
 import { Profile } from './Profile.js'
 import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
-// import { PongGame } from './Game.js';
-import { Tournament } from './Tournament.js';
 import { MatchLobby } from './MatchLobby.js'
 import { Match } from './Match.js'
 import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
-import { Navbar } from './Navbar.js';
-
-
+import Navbar from './Navbar.js';
+import jwt_decode from 'jwt-decode';
 
 export const routes = {
     '/' : {
@@ -48,12 +45,6 @@ export const routes = {
         view : Settings,
         auth : true
     },
-    // '/game' : {
-    //     path : '/game',
-    //     view : PongGame,
-    //     css : './css/game.css',
-    //     auth : true
-    // },
     '/chat' : {
         path : '/chat',
         view : Chat,
@@ -81,6 +72,7 @@ export const routes = {
         auth : true
     },
 }
+
 export let onlineSocket = null;
 
 export const connectUser = () => {
@@ -145,18 +137,12 @@ export const connectUser = () => {
 // }
 
 // Use the history API to prevent full page reload
-// export const navigateTo = (event) => {
-//     history.pushState(null, null, event.target);
-
-//     router();
-
-// };
-
-export const navigateTo = (target) => {
-    history.pushState(null, null, target);
+export const navigateTo = (url) => {
+    console.log(`navigateTo called`);
+    // event.preventDefault();
+    history.pushState(null, null, url);
     router();
 };
-
 
 /* Explanation of the modified regular expression:
 ( ^ ) -> Match the start of the string.
@@ -177,67 +163,125 @@ function findMatchingRoute(url) {
     return null;
 }
 
-const navbar = new Navbar();
-
-// await navbar.getHtml();
-
-
+let previousView = null;
 export const router = async () => {
-    connectUser();
-    const path = window.location.pathname;
-    console.log(`path[${path}]`);
-    const matchedRoute = findMatchingRoute(path);
+    // connectUser();
 
-    const viewObject = routes[matchedRoute];
-    let id = null;
+    const path = window.location.pathname;
+    console.log(`ROUTER path[${path}]`);
+    const matchedRoute = findMatchingRoute(path);
     
+    const viewObject = routes[matchedRoute];
+
+    let id = null;
+
+    if (previousView && typeof previousView.cleanup === 'function') {
+        console.log("CLEANING UP SHITTY EVENT LISTENERS");
+        previousView.cleanup();
+    }
+
+    const token = localStorage.getItem('token');
+    const auth = await checkAuthentication();
+    if (auth)
+        connectUser();
+    document.getElementById('app').innerHTML = '';
+    document.getElementById('header').innerHTML = '';
+
     if (!viewObject) {
         const errorView = new ErrorClass();
-        // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-        await navbar.getHtml();
+        navbar.setIsAuthenticated(auth);
+        navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
         document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
         return;
     }
 
-    if (viewObject.auth === true) {
-        const token = localStorage.getItem('token');
-        if (!token || navbar.checkAuthentication() === false) {
-            const errorView = new ErrorClass();
-            // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-            await navbar.getHtml();
-            document.getElementById('app').innerHTML = errorView.getHtmlForMain();
-            return;
-        }
+    if (viewObject.auth === true && (!token || auth === false)) {
+        // const errorView = new ErrorClass();
+        // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
+        // document.getElementById('app').innerHTML = errorView.getHtmlForMain();
+        navigateTo("/");
+        return;
+    } else if (viewObject.auth === false && (token && auth === true))
+    {
+        navigateTo("/dashboard");
+        return;
     }
 
     if (viewObject.dinamic == true)
     {
         id = path.split('/')[2];
     }
-
-    navbar.removeClickEventsAndListeners();
-
-    let view = new viewObject.view(id);
-
+    
+    const view = new viewObject.view(id);
+    previousView = view;
+    
     if (viewObject.css) {
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
         styleCss.href = viewObject.css;
-        console.log(viewObject.css)
-        console.log(styleCss.href);
         document.head.appendChild(styleCss);
     }
 
-    // document.getElementById('header').innerHTML = await view.getHtmlForHeader();
-    await navbar.getHtml();
-    // document.getElementById('app').innerHTML = '';
     document.getElementById('app').innerHTML = await view.getHtmlForMain();
-    // document.body.removeEventListener('click', clickHandler);
+    (viewObject.path === '/logout') ? navbar.setIsAuthenticated(false) : navbar.setIsAuthenticated(auth);
+    navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
 }
 
-window.addEventListener("popstate", router);
+async function checkAuthentication() {
+    console.log("checking authentication (Router.js)");
+    try {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            return false;
+        }
+
+        let decodedToken;
+        try {
+            decodedToken = jwt_decode(token);
+        } catch (decodeError) {
+            console.error('Error decoding token:', decodeError.message);
+            return false;
+        }
+
+        const response = await fetch('http://localhost:8000/users/check-authentication/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            // console.error('Error checking authentication:', response.statusText);
+            return false;
+        }
+
+        const data = await response.json();
+
+        if ('authenticated' in data) {
+            return data.authenticated;
+        } else {
+            // console.error('Invalid response format:', data);
+            return false;
+        }
+    } catch (error) {
+        // console.error('Unexpected error checking authentication:', error);
+        return false;
+    }
+}
+
+let navbar = new Navbar();
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM CONTETN LOADED");
+    console.log("DOM content loaded (Router.js)");
     router();
+    document.getElementById('header').innerHTML = navbar.getHtml();
+    document.getElementById('header').addEventListener('click', (event) => {
+        if (event.target.tagName === 'A' && event.target.classList.contains('navbar-link')) {
+            console.log('LISTENER (Router.js) navbar button clicked: ', event.target);
+            event.preventDefault();
+            navigateTo(event.target);
+        }
+    });
 });

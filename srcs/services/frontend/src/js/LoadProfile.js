@@ -1,15 +1,10 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
 import jwt_decode from 'jwt-decode';
 
 export class LoadProfile
 {
     constructor(id) {
         this.id = id;
-        this.navbar = new Navbar();
-    }
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
     }
 
     async getUserData() {

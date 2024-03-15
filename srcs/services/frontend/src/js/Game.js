@@ -28,14 +28,6 @@ export class PongGame extends BaseClass
 		this.initGameTwoD();
 	}
 
-	getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    <button id="btn-profile" class="btn-nav-bar btn btn-outline-warning">Profile</button>
-                    <button id="btn-chat" class="btn-nav-bar btn btn-outline-warning">Chat</button>
-					<button id="btn-log-out" class="btn-nav-bar btn btn-outline-warning">Log out</button>
-                </nav>`;
-    }
-
     getHtmlForMain() {
         return initGameTwoD();
     }

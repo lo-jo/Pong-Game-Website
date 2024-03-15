@@ -21,7 +21,7 @@ class BlockUserView(APIView):
         if BlackList.objects.filter(blocking_user=blocking_user, blocked_user=blocked_user).exists():
             print("already blocked this bitch")
             return Response({"error": "You have already blocked this user."}, status=status.HTTP_400_BAD_REQUEST)
-        if Friendship.objects.filter(blocking_user=blocked_user, blocked_user=blocking_user).exists():
+        if BlackList.objects.filter(blocking_user=blocked_user, blocked_user=blocking_user).exists():
             return Response({"error": "The user you're trying to block has already blocked you."}, status=status.HTTP_400_BAD_REQUEST)
 
 

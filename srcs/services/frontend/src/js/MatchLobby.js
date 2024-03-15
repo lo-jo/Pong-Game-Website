@@ -1,11 +1,9 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
-import { Navbar } from './Navbar';
 
 export class MatchLobby extends BaseClass {
     constructor() {
         super();
-        this.navbar = new Navbar();
         this.postMatch();
         this.initWebSocket();
         this.match_status = null;
@@ -73,10 +71,6 @@ export class MatchLobby extends BaseClass {
         socket.onclose = function() {
             console.log('WebSocket (match lobby) connection closed.');
         };
-    }
-
-    getHtmlForHeader(){
-        return this.navbar.getHtml();
     }
 
     /*Method to get the HTML of the dashboard*/

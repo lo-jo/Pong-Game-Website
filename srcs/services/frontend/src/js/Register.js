@@ -1,13 +1,11 @@
 import { BaseClass } from './BaseClass';
-import { Navbar } from './Navbar';
 import { router } from './Router';
 
 export class Register extends BaseClass
 {
     constructor() {
         super();
-        this.navbar = new Navbar();
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.addDocumentClickListener();
     }
 
     getCookie(name) {
@@ -17,12 +15,11 @@ export class Register extends BaseClass
     }
 
     async handleDocumentClick(event) {
-        this.registerButton = document.getElementById('register');
-        if (event.target.id === 'register' && this.registerButton && this.registerButton.disabled == false) {
+        if (event.target.id === 'register') {
             event.preventDefault();
-            this.registerButton.disabled = true;
+            // this.registerButton.disabled = true;
             await this.handleButtonClick(event);
-            this.registerButton.disabled = false;
+            // this.registerButton.disabled = false;
         }
     }
     async handleButtonClick(event) {
@@ -43,7 +40,7 @@ export class Register extends BaseClass
         .then(response => {
             if (!response.ok) {
                 document.getElementById('app').innerHTML = "Invalid Credentials";
-                // throw new Error('Invalid credentials');
+                throw new Error('Invalid credentials');
                 
             }
             return response.json();
@@ -62,11 +59,7 @@ export class Register extends BaseClass
         });
     }
 
-    getHtmlForHeader() {
-        return this.navbar.getHtml();
-    }
-
-    getHtmlForMain() {
+    async getHtmlForMain() {
         return `<h1>Sign-up </h1><div class="form-group">
         <form id="loginForm">
             <label for="username">Username:</label>
@@ -82,4 +75,5 @@ export class Register extends BaseClass
         </form>
         </div>`
     }
+
 }
