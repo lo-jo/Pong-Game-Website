@@ -1,4 +1,4 @@
-import json
+import os, json, jwt
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Match
 from users.models import User
@@ -29,19 +29,17 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.group_name = f'match_{self.match_id}'
         # Accepting the connection
         await self.accept()
-
         # Checking if match exists en BDD
         match_info = await self.match_in_db()
         if match_info == None:
-            await self.send_to_connection({'game_state' : "match_do_not_exist"})
+            await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'match_do_not_exist'})
             await self.close()
             return
+        # Saving match info in consumer
+        self.match_info = match_info
 
-
-
-        
-        # Sending welcome message
-        # await self.send_to_connection({'game_state' : "welcome"})
+        # Requesting ws handshaking to client
+        await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
         # try:
         #     match = await sync_to_async(Match.objects.get)(id=self.match_id)
         #     match_json = MatchSerializer(match)
@@ -51,7 +49,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         #     await self.close()
         #     return
 
-        print(match_info)
+        # print(match_info)
         self.ball = {
             'x': '0',
             'y': '0',
@@ -136,23 +134,45 @@ class PongConsumer(AsyncWebsocketConsumer):
         print(f"WEBSOCKET DISCONNECTTTTTTTTTTTT   {close_code}")
 
 
+    # Receivers
     async def receive(self, text_data):
         data = json.loads(text_data)
-        message = data.get('message')
-        if message == 'confirm':
-            match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            match_json = MatchSerializer(match)
-            print(match_json.data)
-            if match_json.data['status'] == 'pending':
-                match.status = 'joined'
-                await sync_to_async(match.save)()
-            elif match_json.data['status'] == 'joined':
-                match.status = 'playing'
-                await sync_to_async(match.save)()
-        elif message == 'score':
-            print("Someone wants to know the score")
-            
+        type_message = data.get('type_message')
 
+        print(f"IN RECEIVE: {type_message}")
+        match type_message:
+            case 'ws_handshake':
+                # print('ws_handshake case')
+                ws_handshake_message = data.get('ws_handshake')
+                # print(f'ws_handshake_message : {ws_handshake_message}')
+                await self.receive_ws_handshake(ws_handshake_message, data)
+        # data = json.loads(text_data)
+        # message = data.get('message')
+        # if message == 'confirm':
+        #     match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        #     match_json = MatchSerializer(match)
+        #     print(match_json.data)
+        #     if match_json.data['status'] == 'pending':
+        #         match.status = 'joined'
+        #         await sync_to_async(match.save)()
+        #     elif match_json.data['status'] == 'joined':
+        #         match.status = 'playing'
+        #         await sync_to_async(match.save)()
+        # elif message == 'score':
+        #     print("Someone wants to know the score")
+            
+    async def receive_ws_handshake(self, ws_handshake_message, data):
+        print('receive_ws_handshake ()')
+        if ws_handshake_message == 'authorization':
+            user_jwt_token = data.get('authorization')
+            decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
+            user_id = decoded_token['user_id']
+            if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
+                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
+            else:
+                print("You can play!")
+
+    # Senders
     async def send_to_group(self, param):
         print(f"send to group {param}")
         await self.channel_layer.group_send(
@@ -170,16 +190,22 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def send_game_state(self, event):
         await self.send(text_data=json.dumps(event))
 
+    # Methods for calling to database
     async def match_in_db(self):
         try:
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
             match_json = MatchSerializer(match)
             return match_json.data
-            # await self.send_to_connection({'game_state' : "welcome"})
         except Match.DoesNotExist:
-            # await self.send_to_connection({'game_state' : "match_do_not_exist"})
-            # await self.close()
             return None
+
+    # async def check_user_in_match_db(self, user_id)
+    #     try:
+    #         match = await sync_to_async(Match.objects.get)(id=self.match_id)
+    #         match_json = MatchSerializer(match)
+    #         return match_json.data
+    #     except Match.DoesNotExist:
+    #         return None
     
     async def game_loop(self):
         # await self.send_to_group('init_pong_game')

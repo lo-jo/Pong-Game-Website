@@ -109,7 +109,6 @@ export class Dashboard extends BaseClass {
             const { action, match_id } = data;
             console.log(action, match_id);
             if (action == 'create_join') {
-                console.log('here');
                 this.getHtmlForWaitingSpinner();
             } else if (action == 'join_play') {
                 socket.close();
