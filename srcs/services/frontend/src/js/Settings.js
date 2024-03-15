@@ -3,8 +3,10 @@ import { BaseClass } from './BaseClass';
 export class Settings extends BaseClass {
     constructor() {
         super();
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.addDocumentClickListener();
+        // document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
+
     async handleDocumentClick(event) {
         this.editButton = document.getElementById('editButton');
         if (event.target.id === 'editButton' && this.editButton && this.editButton.disabled == false) {

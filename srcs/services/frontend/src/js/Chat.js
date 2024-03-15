@@ -4,7 +4,8 @@ export class Chat extends BaseClass {
     constructor() {
         super();
         this.chatSocket = null;
-        document.addEventListener('click', this.handleDocumentClick.bind(this));
+        this.addDocumentClickListener();
+        // document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
     async handleDocumentClick(event) {

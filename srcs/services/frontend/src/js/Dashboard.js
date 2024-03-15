@@ -6,9 +6,9 @@ export class Dashboard extends BaseClass {
     constructor() {
         super();
         this.tournament = new Tournament(this);
-        // this.handleDocumentClickBound = this.handleButtonClick.bind(this);
+        this.addDocumentClickListener();
+        // this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
         // document.getElementById('app').addEventListener('click', this.handleDocumentClickBound);
-        // document.getElementById('app').addEventListener('click', this.handleButtonClick.bind(this));
     }
 
     async handleDocumentClick(event) {
@@ -86,4 +86,9 @@ export class Dashboard extends BaseClass {
                     </div>
                 </div>`;
     };
+
+    // cleanup() {
+    //     super.cleanup();
+    //     // document.getElementById('app').removeEventListener('click', this.handleDocumentClickBound);
+    // }
 }

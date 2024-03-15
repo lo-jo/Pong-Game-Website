@@ -5,6 +5,7 @@ export class Register extends BaseClass
 {
     constructor() {
         super();
+        this.addDocumentClickListener();
     }
 
     getCookie(name) {
