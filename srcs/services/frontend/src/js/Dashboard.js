@@ -25,9 +25,9 @@ export class Dashboard extends BaseClass {
         } else if (event.target.id === 'createTournament' && this.createTournamentButton && this.createTournamentButton.disabled == false) {
             event.preventDefault();
             const tournamentName = await document.getElementById("tournamentName").value;
-            this.createTournamentButton.disabled = true;
+            // this.createTournamentButton.disabled = true;
             await this.tournament.createTournament(tournamentName);
-            this.createTournamentButton.disabled = false;
+            // this.createTournamentButton.disabled = false;
             this.updateView();
             document.getElementById('app').innerHTML = await this.getHtmlForMain();
         } else if (event.target.id === 'join-tournament' && this.joinTournamentButton && this.joinTournamentButton.disabled == false) {
