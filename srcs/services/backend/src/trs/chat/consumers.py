@@ -8,6 +8,8 @@ from users.models import User
 from chat.models import Message
 from chat.serializers import CustomSerializer
 from chat.models import BlackList
+from rest_framework import status
+from rest_framework.response import Response
 
 User = get_user_model()
 
@@ -41,7 +43,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     )
 
     async def disconnect(self, close_code):
-        print("disconnect chat")
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         await super().disconnect(close_code)
         # store the disconnection time to the group in database
@@ -57,8 +58,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message = data['message']
                 receiver_id = user.username
                 sender = await self.get_user(receiver_id.replace('"', ''))
+                print("SENDER", sender)
                 print(self.room_group_name)
-                if self.is_blocked(sender, self.room_group_name):
+                if await self.is_blocked(sender, self.room_group_name):
                     message = "You have blocked this user"
                     receiver_id = "ERROR"
                     await self.channel_layer.group_send(
@@ -148,53 +150,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except (jwt.InvalidTokenError, User.DoesNotExist):
             return None  # Invalid token or user not found
 
-    # @database_sync_to_async
-    async def is_blocked(self, user_id, receiver_id):
-        if BlackList.objects.filter(blocking_user_id=blocking_user_id, blocked_user_id=blocked_user_id).exists():
-            print("BLOCKED RELATIONSHIP WAS FOUND")
+    @database_sync_to_async
+    def is_blocked(self, user, thread_name):
+        # sender id
+        blocking_id = user.id
+        # receiver id
+        blocked_id = self.scope['url_route']['kwargs']['id'] 
+
+        try:
+            blacklist_entry = BlackList.objects.get(
+                blocked_user__id=blocked_id,
+                blocking_user__id=blocking_id
+            )
             return True
-        else:
-            print("HELL NO")
-            return False
-        # blocked_users = await database_sync_to_async(BlackList.objects.filter)(
-        #     blocked_user=user_id
-        # )
-
-        # # receiver_blocked = any(user.blocking_user.id == receiver_id for user in blocked_users)
-        # # sender_blocked = any(user.blocked_user.id == receiver_id for user in blocked_users)
-        # receiver_blocked = blocked_users.filter(blocking_user_id=receiver_id).exists()
-        # sender_blocked = blocked_users.filter(blocked_user_id=receiver_id).exists()
-
-        # return sender_blocked or receiver_blocked
-    # def is_blocked(self, user, thread_name):
-    #     print("THREAD NAME", thread_name)
-    #     receiver_id = self.scope['url_route']['kwargs']['id']
-    #     print("RECEIVER USERNAME", receiver_id)
-    #     print("SENDER USERNAME", user)
-    #     user = user.id
-    #     print("SENDER userid", user)
-
-        # blocked_users = BlackList.objects.filter(blocked_user=user)
-
-        # receiver_blocked = any(user.blocking_user.username == receiver_id for user in blocked_users)
-        
-        # sender_blocked = any(user.blocked_user.username == receiver_id for user in blocked_users)
-
-        # return sender_blocked or receiver_blocked
-
-    # @database_sync_to_async
-    # def is_blocked(self, user, thread_name):
-    #     print("THREAD NAME", thread_name)
-    #     receiver_id = self.scope['url_route']['kwargs']['id']
-    #     print("SENDER USERNAME", receiver_id)
-    #     print("TARGET", user)
-    #     user_id = user.id
-    #     print("current userid", user)
-
-    #     blocked_users = BlackList.objects.filter(blocked_user=user_id)
-
-    #     receiver_blocked = any(user.blocking_user.username == receiver_id for user_id in blocked_users)
-        
-    #     sender_blocked = any(user.blocked_user.username == sender_id for user_id in blocked_users)
-
-    #     return sender_blocked or receiver_blocked
+        except BlackList.DoesNotExist:
+            try:
+                blacklist_entry = BlackList.objects.get(
+                blocked_user__id=blocking_id,
+                blocking_user__id=blocked_id
+            )
+                return True
+            except BlackList.DoesNotExist:
+                return False

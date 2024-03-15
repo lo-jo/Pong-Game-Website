@@ -6,13 +6,13 @@ export class Chat extends BaseClass {
         super();
         this.chatSocket = null;
         this.token = localStorage.getItem('token');
+        this.profileData;
         this.addDocumentClickListener();
     }
 
     async handleDocumentClick(event) {
         const target = event.target;
-        console.log(`event.target.id: ${event.srcElement}`);
-        // if (target.className === 'btn btn-dark btn-small') 
+        console.log(`event.target.id: ${event.srcElement}`); 
         if (target.tagName === 'BUTTON') 
         {
             event.preventDefault();
@@ -87,8 +87,6 @@ export class Chat extends BaseClass {
     }
 
     async initChatWindow(targetId, targetUsername, event) {
-        console.log("CLICK SEND EVENT", event);
-        // event.stopPropagation();
         const chatWindow = document.getElementById('chatWindow');
         chatWindow.innerHTML = '';
         const chatLog = document.createElement('textarea');
@@ -113,8 +111,8 @@ export class Chat extends BaseClass {
         blockLink.setAttribute('id', `block_${targetId}`)
         blockLink.innerText = `Block ${targetUsername}`;
         blockLink.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default action of clicking the link (navigating to a new page)
-            this.blockFriendUser(`${targetId}`); // Call the method
+            event.preventDefault(); 
+            this.blockFriendUser(`${targetId}`); 
         }.bind(this));
         blockDiv.appendChild(blockLink);
 
@@ -148,26 +146,13 @@ export class Chat extends BaseClass {
             link.innerText = `${friendUsername}`;
             li.appendChild(link);
             ul.appendChild(li);
-            // this.addClickEvent(`${friendId}`, `${friendUsername}`);
         });
         friendListContainer.appendChild(ul);
-        // ul.addEventListener('click', (event) => {
-        //     console.log("click ul");
-        //     const target = event.target;
-        //     if (target.tagName === 'BUTTON') {
-        //         event.preventDefault();
-        //         console.log('clicked send message', target.id);
-        //         this.initChatWindow(target.id, target.nextSibling.innerText, event);
-        //     }
-        // });
     }
 
     async displayFriendList() {
-        // this.chatBtn = document.getElementById('chatBtn');
-        // this.chatBtn.removeEventListener('click', this.handleNavbarClick);
-
-        const friendList = document.getElementById('friendList');
-        await fetch('http://localhost:8000/users/friendship/sock/', {
+        console.log("PRINTIN USER DATA", this.profileData);
+        await fetch(`http://localhost:8000/users/friendship/${this.profileData.username}/`, {
             method : 'GET',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -188,6 +173,33 @@ export class Chat extends BaseClass {
         });
     }
 
+    async getUserData() {
+        try {
+            const response = await fetch(`http://localhost:8000/users/profile/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            this.profileData = data;
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
     getHtmlForHeader() {
         return `<nav id="nav-bar">
                     PROFILE
@@ -196,7 +208,8 @@ export class Chat extends BaseClass {
                 </nav>`;
     }
 
-    getHtmlForMain() {
+    async getHtmlForMain() {
+        await this.getUserData();
         this.displayFriendList();
         return `<div class="container">
         <div class="row">

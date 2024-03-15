@@ -19,4 +19,4 @@ class BlackList(models.Model):
     blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocked_user')
     blocking_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocking_user')
     def __str__(self):
-        return f"{self.blocked_user.username} - {self.blocking_user.username}"
+        return f"{self.blocked_user.id} - {self.blocking_user.id}"
