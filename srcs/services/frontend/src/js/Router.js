@@ -50,11 +50,6 @@ export const routes = {
         view : Chat,
         auth : true
     },
-    '/match_lobby' : {
-        path : '/match',
-        view : MatchLobby,
-        auth : true
-    },
     '/match/:id' : {
         view : Match,
         dinamic : true,
@@ -77,7 +72,7 @@ export let onlineSocket = null;
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
-    console.log("connect user func");
+    // console.log("connect user func");
 
     if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN) {
         console.log('WebSocket connection already open.');
@@ -219,6 +214,8 @@ export const router = async () => {
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
         styleCss.href = viewObject.css;
+        console.log(viewObject.css)
+        console.log(styleCss.href);
         document.head.appendChild(styleCss);
     }
 

@@ -1,3 +1,4 @@
+import websocket
 import subprocess
 import requests
 import json
@@ -5,19 +6,21 @@ import curses
 import time # to delete
 
 from modules.prompt import prompt
+from .WebSocketClient import WebSocketClient
 
 class BaseEndpoint:
     def __init__(self, endpoint):
         # Main endpoint
         self.endpoint = endpoint
+        self.ws_client = None
 
     def __str__(self):
         return self.endpoint
 
-    # Methods
-    def handle_request(self, endpoint_uri, http_method, token_user, host):
-        if endpoint_uri in self.switch_request:
-            endpoint_methods = self.switch_request[endpoint_uri]
+    # Main methods
+    def handle_http_request(self, endpoint_uri, http_method, token_user, host, http):
+        if endpoint_uri in self.switch_request_http:
+            endpoint_methods = self.switch_request_http[endpoint_uri]
             if http_method in endpoint_methods:
                 func = endpoint_methods[http_method]
             else:
@@ -27,8 +30,9 @@ class BaseEndpoint:
             print(f"Endpoint {endpoint_uri} not found in switch_request")
             return False
 
-        command = func(endpoint_uri, http_method, token_user, host)
+        command = func(endpoint_uri, http_method, token_user, host, http)
     
+        # print(command)
         try:
             output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
             json_response = output.decode()
@@ -38,23 +42,34 @@ class BaseEndpoint:
             print(f"Error to execute request: {e}")
             return False
 
+    def handle_wss_request(self, endpoint_wss, token_user, host, ws):
+        if endpoint_wss in self.switch_request_wss:
+            func = self.switch_request_wss[endpoint_wss]
+            endpoint_wss_connection = func(endpoint_wss)
+            print(endpoint_wss_connection)
+            self.ws_client = WebSocketClient(f"{ws}{host}/{endpoint_wss_connection}")
+            self.ws_client.run_client()
+        else:
+            print("Error searching the correct function!")
 
-    def request_get_collection(self, endpoint_uri, http_method, token_user, host):
-        url = f'{host}{endpoint_uri}'
+    # HTTP Methods
+    def request_get_collection(self, endpoint_uri, http_method, token_user, host, http):
+        url = f'{http}{host}{endpoint_uri}'
         command = ['curl', '-k', '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
         return command
 
-    def request_get_single_element(self, endpoint_uri, http_method, token_user, host):
+    def request_get_single_element(self, endpoint_uri, http_method, token_user, host, http):
         endpoint_uri_with_id = self.set_id(endpoint_uri, self.uri_id_question)
-        url = f'{host}{endpoint_uri_with_id}'
+        url = f'{http}{host}{endpoint_uri}'
         command = ['curl', '-k' , '-X', http_method, '-H', f'Authorization: Bearer {token_user}', f'{url}']
         return command
 
+    # File method
     def create_temp_file(self, json_response):
         with open('json_response.json', 'w') as file:
             file.write(json_response)
     
-    # Input functions
+    # Input methods
     def request_id(self, message):
         while True:
             id = input(message).strip()
@@ -76,7 +91,10 @@ class BaseEndpoint:
 class UsersEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/users/')
-        self.switch_request = {
+
+        self.switch_request = ['HTTPS']
+
+        self.switch_request_http = {
             '/users/': {
                 'GET' : self.request_get_collection,
                 # 'POST' : self.request_post_collection,
@@ -104,8 +122,16 @@ class UsersEndpoint(BaseEndpoint):
 class PongEndpoint(BaseEndpoint):
     def __init__(self):
         super().__init__('/pong/')
+
+        self.switch_request = ['HTTPS', 'WSS']
         
-        self.switch_request = {
+        # self.switch_request_wss = ['ws/pong/lobby', 'ws/pong/match/<id>']
+        self.switch_request_wss = {
+            'ws/pong/match/<id>' : self.request_join_match,
+            'ws/pong/lobby' : self.request_join_lobby
+        }  
+
+        self.switch_request_http = {
             '/pong/matches/': {
                 'GET' : self.request_get_collection,
                 'POST' : self.request_post_collection,
@@ -118,11 +144,14 @@ class PongEndpoint(BaseEndpoint):
             },
             '/pong/join_match/' : {
                 'POST' : self.post_join_match
+            },
+            '/pong/delete-all-items/' : {
+                'POST' : self.delete_all_items
             }
         }
         self.uri_id_question = "Enter the match ID: "
     
-    def request_post_collection(self, endpoint_uri, http_method, token_user, host):
+    def request_post_collection(self, endpoint_uri, http_method, token_user, host, http):
         match_data = self.get_data_for_post()
         match_data_json = json.dumps(match_data)
         command = [
@@ -130,12 +159,12 @@ class PongEndpoint(BaseEndpoint):
             '-H', f'Authorization: Bearer {token_user}',
             '-H', 'Content-Type: application/json',
             '-d', match_data_json,
-            f'{host}{endpoint_uri}'
+            f'{http}{host}{endpoint_uri}'
         ]
         return command
     
     def get_data_for_post(self):
-        print("This CLI only supports match initializations as pending, users to play and tournament id are optional.")
+        print("This CLI only supports match initializations as pending, match users and tournament id are optional.")
         
         match_data = {
             'status': 'pending',
@@ -162,4 +191,19 @@ class PongEndpoint(BaseEndpoint):
             f'{host}{endpoint_uri}'
         ]
         return command
+
+    def delete_all_items(self, endpoint_uri, http_method, token_user, host):
+        command = [
+            'curl', '-k' ,'-X', 'POST',
+            '-H', f'Authorization: Bearer {token_user}',
+            f'{host}{endpoint_uri}'
+        ]
+        return command
+
+    def request_join_match(self, endpoint_wss):
+        final_endpoint_wss = self.set_id(endpoint_wss, self.uri_id_question)
+        return final_endpoint_wss
+
+    def request_join_lobby(self, endpoint_wss):
+        print("Request join lobby for match!")
 

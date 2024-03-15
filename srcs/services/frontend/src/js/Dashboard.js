@@ -13,12 +13,22 @@ export class Dashboard extends BaseClass {
 
     async handleDocumentClick(event) {
         console.log(`button clicked:[${event.target.id}]`);
-
         this.createTournamentButton = document.getElementById('createTournament');
         this.joinTournamentButton = document.getElementById('join-tournament');
         if (event.target.id === 'launch-game-button') {
-            history.pushState({}, '', '/match_lobby');
-            router();
+            event.preventDefault();
+            const button = document.getElementById('launch-game-button');
+            // button.disabled = true;
+            try {
+                this.initWebSocketLobby();
+                await this.postMatch();
+                console.log('web socket');
+            } catch (error) {
+                console.error('Error:', error);
+                // button.disabled = false;
+            }
+            // history.pushState({}, '', '/match_lobby');
+            // router();
         } else if (event.target.id === 'launch-tournament') {
             history.pushState({}, '', '/dashboard');
             document.getElementById('app').innerHTML = await this.getHtmlFormTournament();
@@ -91,4 +101,11 @@ export class Dashboard extends BaseClass {
     //     super.cleanup();
     //     // document.getElementById('app').removeEventListener('click', this.handleDocumentClickBound);
     // }
+
+    getHtmlForWaitingSpinner() {
+        document.getElementById('app').innerHTML =  `<div class="spinner-border" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>`;
+    }
+
 }

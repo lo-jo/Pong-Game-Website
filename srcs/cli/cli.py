@@ -33,20 +33,37 @@ def main():
         if endpoint_choice == 'EXIT':
             break
         endpoint_class = endpoints.get(endpoint_choice)
-        endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request.keys()), "Choose uri for entrypoint:\n", True))
-        if endpoint_uri == 'GO BACK':
+        # endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request.keys()), "Choose uri for entrypoint:\n", True))
+        protocol = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request), "Choose the communication protocol:\n", True))
+        if protocol == 'GO BACK':
             continue
-        elif endpoint_uri == 'EXIT':
+        elif protocol == 'EXIT':
             break
         else:
-            http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
-            # http_method = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request[endpoint_uri].keys()), "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
-            if http_method == 'GO BACK':
-                continue
-            elif http_method == 'EXIT':
-                break
-            if not user_cli.send_curl_request(endpoint_class, endpoint_uri, http_method):
-                break
+            if protocol == 'HTTPS':
+                endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request_http.keys()), "Choose the uri endpoint:\n", True))
+                if endpoint_uri == 'GO BACK':
+                    continue
+                elif endpoint_uri == 'EXIT':
+                    break
+                # http_method = curses.wrapper(lambda stdscr: prompt(stdscr, http_methods, "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
+                http_method = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request_http[endpoint_uri].keys()), "Choosee the allowed HTTP Method for your request and type 'Enter':\n", True))
+                if http_method == 'GO BACK':
+                    continue
+                elif http_method == 'EXIT':
+                    break
+                if not user_cli.send_curl_request(endpoint_class, endpoint_uri, http_method):
+                    break
+            elif protocol == 'WSS':
+                endpoint_wss = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request_wss), "Choose the uri endpoint:\n", True))
+                if endpoint_wss == 'GO BACK':
+                    continue
+                elif endpoint_wss == 'EXIT':
+                    break
+
+                if not user_cli.send_wss_request(endpoint_class, endpoint_wss):
+                    break
+
 
 if __name__ == "__main__":
     # signal.signal(signal.SIGINT, handler)
