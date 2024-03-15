@@ -76,7 +76,6 @@ export class Profile extends BaseClass {
                 statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-danger')
             } else {
                 // document.getElementById('status').innerText = 'Online';
-;
             }
         })
         .catch(error => console.error('Error fetching status:', error));
