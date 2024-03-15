@@ -24,9 +24,12 @@ class WebSocketClient:
 
     def run_client(self):
         self.connect()
-        print("Receiving...")
         welcome_message =  self.websocket.recv()
-        self.parse_message(welcome_message)
+        if self.parse_message(welcome_message) == False:
+            print("Closing connection")
+            self.websocket.close()
+            time.sleep(2)
+            return
         time.sleep(2)
         while True:
             requested_action = curses.wrapper(lambda stdscr: prompt(stdscr, list(self.request_endpoint_actions), "Choose the action for WebSocket connection:\n", False))
@@ -81,25 +84,17 @@ class WebSocketClient:
     def parse_message(self, message):
         message_json = json.loads(message)
         instruction = message_json["game_state"]
+        continue_flag = True
 
         match instruction:
+            case "match_do_not_exist":
+                print("You have tried to join a non-existent match, try with a valid ID")
+                continue_flag = False
             case "welcome":
                 print("Welcome to this match.")
+        return continue_flag
+        
     def request_score(self):
         return 'score'
     def request_movement_up(self):
         return 'move_up'
-
-# if __name__ == "__main__":
-#     # URL de la ruta WebSocket en tu servidor Django Channels
-#     ws_url = "ws://tu-servidor.com/tu-ruta-websocket/"
-
-#     # Crea una instancia del cliente WebSocket
-#     ws = websocket.WebSocketApp(ws_url,
-#                                 on_message=on_message,
-#                                 on_error=on_error,
-#                                 on_close=on_close)
-#     ws.on_open = on_open
-
-#     # Inicia la conexión WebSocket
-#     ws.run_forever()

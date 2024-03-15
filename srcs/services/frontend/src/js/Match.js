@@ -1,4 +1,5 @@
 import { BaseClass } from './BaseClass'
+import { router } from './Router'
 import { Navbar } from './Navbar';
 import { initGameTwoD } from './game';
 
@@ -26,9 +27,7 @@ export class Match extends BaseClass {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
             const { game_state } = data;
-            console.log(game_state);
             this.updateGameState(game_state, data);
         };
 
@@ -80,25 +79,45 @@ export class Match extends BaseClass {
     updateGameState(game_state, data)
     {
         console.log(game_state);
-        if (game_state === 'init_pong_game')
+        switch (game_state)
         {
-            console.log('Draw board in frontend!')
-            initGameTwoD();
+            case 'match_do_not_exist':
+                this.showMessageAndRedirect();
+                break;
+            case 'welcome':
+                console.log("Welcome to this match");
+                break;
+            case 'init_pong_game':
+                console.log('Draw board in frontend!')
+                initGameTwoD();
+                break;
+            case 'someone_left':
+                console.log('Someone left');
+                break;
+            default:
+                console.log(`Sorry, we are out of ${game_state}.`);
         }
-        else if (game_state === 'someone_left')
-        {
-            console.log('Someone left');
-        }
-        else if (game_state === 'timer')
-        {
-            let { timer } = data;
-            console.log(timer)
-            this.updateTimer(timer);
-        }
-        else if (game_state === 'welcome')
-        {
-            console.log("Welcome to this match")
-        }
+
+
+        // if (game_state === 'init_pong_game')
+        // {
+        //     console.log('Draw board in frontend!')
+        //     initGameTwoD();
+        // }
+        // else if (game_state === 'someone_left')
+        // {
+        //     console.log('Someone left');
+        // }
+        // else if (game_state === 'timer')
+        // {
+        //     let { timer } = data;
+        //     console.log(timer)
+        //     this.updateTimer(timer);
+        // }
+        // else if (game_state === 'welcome')
+        // {
+        //     console.log("Welcome to this match")
+        // }
     }
 
     updateTimer(seconds) {
@@ -110,6 +129,22 @@ export class Match extends BaseClass {
 
         document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
+
+    showMessageAndRedirect() {
+        document.getElementById('app').innerHTML = `<p>You have tried to join a non-existent match, try with a valid ID<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
+        let seconds = document.getElementById('seconds'),
+        total = seconds.innerHTML,
+        timeinterval = setInterval(function () {
+            total = --total;
+            seconds.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                history.pushState('', '', `/dashboard`);
+                router();
+            }
+        }, 1000);
+    }
+    
 }
 
 

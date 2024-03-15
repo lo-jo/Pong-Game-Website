@@ -3,6 +3,7 @@ import random
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Match
+from users.models import User
 from .serializers import MatchSerializer
 from .pong_game import get_game_state
 from asgiref.sync import sync_to_async
@@ -28,6 +29,31 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.match_id = self.scope['url_route']['kwargs']['id']
         # Setting group (channels) for sending data to ws
         self.group_name = f'match_{self.match_id}'
+        # Accepting the connection
+        await self.accept()
+
+        # Checking if match exists en BDD
+        match_info = await self.match_in_db()
+        if match_info == None:
+            await self.send_to_connection({'game_state' : "match_do_not_exist"})
+            await self.close()
+            return
+
+
+
+        
+        # Sending welcome message
+        # await self.send_to_connection({'game_state' : "welcome"})
+        # try:
+        #     match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        #     match_json = MatchSerializer(match)
+        #     await self.send_to_connection({'game_state' : "welcome"})
+        # except Match.DoesNotExist:
+        #     await self.send_to_connection({'game_state' : "match_do_not_exist"})
+        #     await self.close()
+        #     return
+
+        print(match_info)
         self.ball = {
             'x': '0',
             'y': '0',
@@ -87,8 +113,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         
         
         # Accepting connection
-        await self.accept()
-        await self.send_to_connection({'game_state' : 'welcome'})
+        # await self.accept()
+        # await self.send_to_connection({'game_state' : 'welcome'})
         # if not match.timer_started:
         #     print("if not match.timer_started")
         #     match.timer_started = True
@@ -146,6 +172,17 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def send_game_state(self, event):
         await self.send(text_data=json.dumps(event))
 
+    async def match_in_db(self):
+        try:
+            match = await sync_to_async(Match.objects.get)(id=self.match_id)
+            match_json = MatchSerializer(match)
+            return match_json.data
+            # await self.send_to_connection({'game_state' : "welcome"})
+        except Match.DoesNotExist:
+            # await self.send_to_connection({'game_state' : "match_do_not_exist"})
+            # await self.close()
+            return None
+    
     async def game_loop(self):
         # await self.send_to_group('init_pong_game')
         game_started = False
