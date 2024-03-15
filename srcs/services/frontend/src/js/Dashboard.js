@@ -13,8 +13,6 @@ export class Dashboard extends BaseClass {
 
     async handleDocumentClick(event) {
         console.log(`button clicked:[${event.target.id}]`);
-        this.createTournamentButton = document.getElementById('createTournament');
-        this.joinTournamentButton = document.getElementById('join-tournament');
         if (event.target.id === 'launch-game-button') {
             event.preventDefault();
             const button = document.getElementById('launch-game-button');
@@ -32,19 +30,21 @@ export class Dashboard extends BaseClass {
         } else if (event.target.id === 'launch-tournament') {
             history.pushState({}, '', '/dashboard');
             document.getElementById('app').innerHTML = await this.getHtmlFormTournament();
-        } else if (event.target.id === 'createTournament' && this.createTournamentButton && this.createTournamentButton.disabled == false) {
+        } else if (event.target.id === 'createTournament') {
             event.preventDefault();
-            const tournamentName = await document.getElementById("tournamentName").value;
-            // this.createTournamentButton.disabled = true;
-            await this.tournament.createTournament(tournamentName);
-            // this.createTournamentButton.disabled = false;
-            this.updateView();
-            document.getElementById('app').innerHTML = await this.getHtmlForMain();
-        } else if (event.target.id === 'join-tournament' && this.joinTournamentButton && this.joinTournamentButton.disabled == false) {
+            let tournamentName = document.getElementById("tournamentName").value.trim();
+            if (!tournamentName) {
+                this.displayMessage("Tournament name cannot be empty.", ".alert-danger");
+                return;
+            }
+            let obj = await this.tournament.createTournament(tournamentName);
+            this.displayMessage(`${obj.message}`, ".alert-success");
+            setTimeout(() => {
+                document.getElementById('app').innerHTML = await this.getHtmlForMain();
+            }, 4000);
+        } else if (event.target.id === 'join-tournament') {
             event.preventDefault();
-            // this.joinTournamentButton.disabled = true;
             await this.tournament.displayOpenTournaments();
-            // this.joinTournamentButton.disabled = false;
         }
     }
 
@@ -139,6 +139,21 @@ export class Dashboard extends BaseClass {
         }
     }
 
+    displayMessage(message, id) {
+        const alertElement = document.querySelector(`#tournamentForm ${id}`);
+        alertElement.textContent = message;
+        alertElement.style.display = 'block';
+        setTimeout(() => {
+            this.hideMessage(id);
+        }, 4000);
+    }
+    
+    hideMessage(id) {
+        const alertElement = document.querySelector(`#tournamentForm ${id}`);
+        alertElement.textContent = '';
+        alertElement.style.display = 'none';
+    }
+
     async startTournament() {
         console.log('Starting tournament...');
     }
@@ -151,6 +166,8 @@ export class Dashboard extends BaseClass {
                             <label for="tournamentName">Tournament name:</label>
                             <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Enter the name of the tournament">
                             <br>
+                            <div id="redWarning" class="alert alert-danger" role="alert"></div>
+                            <div id="greenNotif" class="alert alert-success" role="alert"></div>
                             <button type="submit" id="createTournament" class="btn btn-dark btn-sm">Create tournament</button>
                         </form>
                     </div>

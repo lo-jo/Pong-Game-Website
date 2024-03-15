@@ -11,9 +11,43 @@ export class Tournament extends BaseClass {
         this.dashboard = dashboardInstance;
     }
 
-    async createTournament(tournamentName) {
-        document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+    // async createTournament(tournamentName) {
+    //     document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
     
+    //     const httpProtocol = window.location.protocol;
+    //     const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
+
+    //     const jwtAccess = localStorage.getItem('token');
+
+    //     const options = {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': `Bearer ${jwtAccess}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             tournamentName: tournamentName,
+    //         }),
+    //     };
+
+    //     try {
+    //         const response = await fetch(url, options);
+    
+    //         if (!response.ok) {
+    //             throw new Error('The request was not successful');
+    //         }
+
+    //         const data = await response.json();
+    //         console.log('Backend response:', data);
+    //         return;
+    //     } catch (error) {
+    //         console.error('Error making request:', error);
+    //     }
+    // }
+
+    async createTournament(tournamentName) {
+        // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+
         const httpProtocol = window.location.protocol;
         const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
 
@@ -32,16 +66,21 @@ export class Tournament extends BaseClass {
 
         try {
             const response = await fetch(url, options);
-    
             if (!response.ok) {
                 throw new Error('The request was not successful');
             }
-
             const data = await response.json();
             console.log('Backend response:', data);
-            return;
+            return {
+                success: true,
+                message: `Tournament ${data.name} succesfully created!`,
+            };
         } catch (error) {
             console.error('Error making request:', error);
+            return {
+                success: false,
+                message: `Error while creating ${tournamentName}`,
+            };
         }
     }
 
