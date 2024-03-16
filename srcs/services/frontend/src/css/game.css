@@ -4,16 +4,37 @@
   box-sizing: border-box;
 }
 
-body {
-  height: 100vh;
-  width: 100vw;
-  background-color: #000000;
+.app-container {
+  font-size: 50px;
+  position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  margin: 0;
-  padding: 0;
 }
+
+.user-info {
+  margin: 5px;
+  padding: 5px;
+  max-width: 200px;
+}
+
+.top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.center {
+  position: relative;
+  margin: auto;
+}
+
 
 .board {
   height: 85vh; 

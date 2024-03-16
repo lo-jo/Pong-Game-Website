@@ -64,7 +64,9 @@ body {
     opacity : .4;
     height: 120% !important; /* Adjust the height as needed */
     overflow-y: auto;
-}/* Game styles */
+}
+
+/* Game styles */
 
 .board {
   height: 100%; 

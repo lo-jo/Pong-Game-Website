@@ -9,8 +9,7 @@ export class Match extends BaseClass {
         this.css = './css/game.css';
         this.socket = null;
         this.addDocumentClickListener();
-        // document.addEventListener('click', this.handleButtonClick.bind(this));
-        // this.insertCssLink();
+        this.insertCssLink();
         this.initWebSocket();
     }
 
@@ -22,21 +21,27 @@ export class Match extends BaseClass {
 
         this.socket.onopen = () => {
             console.log('WebSocket(match gameeee) connection established.');
-            this.socket.send(JSON.stringify({ 'match_id' : this.id}));
         };
 
         this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const { type_message } = data 
+            const { type_message } = data
+            console.log(`TYPE MESSAGE ${type_message}`);
             if (type_message === 'ws_handshake')
             {
                 const { ws_handshake } = data;
-                this.ws_handshake(ws_handshake);
+                this.ws_handshake(ws_handshake, data);
             }
             else if (type_message === 'game_state')
             {
                 const { game_state } = data;
                 this.updateGameState(game_state, data);
+            }
+            else if (type_message === 'other_user')
+            {
+                const { other_user } = data
+                console.log(other_user);
+                this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
             }
         };
 
@@ -49,28 +54,17 @@ export class Match extends BaseClass {
         };
     }
 
-    async handleDocumentClick(event) {
-        if (event.target.id === 'confirm-match') {
-            socket.send(JSON.stringify({ 'message' : 'confirm'}));
-        }
-    }
 
     insertCssLink()
     {
-        console.log("Here");
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
-        styleCss.href = this.css;
+        styleCss.href = `http://localhost:5173/${this.css}`;
         document.head.appendChild(styleCss);
     }
 
-    /*Method to get the HTML of the dashboard*/
-    getHtmlForMain() {
-        return `<button id="confirm-match">Ready</button>`;
-    }
-
     /*Methods for match handshake*/
-    ws_handshake(ws_handshake_message)
+    ws_handshake(ws_handshake_message, data)
     {
         console.log('In ws_handshake()');
         console.log(ws_handshake_message)
@@ -86,6 +80,9 @@ export class Match extends BaseClass {
             case 'failed_authorization':
                 this.showMessageAndRedirect(`You don'have authorization to this match.`);
                 break;
+            case 'initial_data':
+                const { user_1_info, user_2_info } = data
+                this.drawConfirmBoard(user_1_info, user_2_info)
         }
     }
 
@@ -97,6 +94,8 @@ export class Match extends BaseClass {
         {
             case 'welcome':
                 console.log("Welcome to this match");
+                const jwtToken = localStorage.getItem('token');
+                this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}` , 'screen_info' : this.getScreenParams()}));
                 break;
             case 'init_pong_game':
                 console.log('Draw board in frontend!')
@@ -129,17 +128,33 @@ export class Match extends BaseClass {
 //     console.log("Welcome to this match")
 // }
     }
-    
-    updateTimer(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        
-        const formattedMinutes = String(minutes).padStart(2, '0');
-        const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-        
-        document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
+
+    // confirmMatch()
+    // {
+    //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+    // }
+
+    /*Functions to send data*/
+    getScreenParams()
+    {
+        const appDiv = document.getElementById('app');
+        const screenParams = {
+            offsetWidth: appDiv.offsetWidth,
+            offsetHeight: appDiv.offsetHeight,
+            clientWidth: appDiv.clientWidth,
+            clientHeight: appDiv.clientHeight
+        };
+        return screenParams;
     }
     
+
+    /*Functions to update html*/
+    
+    /*Method to get the HTML of the dashboard*/
+    getHtmlForMain() {
+        return ``;
+    }
+
     showMessageAndRedirect(redirect_reason) {
         document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
@@ -156,18 +171,52 @@ export class Match extends BaseClass {
         }, 1000);
     }
     
-    getScreenParams()
-    {
-        const appDiv = document.getElementById('app');
-        const screenParams = {
-            offsetWidth: appDiv.offsetWidth,
-            offsetHeight: appDiv.offsetHeight,
-            clientWidth: appDiv.clientWidth,
-            clientHeight: appDiv.clientHeight
-        };
-        return screenParams;
+    updateTimer(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+        
+        document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
     
+    drawConfirmBoard(user_1_info, user_2_info){
+        const app = document.getElementById('app');
+        
+        app.classList.add('app-container');
+
+        const user1Div = document.createElement('div');
+        user1Div.classList.add('user-info', 'top-left');
+        user1Div.innerHTML = `
+            <h2>${user_1_info.username}</h2>
+        `;
+
+        const user2Div = document.createElement('div');
+        user2Div.classList.add('user-info', 'top-right');
+        user2Div.innerHTML = `
+            <h2>${user_2_info.username}</h2>
+        `;
+
+        // Confirmation button 
+        const confirmMatchButton = document.createElement('button');
+        confirmMatchButton.id = 'confirm-match';
+        confirmMatchButton.classList.add('btn', 'btn-light', 'center');
+        confirmMatchButton.textContent = 'Ready';
+        confirmMatchButton.addEventListener('click', () => {
+            this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+        });
+
+        app.appendChild(user1Div);
+        app.appendChild(user2Div);
+        app.appendChild(confirmMatchButton);
+    }
+
+    // getHtmlForWaitingSpinner() {
+    //     document.getElementById('app').innerHTML =  `<div class="spinner-border" role="status">
+    //                                                     <span class="visually-hidden">Loading...</span>
+    //                                                 </div>`;
+    // }
 }
 
 
