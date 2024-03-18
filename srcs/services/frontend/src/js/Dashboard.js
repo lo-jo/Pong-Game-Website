@@ -32,14 +32,23 @@ export class Dashboard extends BaseClass {
             document.getElementById('app').innerHTML = await this.getHtmlFormTournament();
         } else if (event.target.id === 'createTournament') {
             event.preventDefault();
-            let tournamentName = document.getElementById("tournamentName").value.trim();
+            let tournamentNameInput = document.getElementById("tournamentName");
+            let createTournamentButton = document.getElementById("createTournament");
+            tournamentNameInput.disabled = true;
+            createTournamentButton.disabled = true;
+            let tournamentName = tournamentNameInput.value.trim();
             if (!tournamentName) {
-                this.displayMessage("Tournament name cannot be empty.", ".alert-danger");
+                this.displayMessage("Tournament name cannot be empty.", false);
+                tournamentNameInput.disabled = false;
+                createTournamentButton.disabled = false;
                 return;
             }
             let obj = await this.tournament.createTournament(tournamentName);
-            this.displayMessage(`${obj.message}`, ".alert-success");
-            setTimeout(() => {
+            this.displayMessage(`${obj.message}`, obj.success);
+            setTimeout(async () => {
+                tournamentNameInput.disabled = false;
+                tournamentNameInput.value = '';
+                createTournamentButton.disabled = false;
                 document.getElementById('app').innerHTML = await this.getHtmlForMain();
             }, 4000);
         } else if (event.target.id === 'join-tournament') {
@@ -139,7 +148,8 @@ export class Dashboard extends BaseClass {
         }
     }
 
-    displayMessage(message, id) {
+    displayMessage(message, flag) {
+        const id = (flag) ? ".alert-success" : ".alert-danger";
         const alertElement = document.querySelector(`#tournamentForm ${id}`);
         alertElement.textContent = message;
         alertElement.style.display = 'block';
