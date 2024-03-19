@@ -36,6 +36,20 @@ export class Login extends BaseClass {
             if (response.ok) {
                 const data = await response.json();
                 if (data.access) {
+                    // call a fetch get on users/profile/
+                    // if otp_enabled is true
+                    // >>>>> and if otp_verified is false 
+                    // >>>>>>> GENERATE NEW PAGE FOR QR CODE (get users/otp/surement pour recup le QR) 
+                    // >>>>>>> +front side: FORM TO SUBMIT
+                    // >>>>>>>>>>> fetch POST URL/users/otp/
+                    // >>>>>>>>>>>>>>>> verifier la reponse (estce que la key correspond)
+                    // >>>>>>>>>>>>>>>> si reponse ok=
+                    // >>>>>>>>>>>>>>>> localStorage.setItem('token', data.access);
+                    // >>>>>>>>>>>>>>>> connectUser()
+                    // >>>>>>>>>>>>>>>> history.pushState({}, '', '/dashboard');
+                    // >>>>>>>>>>>>>>>> router();
+                    // >>>>>>>>>>>>>>>> si reponse pas OK > fuck off 
+                    // else
                     localStorage.setItem('token', data.access);
                     connectUser();
                     history.pushState({}, '', '/dashboard');
