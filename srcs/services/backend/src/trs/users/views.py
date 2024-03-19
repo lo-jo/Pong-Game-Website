@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 #TEST CHECK_AUTHENTICATION
 from rest_framework_simplejwt.authentication import JWTAuthentication
+import pyotp
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class AllUsersView(APIView):
@@ -65,7 +67,6 @@ class FriendshipView(APIView):
 
     def get_queryset(self, username):
         user = get_object_or_404(User, username=username)
-        print("QUERY SET USERNAME:", user.username)
         # List all the friendship objects where the target user was either a sender or a recipient (=all friends)
         return Friendship.objects.filter(sender=user) | Friendship.objects.filter(recipient=user)
     #Show friend list of the target user 
@@ -89,21 +90,11 @@ class FriendshipView(APIView):
         return Response(modified_data, status=status.HTTP_200_OK)
 
     def post(self, request, username, *args, **kwargs):
-            #user sending the friend request (the sender)
             current_user = request.user
-            print("SENDER id:", current_user)
-            print("USERNAME IN THE POST METHOD: (should be the target)", username)
-            # Get the target user (User 2)
-
-            # target_user = username
-            # print("TARGET username:", target_user)
             target_user = get_object_or_404(User, id=username)
-            print("TARGET username:", target_user.username)
-
             # Check if the users are the same
             if current_user == target_user:
                 return Response({"error": "Cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
-
             # Check if the friendship already exists
             if Friendship.objects.filter(sender=current_user, recipient=target_user).exists():
                 return Response({"error": "Friendship already exists."}, status=status.HTTP_400_BAD_REQUEST)
@@ -141,3 +132,41 @@ class CheckAuthentication(APIView):
 
     def get(self, request):
         return Response({'authenticated': True})
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            username = serializer.validated_data.get('username')
+            password = serializer.validated_data.get('password')
+            otp = serializer.validated_data.get('otp')
+
+            user = User.objects.filter(username=username).first()
+
+            if user:
+                if user.check_password(password):
+                    # Check if the user has 2FA enabled
+                    if user.otp_secret_key:
+                        # Verify OTP
+                        if self.verify_otp(user.otp_secret_key, otp):
+                            # Generate JWT token
+                            tokens = super().post(request, *args, **kwargs).data
+                            return Response(tokens, status=status.HTTP_200_OK)
+                        else:
+                            return Response({"detail": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        # No 2FA enabled, proceed with JWT token generation
+                        tokens = super().post(request, *args, **kwargs).data
+                        return Response(tokens, status=status.HTTP_200_OK)
+                else:
+                    return Response({"detail": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"detail": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def verify_otp(self, secret_key, otp):
+        totp = pyotp.TOTP(secret_key)
+        return totp.verify(otp)

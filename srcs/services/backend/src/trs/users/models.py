@@ -21,10 +21,10 @@ class User(AbstractUser):
     bio = models.TextField(max_length=100, blank=True)
     email = models.EmailField(unique=True, blank=False, null=False)
     profile_pic = models.ImageField(upload_to='users/profile_pic/', blank=True, null=True, default="users/profile_pic/default.png")
-    #Many to Many field in the db to store all the users' friends
-    #friends = models.ManyToManyField("User", blank=True)
+    otp_enabled = models.BooleanField(default=False, null=True)
+    otp_key = models.CharField(max_length=100, blank=True, null=True)
+    otp_verified = models.BooleanField(default=False, null=True)  
     objects = UserProfileManager()
-    # USERNAME_FIELD = 'username'
 
     def __str__(self):
         return self.username

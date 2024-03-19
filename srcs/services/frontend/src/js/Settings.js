@@ -4,14 +4,19 @@ export class Settings extends BaseClass {
     constructor() {
         super();
         this.addDocumentClickListener();
+        this.isChecked = false;
         // document.addEventListener('click', this.handleDocumentClick.bind(this));
     }
 
     async handleDocumentClick(event) {
         this.editButton = document.getElementById('editButton');
+        this.switchCheck = document.getElementById('twoFA_switch')
         if (event.target.id === 'editButton' && this.editButton && this.editButton.disabled == false) {
             event.preventDefault();
             await this.handleButtonClick(event);
+        }
+        else if (event.target.id == 'twoFA_switch'){
+            this.isChecked = (this.switchCheck.checked) ? true : false;
         }
     }
 
@@ -50,6 +55,10 @@ export class Settings extends BaseClass {
         const email = document.getElementById('newemail').value;
         const bio = document.getElementById('newbio').value;
         const profile_pic = document.getElementById('newavatar');
+        // const switchCheckbox = document.getElementById("twoFA_switch");
+        // const isChecked = switchCheckbox.checked;
+        console.log("ISCHECKED VALUE", this.isChecked)
+
         
             // Prepare data object for JSON
             const jsonData = {};
@@ -62,7 +71,8 @@ export class Settings extends BaseClass {
             if (bio.trim() !== '') {
                 jsonData.bio = bio.trim();
             }
-    
+            jsonData.otp_enabled = this.isChecked;
+   
             // Create FormData for file upload
             const formData = new FormData();
             if (profile_pic.files && profile_pic.files.length > 0) {
@@ -88,12 +98,14 @@ export class Settings extends BaseClass {
         .then(response => {
             if (!response.ok) {
                 
-                console.log(JSON.stringify({ username, email, bio, profile_pic }));
+                console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
                 throw new Error('Invalid submission');
             }
             return response.json();
         })
         .then(data => {
+            console.log(data);
+            // console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
             document.getElementById('app').innerHTML = "Profile succesfully updated";
             this.removeEventListeners();
         })
@@ -111,19 +123,28 @@ export class Settings extends BaseClass {
         <form id="editprofile" enctype="multipart/form-data">
             <label for="username">Username:</label>
             <input class="form-control form-control-sm" type="text" id="newusername" name="username" placeholder="Enter username">
-            <br>
+
             <label for="email">E-mail:</label>
             <input class="form-control form-control-sm" type="email" id="newemail" name="email" placeholder="Enter e-mail">
-            <br>
+
             <label for="password">bio:</label>
             <input class="form-control form-control-sm" type="text" id="newbio" name="bio" placeholder="bio">
-            <br>
+
             <div class="mb-3">
-                <label for="formFile" class="form-label">Default file input example</label>
+                <label for="formFile" class="form-label">Profile Pic:</label>
                 <input class="form-control" type="file" id="newavatar">
               </div>
+
+            <div class="form-check form-switch" id="twoFA">
+                <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch">
+                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"></label>
+            </div>
+            <br>
             <button type="submit" id="editButton" class="btn btn-dark btn-sm">Submit</button>
         </form>
         </div>`
     }
 }
+
+
+

@@ -19,10 +19,11 @@ class UpdateUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False)
     bio = serializers.CharField(required=False)
     profile_pic = serializers.ImageField(required=False)
+    otp_enabled = serializers.BooleanField(required=False)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'bio', 'profile_pic')
+        fields = ('username', 'email', 'bio', 'profile_pic', 'otp_enabled')
 
     def validate_username(self, value):
         print("value:", value)
@@ -32,31 +33,32 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         return value
 
     def validate_email(self, value):
-        print("vVALIDATE EMAIL:")
         user = self.context['request'].user
         if User.objects.exclude(pk=user.pk).filter(email=value).exists():
             raise serializers.ValidationError({"email": "This email is already in use."})
         return value
 
     def validate_bio(self, value):
-        print("value:", value)
         user = self.context['request'].user
         return value
 
     def validate_profile_pic(self, value):
-        print("value:", value)
+        user = self.context['request'].user
+        return value
+
+    def validate_otp_enabled(self, value):
+        print("SWITCH", value)
         user = self.context['request'].user
         return value
 
     def update(self, instance, validated_data):
-        print("Validated Data:", validated_data)
-        print("Instance:", instance)
         user = self.context['request'].user
         if user.pk != instance.pk:
             raise serializers.ValidationError({"authorize": "You dont have permission for this user."})
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.bio = validated_data.get('bio', instance.bio)
+        instance.otp_enabled = validated_data.get('otp_enabled', instance.otp_enabled)
         profile_pic = validated_data.get('profile_pic')
         if profile_pic:
             instance.profile_pic = profile_pic

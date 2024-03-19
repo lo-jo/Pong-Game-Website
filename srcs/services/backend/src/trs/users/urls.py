@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:pk>/profile/', UserProfileView.as_view(), name='user_profile'),
     path('profile/', UserView.as_view()),
     path('register/', RegisterUserView.as_view()),
+    # path('otp_sta')
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('update_profile/<int:pk>/', UpdateProfileView.as_view(), name='update_profile'),
