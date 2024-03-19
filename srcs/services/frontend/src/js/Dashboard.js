@@ -39,8 +39,10 @@ export class Dashboard extends BaseClass {
             let tournamentName = tournamentNameInput.value.trim();
             if (!tournamentName) {
                 this.displayMessage("Tournament name cannot be empty.", false);
-                tournamentNameInput.disabled = false;
-                createTournamentButton.disabled = false;
+                setTimeout(async () => {
+                    tournamentNameInput.disabled = false;
+                    createTournamentButton.disabled = false;
+                }, 2000);
                 return;
             }
             let obj = await this.tournament.createTournament(tournamentName);
@@ -50,7 +52,7 @@ export class Dashboard extends BaseClass {
                 tournamentNameInput.value = '';
                 createTournamentButton.disabled = false;
                 document.getElementById('app').innerHTML = await this.getHtmlForMain();
-            }, 4000);
+            }, 2000);
         } else if (event.target.id === 'join-tournament') {
             event.preventDefault();
             await this.tournament.displayOpenTournaments();
@@ -136,18 +138,6 @@ export class Dashboard extends BaseClass {
         };
     }
 
-    displayPlayButton() {
-        let playButton = document.getElementById('play-button');
-        if (!playButton) {
-            const gameStatsDiv = document.getElementById('game-stats');
-            playButton = document.createElement('button');
-            playButton.id = 'play-button';
-            playButton.textContent = 'PLAY';
-            playButton.addEventListener('click', this.startTournament.bind(this));
-            gameStatsDiv.appendChild(playButton);
-        }
-    }
-
     displayMessage(message, flag) {
         const id = (flag) ? ".alert-success" : ".alert-danger";
         const alertElement = document.querySelector(`#tournamentForm ${id}`);
@@ -155,17 +145,13 @@ export class Dashboard extends BaseClass {
         alertElement.style.display = 'block';
         setTimeout(() => {
             this.hideMessage(id);
-        }, 4000);
+        }, 2000);
     }
     
     hideMessage(id) {
         const alertElement = document.querySelector(`#tournamentForm ${id}`);
         alertElement.textContent = '';
         alertElement.style.display = 'none';
-    }
-
-    async startTournament() {
-        console.log('Starting tournament...');
     }
 
     async getHtmlFormTournament() {
