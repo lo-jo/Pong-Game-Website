@@ -1,0 +1,13 @@
+#qrCode {
+    display: block;
+    width: 40%;
+    height: auto;
+
+}
+
+.titreTwofa {
+    writing-mode: vertical-lr; /* Rotate the text vertically from left to right */
+    transform: rotate(180deg); /* Additional rotation to make it display bottom to top */
+    float: right; /* Center the text horizontally */
+    white-space: nowrap; /* Prevent line breaks */
+}

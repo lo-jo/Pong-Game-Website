@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, Friendship
 from rest_framework.permissions import AllowAny
+import os
 
 # A user serializer will translate python data to JSON data and vice versa
 
@@ -60,7 +61,18 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         instance.bio = validated_data.get('bio', instance.bio)
         profile_pic = validated_data.get('profile_pic')
         instance.otp_enabled = validated_data.get('otp_enabled', instance.otp_enabled)
+        if instance.otp_enabled == False:
+            instance.otp_verified = False
+            if instance.qr_code:
+                if os.path.isfile(instance.qr_code.path):
+                    os.remove(instance.qr_code.path)
+                instance.qr_code = None
         if profile_pic:
+            if instance.profile_pic and not user.profile_pic.name.startswith('users/profile_pic/default'):
+                print("if profile pic is new and not a default pic")
+                if os.path.isfile(user.profile_pic.path):
+                    print("INSTANCE PP PATH", instance.profile_pic.path)
+                    os.remove(user.profile_pic.path)
             instance.profile_pic = profile_pic
         instance.save()
 

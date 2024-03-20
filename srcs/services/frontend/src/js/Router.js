@@ -28,7 +28,8 @@ export const routes = {
     '/login' : {
         path : '/login',
         view : Login,
-        auth : false
+        auth : false,
+        css : './css/login.css'
     },
     '/register' : {
         path : '/register',

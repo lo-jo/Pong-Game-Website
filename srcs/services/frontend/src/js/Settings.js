@@ -5,9 +5,8 @@ export class Settings extends BaseClass {
         super();
         this.addDocumentClickListener();
         this.token = localStorage.getItem('token');
-        this.isChecked = false;
         this.userData;
-        // document.addEventListener('click', this.handleDocumentClick.bind(this));
+
     }
 
     async getUserData() {
@@ -45,7 +44,6 @@ export class Settings extends BaseClass {
             await this.handleButtonClick(event);
         }
         else if (event.target.id == 'twoFA_switch'){
-
             this.isChecked = (this.switchCheck.checked) ? true : false;
         }
     }
@@ -90,7 +88,8 @@ export class Settings extends BaseClass {
         if (bio.trim() !== '') {
             jsonData.bio = bio.trim();
         }
-        jsonData.otp_enabled = this.isChecked;
+        if (this.isChecked != null)
+            jsonData.otp_enabled = this.isChecked;
    
         // Create FormData for file upload
         const formData = new FormData();
@@ -117,7 +116,7 @@ export class Settings extends BaseClass {
         .then(response => {
             if (!response.ok) {
                 
-                console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
+                // console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
                 throw new Error('Invalid submission');
             }
             return response.json();
@@ -132,20 +131,18 @@ export class Settings extends BaseClass {
             console.error('Failed to update profile', error);
         });
 
-        if (this.isChecked == true && this.userData.otp_enabled == false)
-        {
-            console.log('lets activate that qr');
+        if (this.isChecked == true && this.isChecked != this.formerState && this.userData.otp_enabled == false){
             await this.enableTwoFa();
-            // await postTwoFa(jsonData);
         }
     }
-    // run() {
-    //     throw new Error("Method 'run()' must be implemented.");
-    // }
 
     async getHtmlForMain() {
         await this.getUserData();
-        console.log("USER DATA", this.userData);
+        let switchValue = null;
+        this.formerState = this.userData.otp_enabled;
+        if (this.formerState == true)
+            switchValue = "checked";
+        
         return `<h1>Edit profile</h1>
         <div class="form-group">
         <form id="editprofile" enctype="multipart/form-data">
@@ -164,7 +161,7 @@ export class Settings extends BaseClass {
               </div>
 
             <div class="form-check form-switch" id="twoFA">
-                <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
                 <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"></label>
             </div>
             <br>
