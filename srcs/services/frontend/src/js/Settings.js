@@ -4,8 +4,37 @@ export class Settings extends BaseClass {
     constructor() {
         super();
         this.addDocumentClickListener();
+        this.token = localStorage.getItem('token');
         this.isChecked = false;
+        this.userData;
         // document.addEventListener('click', this.handleDocumentClick.bind(this));
+    }
+
+    async getUserData() {
+        try {
+            const response = await fetch(`http://localhost:8000/users/profile/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            this.userData = data;
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
     }
 
     async handleDocumentClick(event) {
@@ -16,6 +45,7 @@ export class Settings extends BaseClass {
             await this.handleButtonClick(event);
         }
         else if (event.target.id == 'twoFA_switch'){
+
             this.isChecked = (this.switchCheck.checked) ? true : false;
         }
     }
@@ -24,74 +54,63 @@ export class Settings extends BaseClass {
         document.removeEventListener('click', this.boundHandleDocumentClick);
     }
 
-    async handleButtonClick(event) {
-        const getData = async () => {
-            const jwtAccess = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/users/profile/', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${jwtAccess}`,
-                    'Content-Type': 'application/json',
-                },
-            }); 
-            const data = await response.json(); //parse JSON data
-            return data;
+    async enableTwoFa(){
+        const res =  await fetch('http://localhost:8000/users/otp/', { 
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json',
+        },
+
+        });
+        if (!res.ok)
+        {
+            console.error("ERROR POSTING OTP");
         }
-    
-        let url;
-        const myObject = await getData().then(data => {
-                            let objet = {}
-                            objet.data = data;
-                            url = "http://localhost:8000/users/update_profile/" + objet.data.id + "/";
-                            console.log(url);
-                            objet.url = url;
-                            return objet;
-                        })
-                        .catch(error => {   console.error(error);});
-        
-        const jwtAccess = localStorage.getItem('token');
-    
+        else {
+            console.log("BRAVO BITCH");
+        }
+    }
+
+    async handleButtonClick(event) {
         const username = document.getElementById('newusername').value;
         const email = document.getElementById('newemail').value;
         const bio = document.getElementById('newbio').value;
         const profile_pic = document.getElementById('newavatar');
-        // const switchCheckbox = document.getElementById("twoFA_switch");
-        // const isChecked = switchCheckbox.checked;
         console.log("ISCHECKED VALUE", this.isChecked)
 
-        
-            // Prepare data object for JSON
-            const jsonData = {};
-            if (username.trim() !== '') {
-                jsonData.username = username.trim();
-            }
-            if (email.trim() !== '') {
-                jsonData.email = email.trim();
-            }
-            if (bio.trim() !== '') {
-                jsonData.bio = bio.trim();
-            }
-            jsonData.otp_enabled = this.isChecked;
+        // Prepare data object for JSON
+        const jsonData = {};
+        if (username.trim() !== '') {
+            jsonData.username = username.trim();
+        }
+        if (email.trim() !== '') {
+            jsonData.email = email.trim();
+        }
+        if (bio.trim() !== '') {
+            jsonData.bio = bio.trim();
+        }
+        jsonData.otp_enabled = this.isChecked;
    
-            // Create FormData for file upload
-            const formData = new FormData();
-            if (profile_pic.files && profile_pic.files.length > 0) {
-                formData.append('profile_pic', profile_pic.files[0]);
-                const fileName = profile_pic.files[0].name;
-                console.log('Selected File:', fileName)
-            }
-            else
-                console.log('No file selected');
+        // Create FormData for file upload
+        const formData = new FormData();
+        if (profile_pic.files && profile_pic.files.length > 0) {
+            formData.append('profile_pic', profile_pic.files[0]);
+            const fileName = profile_pic.files[0].name;
+            console.log('Selected File:', fileName)
+        }
+        else
+            console.log('No file selected');
+
+        // Merge JSON and file data into FormData
+        for (const [key, value] of Object.entries(jsonData)) {
+            formData.append(key, value);
+        }
     
-            // Merge JSON and file data into FormData
-            for (const [key, value] of Object.entries(jsonData)) {
-                formData.append(key, value);
-            }
-        
-        fetch(url, {
+        fetch(`http://localhost:8000/users/update_profile/${this.userData.id}/`, {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
+                'Authorization': `Bearer ${this.token}`,
             },
             body: formData,
         })
@@ -112,12 +131,21 @@ export class Settings extends BaseClass {
         .catch(error => {
             console.error('Failed to update profile', error);
         });
+
+        if (this.isChecked == true && this.userData.otp_enabled == false)
+        {
+            console.log('lets activate that qr');
+            await this.enableTwoFa();
+            // await postTwoFa(jsonData);
+        }
     }
     // run() {
     //     throw new Error("Method 'run()' must be implemented.");
     // }
 
-    getHtmlForMain() {
+    async getHtmlForMain() {
+        await this.getUserData();
+        console.log("USER DATA", this.userData);
         return `<h1>Edit profile</h1>
         <div class="form-group">
         <form id="editprofile" enctype="multipart/form-data">

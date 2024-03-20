@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'id', 'bio', 'profile_pic')
+        fields = ('username', 'password', 'email', 'id', 'bio', 'profile_pic', 'otp_enabled', 'otp_verified', 'qr_code')
         extra_kwargs = {'password': {'write_only': True}}
     # method to create a new row in the database
     def create(self, validated_data):
@@ -58,8 +58,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
         instance.bio = validated_data.get('bio', instance.bio)
-        instance.otp_enabled = validated_data.get('otp_enabled', instance.otp_enabled)
         profile_pic = validated_data.get('profile_pic')
+        instance.otp_enabled = validated_data.get('otp_enabled', instance.otp_enabled)
         if profile_pic:
             instance.profile_pic = profile_pic
         instance.save()

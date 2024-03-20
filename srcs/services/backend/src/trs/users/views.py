@@ -10,6 +10,10 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+import pyotp
+import qrcode
+from io import BytesIO
+from django.core.files.base import ContentFile
 #TEST CHECK_AUTHENTICATION
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import pyotp
@@ -170,3 +174,47 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     def verify_otp(self, secret_key, otp):
         totp = pyotp.TOTP(secret_key)
         return totp.verify(otp)
+
+class OtpUserView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user.otp_enabled = True
+        secret_key = pyotp.random_base32()
+        totp = pyotp.TOTP(secret_key)
+        provisioning_uri = totp.provisioning_uri(user.email, issuer_name="PONG")
+        qr = qrcode.make(provisioning_uri)
+        user.otp_key = secret_key
+        user.save()
+
+        # Save QR code image to user's account
+        buffer = BytesIO()
+        qr.save(buffer, format='PNG')
+        buffer.seek(0)
+        user.qr_code.save('qr_code.png', ContentFile(buffer.getvalue()))
+        return Response({"message": "2FA enabled successfully"}, status=status.HTTP_200_OK)
+
+class VerifyOtpView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        otp_entered = request.data.get('otp')
+
+        # Retrieve the secret key associated with the user from the database
+        secret_key = user.otp_key
+
+        # Generate OTP using PyOTP
+        totp = pyotp.TOTP(secret_key)
+        otp_generated = totp.now()
+
+        # Compare the generated OTP with the OTP provided by the user
+        if otp_generated == otp_entered:
+            # OTP verification successful
+            user.otp_verified = True
+            user.save()
+            return Response({"message": "OTP verification successful"}, status=status.HTTP_200_OK)
+        else:
+            # OTP verification failed
+            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)

@@ -10,11 +10,80 @@ export class Login extends BaseClass {
         // document.getElementById('app').addEventListener('click', this.handleDocumentClickBound);
     }
 
+    async verifyCode(codeTwoFa) {
+        const res =  await fetch('http://localhost:8000/users/otp_verify/', { 
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                otp: codeTwoFa,
+            }),
+            });
+            if (!res.ok)
+            {
+                console.error(res.error);
+            }
+            else {
+                console.log(res.message);
+                localStorage.setItem('token', this.token);
+                connectUser();
+                history.pushState({}, '', '/dashboard');
+                router();
+            }
+    }
+
     async handleDocumentClick(event) {
         if (event.target.id === 'loginButton') {
             event.preventDefault();
             await this.handleButtonClick(event);
+        } else if (event.target.id === 'twoFaButton'){
+            event.preventDefault();
+            console.log('submitting code...');
+            const codeTwoFa = document.getElementById("codeTwoFa").value;
+            if (this.userData)
+                await this.verifyCode(codeTwoFa);
         }
+    }
+
+    async getUserData() {
+        try {
+            const response = await fetch(`http://localhost:8000/users/profile/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            this.userData = data;
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async getVerifyTwoFaHtml() {
+        console.log("userData: ", this.userData);
+        return `<h1>Verify 2FA</h1>
+                <form id="twofaForm">
+                <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE" class="img-fluid">
+                    <label for="password">Code:</label>
+                    <input class="form-control form-control-sm" id="codeTwoFa" name="codeTwoFa" required><br>
+                    <button type="submit" id="twoFaButton" class="btn btn-dark btn-sm">Send code</button>
+                </form>
+        `;
     }
 
     async handleButtonClick(event) {
@@ -36,6 +105,18 @@ export class Login extends BaseClass {
             if (response.ok) {
                 const data = await response.json();
                 if (data.access) {
+                    this.token = data.access;
+                    this.userData = await this.getUserData();
+                    if (this.userData.otp_enabled  === true && this.userData.otp_verified === false)
+                    {
+                        
+                        document.getElementById('app').innerHTML = await this.getVerifyTwoFaHtml();
+                    } else {
+                        localStorage.setItem('token', data.access);
+                        connectUser();
+                        history.pushState({}, '', '/dashboard');
+                        router();
+                    }
                     // call a fetch get on users/profile/
                     // if current_user.otp_enabled is true
                     // >>>>> and if otp_verified is false 
@@ -50,10 +131,6 @@ export class Login extends BaseClass {
                     // >>>>>>>>>>>>>>>> router();
                     // >>>>>>>>>>>>>>>> si reponse pas OK > fuck off 
                     // else
-                    localStorage.setItem('token', data.access);
-                    connectUser();
-                    history.pushState({}, '', '/dashboard');
-                    router();
                 } else {
                     console.log("Invalid Credentials");
                     // Handle invalid credentials

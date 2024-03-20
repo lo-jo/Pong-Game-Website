@@ -15,6 +15,7 @@ djangorestframework-simplejwt = "*"
 django-node-assets = "*"
 django-cors-headers = "*"
 pyotp = "2.8.0"
+qrcode = "*"
 
 
 [dev-packages]
