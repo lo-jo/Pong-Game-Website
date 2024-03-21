@@ -84,6 +84,7 @@ export const connectUser = () => {
         onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
         
         onlineSocket.onopen = function (e) {
+            console.log('WebSocket connection established.');
             onlineSocket.send(JSON.stringify({ type: 'send_notification', token: token }));
         };
         onlineSocket.onmessage = function (e) {
@@ -94,7 +95,7 @@ export const connectUser = () => {
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
-            setTimeout(connectUser(), 1000)
+            // setTimeout(connectUser(), 1000)
         }; 
     }
 }

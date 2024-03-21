@@ -1,4 +1,5 @@
 import { BaseClass } from './BaseClass';
+import { onlineSocket, router } from './Router';
 
 export class Logout extends BaseClass{
     constructor() {
@@ -6,13 +7,15 @@ export class Logout extends BaseClass{
         this.clearToken();
     }
     clearToken() {
-        // if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN)
-        //     onlineSocket.close();
+        if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN)
+            onlineSocket.close();
         const token = localStorage.getItem('jwt_token');
         localStorage.removeItem('jwt_token');
         sessionStorage.removeItem(token);
         localStorage.removeItem('sessionSocket');
-        window.localStorage.clear();
+        // window.localStorage.clear();
+        // history.pushState({}, '', '/login');
+        // router();
     }
 
     getHtmlForMain() {
