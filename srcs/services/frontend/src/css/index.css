@@ -32,8 +32,9 @@ body {
 }
 
 #nav-bar .navbar-link{
-  color: #ffff;
-  font-weight: bold;
+  color: #ffffff;
+  /* font-weight: bold; */
+  text-transform: uppercase;
 }
 
 #app {

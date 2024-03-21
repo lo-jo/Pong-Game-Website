@@ -12,7 +12,7 @@ export class Chat extends BaseClass {
 
     async handleDocumentClick(event) {
         const target = event.target;
-        console.log(`event.target.id: ${event.srcElement}`); 
+        // console.log(`event.target.id: ${event.srcElement}`); 
         if (target.tagName === 'BUTTON') 
         {
             event.preventDefault();
@@ -44,6 +44,22 @@ export class Chat extends BaseClass {
     
     }
 
+    generateChatBubble(sender, message, time){
+        return `
+        <div class="d-flex flex-row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
+
+        <div>
+          <p class="small p-2 ms-3 mb-0 rounded-3" style="background-color: #f5f6f7;">
+          ${message}</p>
+          <p class="small ms-3 mb-0 rounded-3 text-muted">${time}</p>
+        </div>
+      </div>
+            `;
+
+
+
+    }
+
     async startConvo(targetId) {
         if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
             // this.chatSocket.close();
@@ -63,14 +79,15 @@ export class Chat extends BaseClass {
             console.log("ON MESSAGE EVENT", e);
             const data = JSON.parse(e.data);
             console.log(e.data);
-            document.querySelector('#chatLog').value += (data.senderUsername + ": " + data.message + '\n');
+            // document.querySelector('#chatLog').innerText += (data.senderUsername + ": " + data.message + '\n');
+            document.querySelector('#chatLog').innerHTML += this.generateChatBubble(data.senderUsername, data.message, data.time)
         }.bind(this);
         this.chatSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
 
         }.bind(this);
 
-        document.querySelector('#chat-message-input').focus();
+        // document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function (e) {
             if (e.keyCode == 13){
                 console.log('enter');
@@ -86,24 +103,61 @@ export class Chat extends BaseClass {
         }.bind(this);
     }
 
+
     async initChatWindow(targetId, targetUsername, event) {
         const chatWindow = document.getElementById('chatWindow');
         chatWindow.innerHTML = '';
-        const chatLog = document.createElement('textarea');
+        
+        // Create a div for chat log
+        const chatLog = document.createElement('div');
         chatLog.setAttribute('id', 'chatLog');
-        chatLog.setAttribute('cols', '40');
-        chatLog.setAttribute('rows', '10');
+        chatLog.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
+        chatLog.style.overflowY = 'scroll'; // Add scroll for overflow
+        chatLog.style.height = '200px'; // Adjust height as needed
+        chatLog.style.border = '1px solid #ccc'; // Add border for visualization
+        chatLog.style.padding = '10px'; // Add padding for visualization
+        chatLog.style.marginBottom = '10px'; // Add margin for visualization
+        chatLog.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Add transparent background
+        chatLog.style.borderRadius = '5px'; // Add border-radius for visualization
+        chatLog.style.overflowWrap = 'break-word'; // Ensure long words wrap correctly
         chatWindow.appendChild(chatLog);
+    
+// Get the chatInput element by its ID
+const chatInput = document.getElementById('chatInput');
+chatInput.innerHTML = '';
 
-        const chatInput = document.getElementById('chatInput');
-        chatInput.innerHTML = '';
-        const chatForm = document.createElement('input');
-        chatForm.setAttribute('class', 'form-control form-control-sm');
-        chatForm.setAttribute('id', 'chat-message-input');
-        chatForm.setAttribute('type', 'text');
-        chatForm.setAttribute('placeholder', `Send message to ${targetUsername}`);
-        chatInput.appendChild(chatForm);
+// Create an input group div
+const inputGroup = document.createElement('div');
+inputGroup.setAttribute('class', 'input-group');
 
+// Create the input field
+const chatInputField = document.createElement('input');
+chatInputField.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
+chatInputField.setAttribute('id', 'chat-message-input');
+chatInputField.setAttribute('type', 'text');
+chatInputField.setAttribute('placeholder', `Send message to ${targetUsername}`);
+
+// Create the input group append div
+const inputGroupAppend = document.createElement('div');
+inputGroupAppend.setAttribute('class', 'input-group-append');
+
+// Create the span element for the icon
+const iconSpan = document.createElement('span');
+iconSpan.setAttribute('class', 'input-group-text');
+iconSpan.innerHTML = '<i class="bi bi-arrow-right-circle""></i>'; // Replace bi-envelope-fill with your desired Bootstrap Icon
+
+// Append the icon span to the input group append div
+inputGroupAppend.appendChild(iconSpan);
+
+// Append the input field to the input group div
+inputGroup.appendChild(chatInputField);
+
+// Append the input group append div to the input group div
+inputGroup.appendChild(inputGroupAppend);
+
+// Append the input group div to the chat input div
+chatInput.appendChild(inputGroup);
+    
         const blockDiv = document.getElementById('blockUser');
         blockDiv.innerHTML = '';
         const blockLink = document.createElement('a');
@@ -115,29 +169,79 @@ export class Chat extends BaseClass {
             this.blockFriendUser(`${targetId}`); 
         }.bind(this));
         blockDiv.appendChild(blockLink);
-
+    
         await this.startConvo(targetId);
     }
+
+    // async initChatWindow(targetId, targetUsername, event) {
+    //     // const chatHeader = document.getElementById('chatHeader');
+    //     // const profile = document.createElement('a');
+    //     // profile.addEventListener('click', (event) => {
+    //     //     if (event.target.tagName === 'A') {
+    //     //         // console.log('chatjsdklsjfsdkljf', event.target);
+    //     //         event.preventDefault();
+    //     //         navigateTo(event.target.href);
+    //     //     }
+    //     // });
+    //     // profile.href = `/test/${targetId}`;
+    //     // profile.innerText = `${targetUsername}`;
+    //     // chatHeader.appendChild(profile);
+
+    //     const chatWindow = document.getElementById('chatWindow');
+    //     chatWindow.innerHTML = '';
+    //     const chatLog = document.createElement('textarea');
+    //     chatLog.setAttribute('id', 'chatLog');
+    //     chatLog.setAttribute('cols', '40');
+    //     chatLog.setAttribute('rows', '10');
+    //     chatWindow.appendChild(chatLog);
+
+    //     const chatInput = document.getElementById('chatInput');
+    //     chatInput.innerHTML = '';
+    //     const chatForm = document.createElement('input');
+    //     chatForm.setAttribute('class', 'form-control form-control-sm');
+    //     chatForm.setAttribute('id', 'chat-message-input');
+    //     chatForm.setAttribute('type', 'text');
+    //     chatForm.setAttribute('placeholder', `Send message to ${targetUsername}`);
+    //     chatInput.appendChild(chatForm);
+
+    //     const blockDiv = document.getElementById('blockUser');
+    //     blockDiv.innerHTML = '';
+    //     const blockLink = document.createElement('a');
+    //     blockLink.href = "#";
+    //     blockLink.setAttribute('id', `block_${targetId}`)
+    //     blockLink.innerText = `Block ${targetUsername}`;
+    //     blockLink.addEventListener('click', function(event) {
+    //         event.preventDefault(); 
+    //         this.blockFriendUser(`${targetId}`); 
+    //     }.bind(this));
+    //     blockDiv.appendChild(blockLink);
+
+    //     await this.startConvo(targetId);
+    // }
 
     async generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
         friendListContainer.innerHTML = '';
     
-        const ul = document.createElement('ul');
+        const ul = document.createElement('div');
+        ul.setAttribute('class', 'row');
+        // ul.style.listStyleType = 'none';
         friends.forEach(friend => {
             const li = document.createElement('li');
             const friendUsername = friend[Object.keys(friend)[0]];
             const friendId = friend[Object.keys(friend)[1]];
-            
             const messageButton = document.createElement('button');
             messageButton.setAttribute('class', 'btn btn-dark btn-small');
             messageButton.setAttribute('id', `${friendId}`);
-            messageButton.innerText = "send";
+            messageButton.innerText = `${friendUsername} `;
+            const chatIcon = document.createElement('i');
+            chatIcon.setAttribute('class', 'bi bi-chat');
+            li.appendChild(chatIcon);
             li.appendChild(messageButton);
             const link = document.createElement('a');
             link.addEventListener('click', (event) => {
                 if (event.target.tagName === 'A') {
-                    console.log('chatjsdklsjfsdkljf', event.target);
+                    // console.log('chatjsdklsjfsdkljf', event.target);
                     event.preventDefault();
                     navigateTo(event.target.href);
                 }
@@ -151,7 +255,6 @@ export class Chat extends BaseClass {
     }
 
     async displayFriendList() {
-        console.log("PRINTIN USER DATA", this.profileData);
         await fetch(`http://localhost:8000/users/friendship/${this.profileData.username}/`, {
             method : 'GET',
             headers: {
@@ -212,22 +315,22 @@ export class Chat extends BaseClass {
         await this.getUserData();
         this.displayFriendList();
         return `<div class="container">
-        <div class="row">
-        <div class="col">
-            <div class="row" id="friendList">
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="row" id="ChatHeader"><h1>Messages</h1></div>
-            <div class="row" id="chatWindow">
+        <div class="row align-items-start">
+            <div class="col-2">
+                <h1 class="titreTwofa">Messages</i></h1>
             </div>
 
-            <div class="row" id="chatInput">
+            <div class="col-3">
+                <div class="row" id="friendList">
+                </div>
             </div>
-            <div class="row" id="blockUser">
+
+            <div class="col-6">
+                <div class="row" id="chatHeader"></div>
+                <div class="row" id="chatWindow"></div>
+                <div class="row" id="chatInput"></div>
+                <div class="row" id="blockUser"></div>
             </div>
-        </div>
         </div>
             `;
     }

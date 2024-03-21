@@ -10,6 +10,7 @@ from chat.serializers import CustomSerializer
 from chat.models import BlackList
 from rest_framework import status
 from rest_framework.response import Response
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -72,7 +73,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                        
                     },
                     )
-                    print("YOU HAVE BLOCKED THIS USER")
                     return
                 await self.save_message(sender=sender, message=message, thread_name=self.room_group_name)
                 # find the queued messages in the db
@@ -90,6 +90,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def message(self, event):
             message = event['message']
             username = event['senderUsername']
+            timestamp = timezone.now()
+            formatted_timestamp = timestamp.strftime('%A %H:%M')
 
             # Send the message to the connected client
             await self.send(
@@ -97,24 +99,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     {
                         'message': message,
                         'senderUsername': username,
+                        'time': formatted_timestamp
                     }
                 )
             )
 
-    async def chat_message(self, event):
-            message = event['message']
-            username = event['senderUsername']
-            # messages = event['messages']
+    # async def chat_message(self, event):
+    #         message = event['message']
+    #         username = event['senderUsername']
+    #         # messages = event['messages']
 
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        'message': message,
-                        'senderUsername': username,
-                        # 'messages': messages,
-                    }
-                )
-            )
+    #         await self.send(
+    #             text_data=json.dumps(
+    #                 {
+    #                     'message': message,
+    #                     'senderUsername': username,
+    #                     'messages': messages,
+    #                 }
+    #             )
+    #         )
 
     @database_sync_to_async
     def get_user(self, username):

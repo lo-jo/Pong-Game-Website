@@ -49,7 +49,8 @@ export const routes = {
     '/chat' : {
         path : '/chat',
         view : Chat,
-        auth : true
+        auth : true,
+        css : './css/login.css'
     },
     '/match/:id' : {
         view : Match,
