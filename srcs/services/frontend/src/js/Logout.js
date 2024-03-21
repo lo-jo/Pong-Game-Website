@@ -13,7 +13,7 @@ export class Logout extends BaseClass{
         localStorage.removeItem('jwt_token');
         sessionStorage.removeItem(token);
         localStorage.removeItem('sessionSocket');
-        // window.localStorage.clear();
+        window.localStorage.clear();
         // history.pushState({}, '', '/login');
         // router();
     }
