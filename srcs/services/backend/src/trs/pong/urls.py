@@ -12,3 +12,6 @@ urlpatterns = [
     path('tournaments/<int:tournament_id>/', TournamentView.as_view(), name='tournament-detail'),
     path('join_tournament/<int:tournament_id>/', JoinTournamentView.as_view())
 ]
+# une vue qui cree 6 matchs POST qui est appelle quand on arrive a 4 
+# nouvelle vue qui renvoie tous les matchs qui font partie dun tournoi a partir de leur id
+# 
