@@ -27,21 +27,24 @@ export class Match extends BaseClass {
             const data = JSON.parse(event.data);
             const { type_message } = data
             console.log(`TYPE MESSAGE ${type_message}`);
-            if (type_message === 'ws_handshake')
+            switch(type_message)
             {
-                const { ws_handshake } = data;
-                this.ws_handshake(ws_handshake, data);
-            }
-            else if (type_message === 'game_state')
-            {
-                const { game_state } = data;
-                this.updateGameState(game_state, data);
-            }
-            else if (type_message === 'other_user')
-            {
-                const { other_user } = data
-                console.log(other_user);
-                this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                case 'ws_handshake':
+                    const { ws_handshake } = data;
+                    this.ws_handshake(ws_handshake, data);
+                    break;
+                case 'game_state':
+                    const { game_state } = data;
+                    this.updateGameState(game_state, data);
+                    break;
+                case 'other_user':
+                    const { other_user } = data
+                    console.log(other_user);
+                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    break;
+                case 'timer':
+                    const { timer } = data
+                    this.updateTimer(timer);
             }
         };
 
@@ -171,7 +174,8 @@ export class Match extends BaseClass {
         }, 1000);
     }
     
-    updateTimer(seconds) {
+    updateTimer(seconds_string) {
+        const seconds = parseInt(seconds_string, 10);
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         
@@ -207,6 +211,14 @@ export class Match extends BaseClass {
             this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
         });
 
+        // Timer
+        const timerElement = document.createElement('div');
+        timerElement.id = 'timer';
+        timerElement.classList.add('timer');
+        timerElement.textContent = '00:00';
+
+        // Adding childs of board
+        app.appendChild(timerElement);
         app.appendChild(user1Div);
         app.appendChild(user2Div);
         app.appendChild(confirmMatchButton);

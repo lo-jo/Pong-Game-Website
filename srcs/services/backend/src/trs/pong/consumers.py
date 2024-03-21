@@ -33,6 +33,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.db_user_2 = None
         self.game_user_1 = None
         self.game_user_2 = None
+        self.who_i_am_id = None
 
         self.ws_handshake = False
         # Accepting the connection
@@ -45,7 +46,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             return
         # Saving match info in consumer
         self.match_info = match_info
-
 
         # Requesting ws handshaking to client
         await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
@@ -95,6 +95,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 user_jwt_token = data.get('token')
                 decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
                 user_id = decoded_token['user_id']
+                # Checking if the user id in JWT token match with the match info database 
                 if user_id == self.match_info["user_1"]:
                     if self.game_user_1 == None:
                         self.game_user_1 = data.get('screen_info')
@@ -106,10 +107,17 @@ class PongConsumer(AsyncWebsocketConsumer):
 
                 # This connection is user_2 in the match
                 if self.game_user_1 == None:
-                    await self.send_to_group('other_user', f'{self.game_user_2}')
+                    self.who_i_am_id = self.game_user_2["user_id"]
+                    print("I am the game_user 2, I send my info")
+                    print(self.game_user_2)
+                    await self.send_to_group('other_user', json.dumps(self.game_user_2))
                 # This connection is user_1 in the match 
                 if self.game_user_2 == None:
-                    await self.send_to_group('other_user', f'{self.game_user_1}')
+                    print(f'?? {self.game_user_1 == None}')
+                    self.who_i_am_id = self.game_user_1["user_id"]
+                    print("I am the game_user 1, I send my info")
+                    print(self.game_user_1)
+                    await self.send_to_group('other_user', json.dumps(self.game_user_1))
 
 
                 print(f'Here user_1: {self.game_user_1}')
@@ -118,10 +126,17 @@ class PongConsumer(AsyncWebsocketConsumer):
             case 'other_user':
                 print("-------------------------- Receiving other user -------------------- ")
                 other_user = data.get('other_user')
+                # print(other_user)
+                other_user_data = json.loads(other_user)
+                # print(other_user_data)
                 if self.game_user_1 == None:
-                    self.game_user_1 = other_user
+                    print(f"I'am the user connection with the id {self.who_i_am_id} and I wanted to receive user 1")
+                    if other_user_data["user_id"] == 1: 
+                        self.game_user_1 = other_user
                 if self.game_user_2 == None:
-                    self.game_user_2 = other_user
+                    print(f"I'am the user connection with the id {self.who_i_am_id} and I wanted to receive user 2")
+                    if other_user_data["user_id"] == 2:
+                        self.game_user_2 = other_user
 
 
         # data = json.loads(text_data)
@@ -233,6 +248,38 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
+
+        print(f'Timer elapsed {self.match_info["time_elapsed"]}')
+
+        # game_duration = self.match_info["time_elapsed"]
+        time_remaining = 120
+
+        while time_remaining > 0:
+            # Tu lógica de juego aquí
+
+            # Verificar si algún jugador se ha desconectado
+            # disconnected_players = set()
+            # for channel_name in self.channel_layer.group_channels(self.group_name):
+            #     if not await self.channel_layer.send(channel_name, {'type': 'ping'}):
+            #         disconnected_players.add(channel_name)
+
+            # if disconnected_players:
+            #     await self.send_to_group('pause_game')
+
+            # time_elapsed += 1
+            # print(time_elapsed)
+            # match.time_elapsed = time_elapsed
+            # await sync_to_async(match.save)()
+
+            # # # Verificar si ha pasado 5 segundos y enviar actualización del tiempo
+            # # if time_elapsed % 5 == 0:
+
+            # time_remaining = time_remaining
+            print("Sending timer to group") 
+            await self.send_to_group('timer', time_remaining)
+            # await self.send_to_connection({'game_state' : 'timer' , 'timer' : time_remaining})
+            await asyncio.sleep(1)
+            time_remaining = time_remaining - 1
 
         # await self.send_to_group('init_pong_game')
         # game_started = False
