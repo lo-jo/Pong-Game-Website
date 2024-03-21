@@ -26,14 +26,14 @@ body {
   text-decoration: none;
 }
 
-#nav-bar .btn.btn-link:hover{
+#nav-bar .navbar-link:hover{
   color: rgb(214, 210, 210);
   text-decoration: underline;
 }
 
-#nav-bar .btn.btn-link{
+#nav-bar .navbar-link{
   color: #ffff;
-  /* font-weight: bold; */
+  font-weight: bold;
 }
 
 #app {

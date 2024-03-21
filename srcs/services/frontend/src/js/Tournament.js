@@ -11,9 +11,43 @@ export class Tournament extends BaseClass {
         this.dashboard = dashboardInstance;
     }
 
-    async createTournament(tournamentName) {
-        document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+    // async createTournament(tournamentName) {
+    //     document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
     
+    //     const httpProtocol = window.location.protocol;
+    //     const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
+
+    //     const jwtAccess = localStorage.getItem('token');
+
+    //     const options = {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': `Bearer ${jwtAccess}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             tournamentName: tournamentName,
+    //         }),
+    //     };
+
+    //     try {
+    //         const response = await fetch(url, options);
+    
+    //         if (!response.ok) {
+    //             throw new Error('The request was not successful');
+    //         }
+
+    //         const data = await response.json();
+    //         console.log('Backend response:', data);
+    //         return;
+    //     } catch (error) {
+    //         console.error('Error making request:', error);
+    //     }
+    // }
+
+    async createTournament(tournamentName) {
+        // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+
         const httpProtocol = window.location.protocol;
         const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
 
@@ -32,16 +66,21 @@ export class Tournament extends BaseClass {
 
         try {
             const response = await fetch(url, options);
-    
             if (!response.ok) {
                 throw new Error('The request was not successful');
             }
-
             const data = await response.json();
             console.log('Backend response:', data);
-            return;
+            return {
+                success: true,
+                message: `Tournament ${data.name} succesfully created!`,
+            };
         } catch (error) {
             console.error('Error making request:', error);
+            return {
+                success: false,
+                message: `Error while creating ${tournamentName}`,
+            };
         }
     }
 
@@ -100,17 +139,8 @@ export class Tournament extends BaseClass {
             spinner.style.display = 'inline-block';
             joinButton.disabled = true;
     
-            // await this.fetchJoinTournament(tournamentId);
-            // await this.displayOpenTournaments();
             await this.fetchJoinTournament(tournamentId);
-            const tournamentData = await this.fetchTournamentData(tournamentId);
             await this.displayOpenTournaments();
-
-            if (tournamentData.participants.length === 4) {
-                console.log("TOURNAMENT IS FULL");
-                this.dashboard.displayPlayButton();
-                // this.displayPlayButton();
-            }
 
         } catch (error) {
             console.error('Error joining tournament:', error);
@@ -175,26 +205,30 @@ export class Tournament extends BaseClass {
         }
     }
 
+    async playTournament() {
+        console.log('Starting tournament...');
+        document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+
+    }
+
     async displayOpenTournaments() {
-        console.log('HERE IN THE DISPLAY OPEN TOURNAMENT FUNC')
         const openTournaments = await this.fetchOpenTournaments();
         const gameStatsDiv = document.getElementById('game-stats');
-
+    
         gameStatsDiv.innerHTML = '';
         gameStatsDiv.innerHTML = '<h2>Tournaments:</h2>';
-
+    
         if (openTournaments.length === 0) {
             gameStatsDiv.innerHTML = '<h2>No open tournaments available 🧐</h2>';
             return;
         }
-
+    
         const tournamentList = document.createElement('ul');
         tournamentList.setAttribute('class', 'list-group');
-
-        const currentUserId =  jwt_decode(localStorage.getItem('token'));
+    
+        const currentUserId = jwt_decode(localStorage.getItem('token'));
     
         await Promise.all(openTournaments.map(async tournament => {
-            // console.log(tournament);
             const listItem = document.createElement('li');
             listItem.setAttribute('class', 'list-group-item');
     
@@ -209,26 +243,35 @@ export class Tournament extends BaseClass {
             spinner.style.display = 'none';
     
             const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
+            const isTournamentFull = tournament.participants.length >= 4;
+    
             const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
             const usernames = players.map(player => player.username);
             listItem.textContent = `${tournament.name} Players: ${usernames.join(', ')}`;
     
             if (userAlreadyJoined) {
+                if (isTournamentFull) {
+                    joinButton.setAttribute('class', 'btn btn-success');
+                    joinButton.textContent = 'Play';
+                    joinButton.addEventListener('click', () => this.playTournament(tournament.id));
+                } else {
+                    joinButton.setAttribute('class', 'btn btn-secondary');
+                    joinButton.disabled = true;
+                    joinButton.textContent = 'Joined';
+                }
+            } else if (isTournamentFull) {
+                joinButton.setAttribute('class', 'btn btn-primary');
                 joinButton.disabled = true;
-                joinButton.textContent = 'Joined';
+                joinButton.textContent = 'Complete';
             } else {
                 joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
                 joinButton.appendChild(spinner);
             }
-  
+    
             listItem.appendChild(joinButton);
             tournamentList.appendChild(listItem);
-
-            // if (tournament.participants.length === 4) {
-            //     this.displayPlayButton();
-            // }
         }));
-
+    
         gameStatsDiv.appendChild(tournamentList);
     }
 

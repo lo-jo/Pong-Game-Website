@@ -1,4 +1,17 @@
 /* Dashboard styles */
+
+/* FORMS */
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+#redWarning, #greenNotif {
+    display: none;
+    animation: fadeOut 6s ease forwards;
+}
+
+/* GAME */
 #game-actions{
     width: 55%;
     display: flex;
