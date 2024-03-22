@@ -249,6 +249,21 @@ class PongConsumer(AsyncWebsocketConsumer):
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
 
+        self.board = {
+            'x' : 500,
+            'y' : 350,
+        }
+
+        self.ball = {
+            'elem' : 'ball',
+            'size_x' : 30,
+            'size_y' : 30,
+            'top' : get_pourcentage(500, ((500 / 2) - (30/2)), 100),
+            'left' : get_pourcentage(350, (350/2) - (30/2), 100)
+        }
+
+        await self.send_to_group('game_element', json.dumps(self.ball))
+
         print(f'Timer elapsed {self.match_info["time_elapsed"]}')
 
         # game_duration = self.match_info["time_elapsed"]
@@ -275,7 +290,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             # # if time_elapsed % 5 == 0:
 
             # time_remaining = time_remaining
-            print("Sending timer to group") 
+            # print("Sending timer to group")
             await self.send_to_group('timer', time_remaining)
             # await self.send_to_connection({'game_state' : 'timer' , 'timer' : time_remaining})
             await asyncio.sleep(1)
@@ -429,3 +444,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'message': message,
             'tournament_id': tournament_id,
         }))
+
+
+def get_pourcentage(op_div, op_mul_1, op_mul_2):
+    x = (op_mul_1 * op_mul_2) / op_div
+    return x
