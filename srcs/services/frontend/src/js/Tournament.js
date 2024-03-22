@@ -11,40 +11,6 @@ export class Tournament extends BaseClass {
         this.dashboard = dashboardInstance;
     }
 
-    // async createTournament(tournamentName) {
-    //     document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
-    
-    //     const httpProtocol = window.location.protocol;
-    //     const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
-
-    //     const jwtAccess = localStorage.getItem('token');
-
-    //     const options = {
-    //         method: 'POST',
-    //         headers: {
-    //             'Authorization': `Bearer ${jwtAccess}`,
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             tournamentName: tournamentName,
-    //         }),
-    //     };
-
-    //     try {
-    //         const response = await fetch(url, options);
-    
-    //         if (!response.ok) {
-    //             throw new Error('The request was not successful');
-    //         }
-
-    //         const data = await response.json();
-    //         console.log('Backend response:', data);
-    //         return;
-    //     } catch (error) {
-    //         console.error('Error making request:', error);
-    //     }
-    // }
-
     async createTournament(tournamentName) {
         // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
 
@@ -205,10 +171,44 @@ export class Tournament extends BaseClass {
         }
     }
 
-    async playTournament() {
-        console.log('Starting tournament...');
-        document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
+    async playTournament(tournament) {
+        const tournamentData = await this.fetchTournamentData(tournament);
+        const currentUser = jwt_decode(localStorage.getItem('token'));
+        const players = await Promise.all(tournamentData.participants.map(participant => this.getParticipants(participant.user_id)));
+    
+        const userIdToUsernameMap = {};
+        players.forEach(player => {
+            userIdToUsernameMap[player.id] = player.username;
+        });
+    
+        const matches = tournamentData.matches.filter(match => {
+            return match.user_1 === currentUser.user_id || match.user_2 === currentUser.user_id;
+        }).map(match => {
+            const user1Name = userIdToUsernameMap[match.user_1] || 'Unknown user';
+            const user2Name = userIdToUsernameMap[match.user_2] || 'Unknown user';
+            return `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${user1Name} vs ${user2Name}</h5>
+                        <button class="btn btn-primary" data-match-id="${match.id}">Play</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    
+        document.getElementById('app').innerHTML = `<div class="tournamentMatches">
+                                                        <h3>Tournament: ${tournamentData.name}</h3>
+                                                        ${matches}
+                                                    </div>`;
+    
+        const buttons = document.querySelectorAll('.tournamentMatches .btn-primary');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id')));
+        });
+    }
 
+    async startMatch(matchId) {
+        console.log(`starting matchId: ${matchId}`);
     }
 
     async displayOpenTournaments() {
@@ -243,7 +243,7 @@ export class Tournament extends BaseClass {
             spinner.style.display = 'none';
     
             const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
-            const isTournamentFull = tournament.participants.length >= 4;
+            const isTournamentFull = tournament.participants.length == 4;
     
             const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
             const usernames = players.map(player => player.username);
@@ -280,9 +280,5 @@ export class Tournament extends BaseClass {
         return `<div class="spinner-border" style="color: #fff; width: 3rem; height: 3rem;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>`
-    }
-
-    async getHtmlForMain() {
-        return `<p>Tournament</p>`;
     }
 }

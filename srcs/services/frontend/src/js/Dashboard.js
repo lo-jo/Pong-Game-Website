@@ -12,7 +12,7 @@ export class Dashboard extends BaseClass {
     }
 
     async handleDocumentClick(event) {
-        console.log(`button clicked:[${event.target.id}]`);
+        console.log(`button clicked:[${event.target.id || event.target.className }]`);
         if (event.target.id === 'launch-game-button') {
             event.preventDefault();
             const button = document.getElementById('launch-game-button');

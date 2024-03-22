@@ -135,6 +135,7 @@ function findMatchingRoute(url) {
 }
 
 let previousView = null;
+let styleCss = null;
 export const router = async () => {
     // connectUser();
 
@@ -149,6 +150,11 @@ export const router = async () => {
     if (previousView && typeof previousView.cleanup === 'function') {
         console.log("CLEANING UP SHITTY EVENT LISTENERS");
         previousView.cleanup();
+    }
+
+    if (styleCss) {
+        styleCss.remove();
+        styleCss = null;
     }
 
     const token = localStorage.getItem('token');
@@ -187,7 +193,7 @@ export const router = async () => {
     previousView = view;
     
     if (viewObject.css) {
-        const styleCss = document.createElement('link');
+        styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
         styleCss.href = viewObject.css;
         console.log(viewObject.css)

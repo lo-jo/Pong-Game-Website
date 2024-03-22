@@ -11,6 +11,16 @@
     animation: fadeOut 6s ease forwards;
 }
 
+.tournamentMatches {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    width: 70%;
+}
+
 /* GAME */
 #game-actions{
     width: 55%;

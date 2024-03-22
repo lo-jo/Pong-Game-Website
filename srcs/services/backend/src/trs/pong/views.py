@@ -12,6 +12,7 @@ from asgiref.sync import async_to_sync
 from .models import Match, Tournament, Participant
 from .serializers import MatchSerializer, TournamentSerializer, ParticipantSerializer
 from django.db.models import Count
+from django.db import transaction
 
 class PongDashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -152,14 +153,17 @@ class OpenTournamentsView(APIView):
         # open_tournaments = Tournament.objects.annotate(num_participants=Count('participants')).filter(num_participants__lt=4)
         serializer = TournamentSerializer(open_tournaments, many=True)
         return Response(serializer.data)
-    
+
 class TournamentView(APIView):
     def get(self, request, tournament_id):
         try:
             tournament = Tournament.objects.get(id=tournament_id)
             serializer = TournamentSerializer(tournament)
-            # return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.data)
+            matches = Match.objects.filter(tournament=tournament)
+            match_serializer = MatchSerializer(matches, many=True)
+            tournament_data = serializer.data
+            tournament_data['matches'] = match_serializer.data
+            return Response(tournament_data)
         except Tournament.DoesNotExist:
             return Response({"error": "Tournament not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
@@ -198,7 +202,6 @@ class JoinTournamentView(APIView):
 
     def post(self, request, tournament_id):
         try:
-            print("TOURNAMENT ID", tournament_id)
             user = request.user
             tournament = Tournament.objects.get(id=tournament_id)
 
@@ -211,21 +214,35 @@ class JoinTournamentView(APIView):
                 return Response({'error': 'This tournament is already full.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Create participant entry for the user in the tournament
-            Participant.objects.create(tournament_id=tournament, user_id=user)
-            # participant = Participant.objects.create(tournament_id=tournament, user_id=user)
+            with transaction.atomic():
+                Participant.objects.create(tournament_id=tournament, user_id=user)
+                
+                # Check if the tournament is complete
+                if tournament.participants.count() == 4:
+                    tournament.status = 'complete'
+                    tournament.save()
+                    self.create_matches_for_tournament(tournament)
 
             serializer = TournamentSerializer(tournament)
             return Response(serializer.data, status=status.HTTP_200_OK)
-            # return Response({
-            #     'tournament': serializer.data,
-            #     'participant': ParticipantSerializer(participant).data,
-            # }, status=status.HTTP_200_OK)
 
         except Tournament.DoesNotExist:
             return Response({'error': 'Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def create_matches_for_tournament(self, tournament):
+        participants = tournament.participants.all()
+
+        if participants.count() == 4:
+            for i, p1 in enumerate(participants):
+                for p2 in participants[i+1:]:
+                    Match.objects.create(
+                        user_1=p1.user_id,
+                        user_2=p2.user_id,
+                        tournament=tournament
+                    )
 
 class DeleteAllMatches(APIView):
     def post(self, request, format=None):
