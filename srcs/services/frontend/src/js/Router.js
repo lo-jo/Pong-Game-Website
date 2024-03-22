@@ -50,7 +50,7 @@ export const routes = {
         path : '/chat',
         view : Chat,
         auth : true,
-        css : './css/login.css'
+        css : './css/chat.css'
     },
     '/match/:id' : {
         view : Match,

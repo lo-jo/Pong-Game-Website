@@ -11,9 +11,3 @@
     float: right; /* Center the text horizontally */
     white-space: nowrap; /* Prevent line breaks */
 }
-
-#chat-message-input:focus {
-    outline: none!important;
-    box-shadow: none!important;
-    border-color: transparent!important;
-}

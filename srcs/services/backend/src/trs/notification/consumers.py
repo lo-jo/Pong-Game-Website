@@ -16,10 +16,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         user = await self.get_user_from_token(token_params)
         print("PRINTING USER AT CONNECTION", user)
         self.scope['user'] = user
-        self.group_name = 'public_room'
+        self.group_name = str(user.username)
+        print("GROUP NAME", self.group_name)
         await self.handle_user_connection(user)
         await self.channel_layer.group_add(
-                # f"user_{user.id}",
                 self.group_name,
                 self.channel_name
         )
@@ -44,7 +44,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def send_notification(self, event):
         print("~~~~~Sending notification:", event)
-        await self.send(text_data=json.dumps({ 'message': event['message'] }))
+        message = event.get('message')  # Try to retrieve 'message' from the event dictionary
+        if message:
+            await self.send(text_data=json.dumps({ 'message': message }))
+        else:
+            print("Message key not found in the event dictionary.")
 
     @database_sync_to_async
     def get_user_from_token(self, token):

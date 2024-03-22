@@ -1,0 +1,27 @@
+.chat-title {
+    writing-mode: vertical-lr; /* Rotate the text vertically from left to right */
+    transform: rotate(180deg); /* Additional rotation to make it display bottom to top */
+    float: right; /* Center the text horizontally */
+    white-space: nowrap; /* Prevent line breaks */
+}
+
+#chat-message-input:focus {
+    outline: none!important;
+    box-shadow: none!important;
+    border-color: transparent!important;
+}
+
+a{
+    text-decoration: none;
+    color: rgba(255, 0, 0, 0.5);
+}
+
+.chatvatar {
+    display: block!important;
+    max-width:30px !important;
+    max-height:30px !important;
+    margin-right : 6px;
+    width: auto;
+    height: auto;
+	  border-radius: 50%;
+}

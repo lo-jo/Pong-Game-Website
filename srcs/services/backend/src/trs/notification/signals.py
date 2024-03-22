@@ -3,21 +3,24 @@ from django.dispatch import receiver
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .models import Notification
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @receiver(post_save, sender=Notification)
 def notification_created(sender, instance, created, **kwargs):
     print("A NOTIFICATION HAS BEEN CREATED")
     if created:
-        print("####INSTANCE.MESSAGE", instance.message)
+        user_id = instance.sender
+        group_name = str(instance.sender)
+        print("####INSTANCE.MESSAGE", instance.message, group_name)
         channel_layer = get_channel_layer()
-        print("********** CHANNEL LAYER", channel_layer)
-        async_to_sync(channel_layer.group_send)(
-            'public_room',
-            {
-                "type": "send_notification",
-                "message": instance.message
-            }
-        )
+
+        message = {
+            'type': 'send_notification',  # Define the message type
+            'content': instance.message,        # Use instance.message as the message content
+        }
+        async_to_sync(channel_layer.group_send)(group_name, message)
 
 
 # @receiver(post_save, sender=Notification)
