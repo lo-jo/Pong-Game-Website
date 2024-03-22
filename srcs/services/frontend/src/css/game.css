@@ -5,20 +5,52 @@
 }
 
 .app-container {
-  font-size: 50px;
   position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: flex-start;
+  /* align-items: flex-start; */
+}
+
+.game-header{
+  font-size: 18px;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #ff003d;
 }
 
 .user-info {
-  margin: 5px;
+  font-size: 22px;
+  /* margin: 5px; */
   padding: 5px;
-  max-width: 200px;
+  max-width: auto;
+  background-color: royalblue;
 }
 
-.top-left {
+.timer {
+  background-color: coral;
+  margin: 5px;
+  padding: 5px;
+  /* max-width: 200px; */
+}
+
+#board-game {
+  position: relative;
+  width: 100%;
+  height: 90%;
+  /* background-color: cadetblue; */
+}
+
+#confirm-match {
+  margin: auto;
+  background-color: #ff003d;
+}
+/* .top-left {
   position: absolute;
   top: 0;
   left: 0;
@@ -33,7 +65,7 @@
 .center {
   position: relative;
   margin: auto;
-}
+} */
 
 
 .board {
@@ -43,14 +75,19 @@
   box-sizing: border-box;
 }
 
-.ball {
+#ball {
   height: 30px;
   width: 30px;
   border-radius: 50%;
   position: fixed;
-  top: calc(53% - 15px);
-  left: calc(50% - 15px);
 }
+
+/* 
+#ball {
+  background-color: red;
+  width: 5rem;
+
+} */
 
 .ball_effect {
   height: 100%;

@@ -34,6 +34,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.game_user_1 = None
         self.game_user_2 = None
         self.who_i_am_id = None
+        self.debug_in_playing = False
 
         self.ws_handshake = False
         # Accepting the connection
@@ -59,7 +60,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         await self.send_initial_data()
 
-        asyncio.create_task(self.game_loop())
+        # asyncio.create_task(self.game_loop())
 
     async def wait_ws_handshake(self):
         while self.ws_handshake == False:
@@ -92,6 +93,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 # print(f'ws_handshake_message : {ws_handshake_message}')
                 await self.receive_ws_handshake(ws_handshake_message, data)
             case 'init_user_data':
+                print("/////// CHECKING IF THERE IS THE GOOD USERS")
                 user_jwt_token = data.get('token')
                 decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
                 user_id = decoded_token['user_id']
@@ -104,6 +106,16 @@ class PongConsumer(AsyncWebsocketConsumer):
                     if self.game_user_2 == None:
                         self.game_user_2 = data.get('screen_info')
                         self.game_user_2["user_id"] = user_id
+
+                print(self.game_user_1 == None)
+                print(self.game_user_2 == None)
+                print(self.game_user_1)
+                print(self.game_user_2)
+
+
+                # DEBUG
+                if self.game_user_1 != None and self.game_user_2 != None:
+                    return
 
                 # This connection is user_2 in the match
                 if self.game_user_1 == None:
@@ -135,6 +147,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                         self.game_user_1 = other_user
                 if self.game_user_2 == None:
                     print(f"I'am the user connection with the id {self.who_i_am_id} and I wanted to receive user 2")
+                    self.debug_in_playing = True
                     if other_user_data["user_id"] == 2:
                         self.game_user_2 = other_user
 
@@ -175,12 +188,15 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(match.save)()
                 print("//////////////////// SENDING WELCOME MESSAGE HEREEEEE //////////////////////////////")
                 await self.send_to_group('game_state', 'welcome')
-                # asyncio.create_task(self.game_loop())
+                asyncio.create_task(self.game_loop())
             elif match.status == 'playing':
                 print("//////////////////// SENDING WELCOME MESSAGE ICIIIII //////////////////////////////")
                 await self.send_to_group('game_state', 'welcome')
                 # print("//////////////////// Creating thread for game //////////////////////////////")
-                # asyncio.create_task(self.game_loop())
+                print("HEREEE WE LAUCH THE GAME")
+                print(self.debug_in_playing)
+                if self.debug_in_playing == True:
+                    asyncio.create_task(self.game_loop())
 
 
 
@@ -246,30 +262,50 @@ class PongConsumer(AsyncWebsocketConsumer):
             print("Waiting for the info...")
             await asyncio.sleep(1)
 
+        
+        print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
 
+        await self.send_to_group('game_state', 'init_pong_game')
+
         self.board = {
-            'x' : 500,
-            'y' : 350,
+            'x' : 1.0,
+            'y' : 0.5,
         }
+
+        # self.ball = {
+        #     'elem' : 'ball',
+        #     'size_x' : 30,
+        #     'size_y' : 30,
+        #     'top' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2),
+        #     'left' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2)
+        # }
 
         self.ball = {
             'elem' : 'ball',
             'size_x' : 30,
             'size_y' : 30,
-            'top' : get_pourcentage(500, ((500 / 2) - (30/2)), 100),
-            'left' : get_pourcentage(350, (350/2) - (30/2), 100)
+            'top' : 0.5,
+            'left' : 0.5
         }
 
-        await self.send_to_group('game_element', json.dumps(self.ball))
+        
 
         print(f'Timer elapsed {self.match_info["time_elapsed"]}')
+
+
+
 
         # game_duration = self.match_info["time_elapsed"]
         time_remaining = 120
 
         while time_remaining > 0:
+
+            if self.ball['left'] < 1.0:
+                self.ball['left'] += 0.025
+                await self.send_to_group('game_element', json.dumps(self.ball))
+
             # Tu lógica de juego aquí
 
             # Verificar si algún jugador se ha desconectado
