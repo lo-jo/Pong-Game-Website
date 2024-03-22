@@ -1,23 +1,29 @@
 # Django imports
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MaxValueValidator
 # Own imports
 from users.models import User
 
 class Tournament(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('full', 'Full'),
+        ('playing','Playing'),
+        ('finished', 'Finished')
+    ]
+
     id = models.AutoField(primary_key=True)
-    creator_id = models.ForeignKey(
-        User, related_name='creator_id', on_delete=models.CASCADE, null=True)
+    creator_id = models.ForeignKey(User, related_name='creator_id', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=20, default='pending')
-    # participants = models.ForeignKey(Participant)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')
+    matches_played = models.IntegerField(default=0, validators=[MaxValueValidator(6)])
 
 class Participant(models.Model):
     id = models.AutoField(primary_key=True)
     tournament_id = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='participants')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    # Created_at: when the participant was added to the tournament or the same info as created at in tournament?
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

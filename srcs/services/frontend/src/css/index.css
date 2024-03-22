@@ -7,19 +7,31 @@ body {
   width: 100%;
   height: 100%;
   background-color: black !important;
-
+  overflow: hidden;
 }
 
 #header{
   margin-top: 2rem;
 }
 
-#nav-bar{
+/* #nav-bar{
   width: 80%;
   margin-left: 10%;
   padding: 0.8rem;
   display: flex;
   justify-content: space-around;
+} */
+
+#nav-bar{
+  width: 100%;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: space-around;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: black;
 }
 
 #nav-bar a{
@@ -38,19 +50,26 @@ body {
 }
 
 #app {
-  display: flex;
+  /* display: flex;
   justify-content: center;
   align-items: center;
   transform-style: preserve-3d;
+  position: absolute; */
+  /* height: 50%; */
+  /* width: 51vw;
+  height: 52.2vh; */
   position: absolute;
-  background-color: #7000ff;
+  width: 72%;
+  min-height: fit-content;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  /* border: 2px solid #ffffff; */
+  border-radius: 10px;
   top: calc(50%);
   left: calc(50%);
-  transform: translate(-50%, -30%);
-  width: 51vw;
-  height: 52.2vh;
+  transform: translate(-50%, -48%);
 }
-
 
 .avatar {
     display: block;
@@ -63,107 +82,6 @@ body {
 
 .card-body {
     opacity : .4;
-    height: 120% !important; /* Adjust the height as needed */
+    height: 120% !important;
     overflow-y: auto;
 }
-
-/* Game styles */
-
-/* .board {
-  height: 100%; 
-  width: 100%;
-  border: 2px solid #ff003d;
-}
-
-.ball {
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  position: fixed;
-  top: calc(53% - 15px);
-  left: calc(50% - 15px);
-}
-
-.ball_effect {
-  height: 100%;
-  width: 100%;
-  border-radius: 100px;
-  animation: spinBall 0.1s linear infinite;
-  box-shadow: inset 0 0 18px #fffffc,
-      inset 6px 0 18px #7000ff,
-      inset -6px 0 18px #ff003d,
-      inset 6px 0 30px #7000ff,
-      inset -6px 0 30px #ff003d,
-      0 0 18px #fffffc, -4px 0 18px
-      #7000ff, 4px 0 18px #fffffc;
-}
-
-@keyframes spinBall {
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
-.paddle {
-  position: fixed;
-  width: 14px;
-  height: 100px;
-  box-shadow: inset 0 0 18px #fffffc,
-  inset -6px 0 18px #fffffc,
-  inset 6px 0 18px #fffffc,
-  inset -6px 0 30px #fffffc,
-  inset 6px 0 30px #fffffc,
-  0 0 18px #fffffc, 4px 0 18px
-  #fffffc, -4px 0 18px #fffffc;
-}
-
-.paddle_1 {
-  top: calc(7.5vh + 55px);
-  left: calc(10vw + 30px);
-}
-
-.paddle_2 {
-  top: calc(85vh + 7.5vh - 100px - 55px);
-  right: calc(10vw + 30px);
-}
-  
-.dotted-line {
-  position: relative;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 100%;
-  background-color: #fffffc;
-  border: dashed 2px #fffffc;
-}
-
-.player_1_score,
-.player_2_score {
-  color: #fcff76;
-  font-weight: bold;
-}
-
-.message {
-  color: #fffffc;
-  font-family: 'Open Sans', sans-serif;
-}
-
-.win-message {
-  position: absolute;
-  top: calc(50%);
-  left: calc(50%);
-  transform: translate(-50%, -50%);
-  background-color: #ff003d;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  display: none;
-}
-
-.win-message h1 {
-  margin: 0;
-  color: #fffffc;
-  font-weight: 500;
-} */

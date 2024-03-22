@@ -219,7 +219,7 @@ class JoinTournamentView(APIView):
                 
                 # Check if the tournament is complete
                 if tournament.participants.count() == 4:
-                    tournament.status = 'complete'
+                    tournament.status = 'full'
                     tournament.save()
                     self.create_matches_for_tournament(tournament)
 

@@ -246,7 +246,8 @@ export class Tournament extends BaseClass {
             spinner.style.display = 'none';
     
             const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
-            const isTournamentFull = tournament.participants.length == 4;
+            // const isTournamentFull = tournament.participants.length == 4;
+            const isTournamentFull = tournament.status == "full";
     
             const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
             const usernames = players.map(player => player.username);
