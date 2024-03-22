@@ -11,38 +11,15 @@ User = get_user_model()
 def notification_created(sender, instance, created, **kwargs):
     print("A NOTIFICATION HAS BEEN CREATED")
     if created:
-        user_id = instance.sender
-        group_name = str(instance.sender)
-        print("####INSTANCE.MESSAGE", instance.message, group_name)
+        sender = instance.sender
+        recipient = instance.recipient
+        group_name = str(instance.recipient)
+        print("####INSTANCE.MESSAGE", instance.message, "from", sender, "to", group_name)
         channel_layer = get_channel_layer()
 
         message = {
             'type': 'send_notification',  # Define the message type
-            'content': instance.message,        # Use instance.message as the message content
+            'sender' : str(instance.sender),
+            'message': instance.message,        # Use instance.message as the message content
         }
         async_to_sync(channel_layer.group_send)(group_name, message)
-
-
-# @receiver(post_save, sender=Notification)
-# def notification_created(sender, instance, created, user=None, target=None, **kwargs):
-#     print("A NOTIFICATION HAS BEEN CREATED")
-#     if created:
-#         print("####INSTANCE.MESSAGE", instance.message)
-#         channel_layer = get_channel_layer()
-#         print("********** CHANNEL LAYER", channel_layer)
-#         if target:
-#             async_to_sync(channel_layer.group_send)(
-#                 f'user_{target.pk}',  # Assuming you have a channel group for each user
-#                 {
-#                     "type": "send_notification",
-#                     "message": instance.message
-#                 }
-#             )
-#         else:
-#             async_to_sync(channel_layer.group_send)(
-#                 'public_room',
-#                 {
-#                     "type": "send_notification",
-#                     "message": instance.message
-#                 }
-#             )

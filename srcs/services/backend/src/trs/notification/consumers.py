@@ -43,10 +43,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await sync_to_async(self.handle_user_disconnection)(user)
 
     async def send_notification(self, event):
-        print("~~~~~Sending notification:", event)
-        message = event.get('message')  # Try to retrieve 'message' from the event dictionary
+        # print("~~~~~Sending notification:", event)
+        message = event.get('message')
+        sender = event.get('sender')
         if message:
-            await self.send(text_data=json.dumps({ 'message': message }))
+            await self.send(text_data=json.dumps({ 'message': message, 'sender': sender}))
         else:
             print("Message key not found in the event dictionary.")
 

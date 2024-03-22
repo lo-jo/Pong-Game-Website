@@ -67,6 +67,12 @@ body {
     overflow-y: auto;
 }
 
+.dropdown-menu{
+    opacity : .4;
+    background-color: #020005 !important;
+    color: #FFFFFF !important;
+}
+
 /* Game styles */
 
 /* .board {

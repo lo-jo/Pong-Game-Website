@@ -91,8 +91,8 @@ export const connectUser = () => {
         onlineSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
             const message = data.message;
-            console.log(message);
-            alert(message);
+            const alertElement = document.getElementById('alert');
+            alertElement.innerHTML += `<li>${message}</li><li><hr class="dropdown-divider"></li>`;
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
