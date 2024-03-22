@@ -10,7 +10,7 @@ export class Match extends BaseClass {
         this.css = './css/game.css';
         this.socket = null;
         this.addDocumentClickListener();
-        // this.insertCssLink();
+        this.insertCssLink();
         this.initWebSocket();
     }
 
@@ -90,6 +90,7 @@ export class Match extends BaseClass {
                 this.showMessageAndRedirect(`You don'have authorization to this match.`);
                 break;
             case 'initial_data':
+                console.log(`drawConfirmBoard!`);
                 const { user_1_info, user_2_info } = data
                 this.drawConfirmBoard(user_1_info, user_2_info)
         }
@@ -182,6 +183,7 @@ export class Match extends BaseClass {
     }
     
     drawConfirmBoard(user_1_info, user_2_info){
+
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');

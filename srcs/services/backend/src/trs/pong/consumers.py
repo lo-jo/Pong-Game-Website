@@ -274,13 +274,13 @@ class PongConsumer(AsyncWebsocketConsumer):
             'y' : 0.5,
         }
 
-        # self.ball = {
-        #     'elem' : 'ball',
-        #     'size_x' : 30,
-        #     'size_y' : 30,
-        #     'top' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2),
-        #     'left' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2)
-        # }
+        # # self.ball = {
+        # #     'elem' : 'ball',
+        # #     'size_x' : 30,
+        # #     'size_y' : 30,
+        # #     'top' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2),
+        # #     'left' : round(get_pourcentage(500, ((500 / 2) - (30/2)), 100), 2)
+        # # }
 
         self.ball = {
             'elem' : 'ball',
@@ -292,7 +292,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         
 
-        print(f'Timer elapsed {self.match_info["time_elapsed"]}')
+        # print(f'Timer elapsed {self.match_info["time_elapsed"]}')
 
 
 
@@ -300,10 +300,10 @@ class PongConsumer(AsyncWebsocketConsumer):
         # game_duration = self.match_info["time_elapsed"]
         time_remaining = 120
 
-        while time_remaining > 0:
+        while time_remaining >= 0:
 
             if self.ball['left'] < 1.0:
-                self.ball['left'] += 0.025
+                self.ball['left'] += 0.05
                 await self.send_to_group('game_element', json.dumps(self.ball))
 
             # Tu lógica de juego aquí
