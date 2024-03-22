@@ -190,16 +190,25 @@ export class Tournament extends BaseClass {
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">${user1Name} vs ${user2Name}</h5>
-                        <button class="btn btn-success" onclick="playMatch(${match.id})">Play</button>
+                        <button class="btn btn-primary" data-match-id="${match.id}">Play</button>
                     </div>
                 </div>
             `;
         }).join('');
     
-        document.getElementById('app').innerHTML = `<div>
+        document.getElementById('app').innerHTML = `<div class="tournamentMatches">
                                                         <h3>Tournament: ${tournamentData.name}</h3>
-                                                        <div class="matches">${matches}</div>
+                                                        ${matches}
                                                     </div>`;
+    
+        const buttons = document.querySelectorAll('.tournamentMatches .btn-primary');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id')));
+        });
+    }
+
+    async startMatch(matchId) {
+        console.log(`starting matchId: ${matchId}`);
     }
 
     async displayOpenTournaments() {
