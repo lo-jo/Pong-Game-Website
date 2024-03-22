@@ -333,6 +333,13 @@ class PongConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(0.1)  # Espera corta para no bloquear el hilo
 
         print("MATCH FINISHHHHH")
+        match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        match.status = 'completed'
+        await sync_to_async(match.save)()
+    
+    async def check_tournament(self):
+        
+
 
         # await self.send_to_group('init_pong_game')
         # game_started = False
