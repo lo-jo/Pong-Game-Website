@@ -35,6 +35,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.game_user_2 = None
         self.who_i_am_id = None
         self.debug_in_playing = False
+        self.time_remaining = 20
+        self.game_finish = False
 
         self.ws_handshake = False
         # Accepting the connection
@@ -189,6 +191,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 print("//////////////////// SENDING WELCOME MESSAGE HEREEEEE //////////////////////////////")
                 await self.send_to_group('game_state', 'welcome')
                 asyncio.create_task(self.game_loop())
+                # await self.main_logic()
             elif match.status == 'playing':
                 print("//////////////////// SENDING WELCOME MESSAGE ICIIIII //////////////////////////////")
                 await self.send_to_group('game_state', 'welcome')
@@ -256,7 +259,27 @@ class PongConsumer(AsyncWebsocketConsumer):
     #         return match_json.data
     #     except Match.DoesNotExist:
     #         return None
+
+    async def main_logic(self):
+        await asyncio.gather(
+            self.game_timer(),
+            self.game_loop()
+        )
     
+    async def game_timer(self):
+        while self.time_remaining >= 0:
+            print(f"In timer {self.time_remaining}")
+            await self.send_to_group('timer', self.time_remaining)
+            print("In timer after sending")
+            await asyncio.sleep(1)
+            print("In timer after sleeping")
+            self.time_remaining = self.time_remaining - 1
+            print(self.time_remaining)
+
+
+        print("**********&&&&&&&&&&&&&&& hereeeeeee &&&&&&&&&&&&&&&&&&& /////////////////")
+        self.game_finish = True
+
     async def game_loop(self):
         while self.game_user_1 == None or self.game_user_2 == None:
             print("Waiting for the info...")
@@ -287,50 +310,29 @@ class PongConsumer(AsyncWebsocketConsumer):
             'size_x' : 30,
             'size_y' : 30,
             'top' : 0.5,
-            'left' : 0.5
+            'left' : 0.5,
+            'speed' : 0.05,
         }
 
-        
 
-        # print(f'Timer elapsed {self.match_info["time_elapsed"]}')
+        asyncio.create_task(self.game_timer())
 
+        while self.game_finish == False:
+            self.ball['left'] += self.ball['speed']
+    
+            if self.ball['left'] >= 0.9 or self.ball['left'] <= 0.1:
+                self.ball['speed'] *= -1
 
+            # # Comprueba si la pelota alcanza los límites verticales y cambia su dirección
+            # if self.ball['top'] >= 1 or self.ball['top'] <= 0:
+            #     self.ball['velocity_y'] *= -1
 
+            # Actualiza la posición de la pelota en el cliente
+            await self.send_to_group('game_element', json.dumps(self.ball))
 
-        # game_duration = self.match_info["time_elapsed"]
-        time_remaining = 120
+            await asyncio.sleep(0.1)  # Espera corta para no bloquear el hilo
 
-        while time_remaining >= 0:
-
-            if self.ball['left'] < 1.0:
-                self.ball['left'] += 0.05
-                await self.send_to_group('game_element', json.dumps(self.ball))
-
-            # Tu lógica de juego aquí
-
-            # Verificar si algún jugador se ha desconectado
-            # disconnected_players = set()
-            # for channel_name in self.channel_layer.group_channels(self.group_name):
-            #     if not await self.channel_layer.send(channel_name, {'type': 'ping'}):
-            #         disconnected_players.add(channel_name)
-
-            # if disconnected_players:
-            #     await self.send_to_group('pause_game')
-
-            # time_elapsed += 1
-            # print(time_elapsed)
-            # match.time_elapsed = time_elapsed
-            # await sync_to_async(match.save)()
-
-            # # # Verificar si ha pasado 5 segundos y enviar actualización del tiempo
-            # # if time_elapsed % 5 == 0:
-
-            # time_remaining = time_remaining
-            # print("Sending timer to group")
-            await self.send_to_group('timer', time_remaining)
-            # await self.send_to_connection({'game_state' : 'timer' , 'timer' : time_remaining})
-            await asyncio.sleep(1)
-            time_remaining = time_remaining - 1
+        print("MATCH FINISHHHHH")
 
         # await self.send_to_group('init_pong_game')
         # game_started = False

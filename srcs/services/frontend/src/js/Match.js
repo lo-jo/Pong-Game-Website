@@ -46,11 +46,13 @@ export class Match extends BaseClass {
                 case 'timer':
                     const { timer } = data
                     this.updateTimer(timer);
+                    break;
                 case 'game_element':
                     console.log(data);
                     const { game_element } = data;
                     console.log(game_element);
                     this.updateGameElement(game_element);
+                    break;
             }
         };
 
