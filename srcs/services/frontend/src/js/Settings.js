@@ -11,7 +11,7 @@ export class Settings extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`http://localhost:8000/users/profile/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -53,7 +53,7 @@ export class Settings extends BaseClass {
     }
 
     async enableTwoFa(){
-        const res =  await fetch('http://localhost:8000/users/otp/', { 
+        const res =  await fetch(`http://${process.env.REMOTE}:8000/users/otp/`, { 
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -106,7 +106,7 @@ export class Settings extends BaseClass {
             formData.append(key, value);
         }
     
-        fetch(`http://localhost:8000/users/update_profile/${this.userData.id}/`, {
+        fetch(`http://${process.env.REMOTE}:8000/users/update_profile/${this.userData.id}/`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${this.token}`,

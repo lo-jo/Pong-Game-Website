@@ -9,13 +9,13 @@ class User{
         this.bio = bio;
       }
     getProfilePicPath() {
-        return "http://localhost:8000" + this.pic;
+        return `http://${process.env.REMOTE}:8000` + this.pic;
     }
     getFriendReq() {
-        return "http://localhost:8000/users/friendship/" + this.username + "/";
+        return `http://${process.env.REMOTE}:8000/users/friendship/` + this.username + "/";
     }
     getStatus() {
-        return "http://localhost:8000/notify/" + this.username + "/";
+        return `http://${process.env.REMOTE}:8000/notify/` + this.username + "/";
     }
 }
 
@@ -86,7 +86,7 @@ export class Profile extends BaseClass {
         console.log("FRIEND ID", friendId);
         const jwtAccess = localStorage.getItem('token');
 
-        fetch(`http://localhost:8000/users/${friendId}/profile/`, {
+        fetch(`http://${process.env.REMOTE}:8000/users/${friendId}/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -180,7 +180,7 @@ export class Profile extends BaseClass {
     displayProfile() {
         const jwtAccess = localStorage.getItem('token');
 
-        fetch('http://localhost:8000/users/profile/', {
+        fetch(`http://${process.env.REMOTE}:8000/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,

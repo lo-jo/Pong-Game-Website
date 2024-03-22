@@ -10,7 +10,7 @@ export class LoadProfile
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${this.id}/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/${this.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -37,7 +37,7 @@ export class LoadProfile
     async getFriendshipStatus(user) {
         const jwtAccess = localStorage.getItem('token');
         let decoded_token = jwt_decode(jwtAccess);
-        fetch(`http://localhost:8000/users/friendship/${user.username}/`, {
+        fetch(`http://${process.env.REMOTE}:8000/users/friendship/${user.username}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -80,7 +80,7 @@ export class LoadProfile
 
     displayStatus = (user) => {
         const jwtAccess = localStorage.getItem('token');
-        fetch(`http://localhost:8000/notify/${user.username}/`, {
+        fetch(`http://${process.env.REMOTE}:8000/notify/${user.username}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -108,7 +108,7 @@ export class LoadProfile
 
     addFriend = (user) => {
         const jwtAccess = localStorage.getItem('token');
-        fetch(`http://localhost:8000/users/friendship/${user.id}/`, {
+        fetch(`http://${process.env.REMOTE}:8000/users/friendship/${user.id}/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,

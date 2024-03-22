@@ -13,6 +13,8 @@ import { Logout } from './Logout.js';
 import Navbar from './Navbar.js';
 import jwt_decode from 'jwt-decode';
 
+
+
 export const routes = {
     '/' : {
         path : '/',
@@ -82,7 +84,7 @@ export const connectUser = () => {
     }
 
     if (token){
-        onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
+        onlineSocket = new WebSocket(`ws://${process.env.REMOTE}:8000/ws/notify/?token=${token}`);
         
         onlineSocket.onopen = function (e) {
             console.log('WebSocket connection established.');
@@ -223,7 +225,7 @@ async function checkAuthentication() {
             return false;
         }
 
-        const response = await fetch('http://localhost:8000/users/check-authentication/', {
+        const response = await fetch(`http://${process.env.REMOTE}:8000/users/check-authentication/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

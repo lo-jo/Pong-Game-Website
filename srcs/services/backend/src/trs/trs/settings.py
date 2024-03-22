@@ -27,7 +27,7 @@ SECRET_KEY = "S*CR*T"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['paul-f5ar3s9', os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
+ALLOWED_HOSTS = [os.getenv("REMOTE"), os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
 
 
 # Application definition
@@ -77,6 +77,9 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://paul-f5ar3s9:5173",
+    "http://paul-f5ar3s8:5173",
+    "http://paul-f5ar3s6:5173"
 ]
 
 

@@ -24,7 +24,7 @@ export class Chat extends BaseClass {
 
     async blockFriendUser(targetId){
         console.log("Blocking", targetId);
-        await fetch(`http://localhost:8000/chat/block-user/${targetId}`, {
+        await fetch(`http://${process.env.REMOTE}:8000/chat/block-user/${targetId}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -68,7 +68,7 @@ export class Chat extends BaseClass {
             this.chatSocket.close();
             this.chatSocket = null;
         }
-        this.chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
+        this.chatSocket = new WebSocket(`ws://${process.env.REMOTE}:8000/ws/chat/${targetId}/?token=${this.token}`);
         this.chatSocket.onopen = function (e) {
             console.log('Socket successfully connected.');
             const authenticateMessage = {
@@ -159,7 +159,7 @@ export class Chat extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -242,7 +242,7 @@ export class Chat extends BaseClass {
     
 
     async displayFriendList() {
-        await fetch(`http://localhost:8000/users/friendship/${this.profileData.username}/`, {
+        await fetch(`http://${process.env.REMOTE}:8000/users/friendship/${this.profileData.username}/`, {
             method : 'GET',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -265,7 +265,7 @@ export class Chat extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`http://localhost:8000/users/profile/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,

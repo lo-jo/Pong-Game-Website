@@ -11,7 +11,7 @@ export class Login extends BaseClass {
     }
 
     async verifyCode(codeTwoFa) {
-        const res =  await fetch('http://localhost:8000/users/otp_verify/', { 
+        const res =  await fetch(`http://${process.env.REMOTE}:8000/users/otp_verify/`, { 
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -49,7 +49,7 @@ export class Login extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`http://localhost:8000/users/profile/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -82,7 +82,7 @@ export class Login extends BaseClass {
                             <h1 class="titreTwofa">Verify 2FA</h1>
                         </div>
                         <div class="col align-items-center">
-                            <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                            <img src=http://${process.env.REMOTE}:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
                             <div class="col-3">
                             <form id="twofaForm">
                             <label for="password"></label>
@@ -101,7 +101,7 @@ export class Login extends BaseClass {
         const password = document.getElementById("password").value;
 
         try {
-            const response = await fetch('http://localhost:8000/users/token/', {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/token/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

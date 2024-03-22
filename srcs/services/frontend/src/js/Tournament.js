@@ -16,7 +16,7 @@ export class Tournament extends BaseClass {
         // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
 
         const httpProtocol = window.location.protocol;
-        const url = `${httpProtocol}//localhost:8000/pong/create_tournament/`;
+        const url = `${httpProtocol}//${process.env.REMOTE}:8000/pong/create_tournament/`;
 
         const jwtAccess = localStorage.getItem('token');
 
@@ -62,7 +62,7 @@ export class Tournament extends BaseClass {
                 'Content-Type': 'application/json',
             },
         };
-        const response = await fetch(`${httpProtocol}//localhost:8000/pong/tournaments/`, options);
+        const response = await fetch(`${httpProtocol}//${process.env.REMOTE}:8000/pong/tournaments/`, options);
         const data = await response.json();
         console.log("tournament list", data);
         return data;
@@ -81,7 +81,7 @@ export class Tournament extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${httpProtocol}//localhost:8000/pong/tournaments/${tournamentId}/`, options);
+            const response = await fetch(`${httpProtocol}//${process.env.REMOTE}:8000/pong/tournaments/${tournamentId}/`, options);
     
             if (!response.ok) {
                 const errorData = await response.json();
@@ -134,7 +134,7 @@ export class Tournament extends BaseClass {
         };
 
         try {
-            const response = await fetch(`${httpProtocol}//localhost:8000/pong/join_tournament/${tournamentId}/`, options);
+            const response = await fetch(`${httpProtocol}//${process.env.REMOTE}:8000/pong/join_tournament/${tournamentId}/`, options);
             
             if (!response.ok) {
                 const errorData = await response.json();
@@ -151,7 +151,7 @@ export class Tournament extends BaseClass {
     async getParticipants(userId) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${userId}/profile/`, {
+            const response = await fetch(`http://${process.env.REMOTE}:8000/users/${userId}/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,

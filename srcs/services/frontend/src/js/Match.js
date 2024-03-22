@@ -3,6 +3,8 @@ import { router } from './Router'
 import { initGameTwoD, drawBall } from './GameElement';
 
 
+
+
 export class Match extends BaseClass {
     constructor(id) {
         super();
@@ -16,7 +18,7 @@ export class Match extends BaseClass {
 
     initWebSocket() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match/${this.id}`;
+        const wsUrl = `${wsProtocol}//${process.env.REMOTE}:8000/ws/pong/match/${this.id}`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -70,7 +72,7 @@ export class Match extends BaseClass {
     {
         const styleCss = document.createElement('link');
         styleCss.rel = 'stylesheet';
-        styleCss.href = `http://localhost:5173/${this.css}`;
+        styleCss.href = `http://${process.env.REMOTE}:5173/${this.css}`;
         document.head.appendChild(styleCss);
     }
 

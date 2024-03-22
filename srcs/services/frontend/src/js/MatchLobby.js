@@ -11,7 +11,7 @@ export class MatchLobby extends BaseClass {
     
     postMatch() {
         const httpProtocol = window.location.protocol;
-        const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
+        const url = `${httpProtocol}//${process.env.REMOTE}:8000/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
         
         const options = {
@@ -40,7 +40,7 @@ export class MatchLobby extends BaseClass {
 
     initWebSocket() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+        const wsUrl = `${wsProtocol}//${process.env.REMOTE}:8000/ws/pong/lobby`;
     
         console.log(wsUrl);
         const socket = new WebSocket(wsUrl);

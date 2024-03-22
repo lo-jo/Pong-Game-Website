@@ -61,7 +61,7 @@ export class Dashboard extends BaseClass {
 
     async postMatch() {
         const httpProtocol = window.location.protocol;
-        const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
+        const url = `${httpProtocol}//${process.env.REMOTE}:8000/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
         
         const options = {
@@ -107,7 +107,7 @@ export class Dashboard extends BaseClass {
 
     initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+        const wsUrl = `${wsProtocol}//${process.env.REMOTE}:8000/ws/pong/lobby`;
 
         const socket = new WebSocket(wsUrl);
 
