@@ -192,11 +192,11 @@ class PongEndpoint(BaseEndpoint):
         ]
         return command
 
-    def delete_all_items(self, endpoint_uri, http_method, token_user, host):
+    def delete_all_items(self, endpoint_uri, http_method, token_user, host, http):
         command = [
             'curl', '-k' ,'-X', 'POST',
             '-H', f'Authorization: Bearer {token_user}',
-            f'{host}{endpoint_uri}'
+            f'{http}{host}{endpoint_uri}'
         ]
         return command
 

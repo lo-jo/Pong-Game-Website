@@ -65,9 +65,11 @@ body {
     opacity : .4;
     height: 120% !important; /* Adjust the height as needed */
     overflow-y: auto;
-}/* Game styles */
+}
 
-.board {
+/* Game styles */
+
+/* .board {
   height: 100%; 
   width: 100%;
   border: 2px solid #ff003d;
@@ -164,4 +166,4 @@ body {
   margin: 0;
   color: #fffffc;
   font-weight: 500;
-}
+} */

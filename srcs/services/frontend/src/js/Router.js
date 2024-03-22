@@ -55,7 +55,7 @@ export const routes = {
     '/match/:id' : {
         view : Match,
         dinamic : true,
-        // css : './css/game.css',
+        css : './css/game.css',
         auth : true
     },
     '/test/:id' : {
