@@ -1,5 +1,6 @@
 import { BaseClass } from './BaseClass'
 import jwt_decode from 'jwt-decode';
+import { router } from './Router';
 
 export class Tournament extends BaseClass {
     // constructor() {
@@ -209,6 +210,8 @@ export class Tournament extends BaseClass {
 
     async startMatch(matchId) {
         console.log(`starting matchId: ${matchId}`);
+        history.pushState('', '', `/match/${matchId}`);
+        router();
     }
 
     async displayOpenTournaments() {
