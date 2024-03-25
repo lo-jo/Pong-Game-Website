@@ -23,6 +23,7 @@ export const initGameTwoD = () => {
 
     const board_game = document.getElementById('board-game');
 
+
     const confirm_match_button = document.getElementById('confirm-match');
     if (confirm_match_button) {
         board_game.removeChild(confirm_match_button);
@@ -30,10 +31,11 @@ export const initGameTwoD = () => {
         console.error("Element with ID 'confirm-match' not found.");
     }
 
-    // board_game.removeChild(confirm_match_button);
+    // // board_game.removeChild(confirm_match_button);
 
-    const board = createBoard('board-game');
-	board_game.appendChild(board);
+    // const board = createBoard('board-game');
+    const ball = createBall('ball');
+	board_game.appendChild(ball);
 	// board.appendChild(timer);
 
 }
@@ -76,9 +78,25 @@ export const drawBall = (ball_info) => {
     const ball = document.getElementById('ball');
     const top = 100 * ball_info.top;
     const left = 100 * ball_info.left
-    ball.style.setProperty('background-color', `blue`);
+    // ball.style.setProperty('background-color', `blue`);
     console.log(`Top ${top}`);
     console.log(`Left ${left}`);
     ball.style.setProperty("top", `calc(${top}%)`);
     ball.style.setProperty("left", `calc(${left}%)`);
+}
+
+export const drawUser = (user_info) => {
+    console.log(`Drawing user!`);
+
+    const user = document.createElement('div');
+    // ball.className = className;
+    user.className = 'game_user';
+
+    const top = 100 * user_info.top;
+    const left = 100 * user_info.left
+    // ball.style.setProperty('background-color', `blue`);
+    console.log(`Top ${top}`);
+    console.log(`Left ${left}`);
+    user.style.setProperty("top", `calc(${top}%)`);
+    user.style.setProperty("left", `calc(${left}%)`);
 }

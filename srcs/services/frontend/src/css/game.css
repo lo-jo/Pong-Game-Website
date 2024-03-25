@@ -40,10 +40,10 @@
 }
 
 #board-game {
-  position: relative;
+  /* position: relative; */
   width: 100%;
   height: 90%;
-  /* background-color: cadetblue; */
+  background-color: cadetblue;
 }
 
 #confirm-match {
@@ -68,18 +68,18 @@
 } */
 
 
-.board {
+/* .board {
   height: 85vh; 
   width: 80vw;
   border: 2px solid #7000ff;
   box-sizing: border-box;
-}
+} */
 
 #ball {
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  position: fixed;
+  position: relative;
 }
 
 /* 

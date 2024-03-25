@@ -290,6 +290,18 @@ class PongConsumer(AsyncWebsocketConsumer):
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
 
+        self.usuario_1 = {
+            'elem' : 'user',
+            'which' : 1,
+            'size_x' : 30,
+            'size_y' : 90,
+            'top' : 0.2,
+            'left' : 0.2
+        }
+
+        await self.send_to_group('game_element', json.dumps(self.usuario_1))
+
+
         await self.send_to_group('game_state', 'init_pong_game')
 
         self.board = {
@@ -311,17 +323,42 @@ class PongConsumer(AsyncWebsocketConsumer):
             'size_y' : 30,
             'top' : 0.5,
             'left' : 0.5,
-            'speed' : 0.05,
+            'speed_x': 0.03,
+            'speed_y': 0.05,
         }
+
+        self.usuario_1 = {
+            'elem' : 'user',
+            'which' : 1,
+            'size_x' : 30,
+            'size_y' : 90,
+            'top' : 0.2,
+            'left' : 0.2
+        }
+
+        await self.send_to_group('game_element', json.dumps(self.usuario_1))
 
 
         asyncio.create_task(self.game_timer())
 
         while self.game_finish == False:
-            self.ball['left'] += self.ball['speed']
+            self.ball['top'] += self.ball['speed_y']
+            if self.ball['top'] >= 0.95 or self.ball['top'] <= 0:
+                self.ball['speed_y'] *= -1
+            
+            # Movimiento horizontal
+            self.ball['left'] += self.ball['speed_x']
+            if self.ball['left'] >= 0.95 or self.ball['left'] <= 0:
+                self.ball['speed_x'] *= -1
+            # self.ball['top'] += self.ball['speed']
     
-            if self.ball['left'] >= 0.9 or self.ball['left'] <= 0.1:
-                self.ball['speed'] *= -1
+            # if self.ball['top'] >= 0.95 or self.ball['top'] <= 0.05:
+            #     self.ball['speed'] *= -1
+            
+            # self.ball['left'] += self.ball['speed']
+    
+            # if self.ball['left'] >= 0.9 or self.ball['left'] <= 0.1:
+            #     self.ball['speed'] *= -1
 
             # # Comprueba si la pelota alcanza los límites verticales y cambia su dirección
             # if self.ball['top'] >= 1 or self.ball['top'] <= 0:
@@ -330,14 +367,14 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Actualiza la posición de la pelota en el cliente
             await self.send_to_group('game_element', json.dumps(self.ball))
 
-            await asyncio.sleep(0.1)  # Espera corta para no bloquear el hilo
+            await asyncio.sleep(0.1)
 
         print("MATCH FINISHHHHH")
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
         match.status = 'completed'
         await sync_to_async(match.save)()
     
-    async def check_tournament(self):
+    #async def check_tournament(self):
         
 
 

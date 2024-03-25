@@ -102,6 +102,7 @@ export class Match extends BaseClass {
     updateGameState(game_state, data)
     {
         console.log(game_state);
+        // const { event } = g 
         switch (game_state)
         {
             case 'welcome':
@@ -127,6 +128,9 @@ export class Match extends BaseClass {
         switch (game_element.elem) {
             case 'ball':
                 drawBall(game_element);
+                break;
+            case 'user':
+                drawUser(game_element);
                 break;
             default:
                 break;
