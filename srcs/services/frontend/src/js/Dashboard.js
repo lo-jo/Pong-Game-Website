@@ -42,7 +42,7 @@ export class Dashboard extends BaseClass {
                 setTimeout(async () => {
                     tournamentNameInput.disabled = false;
                     createTournamentButton.disabled = false;
-                }, 2000);
+                }, 1500);
                 return;
             }
             let obj = await this.tournament.createTournament(tournamentName);
@@ -52,7 +52,7 @@ export class Dashboard extends BaseClass {
                 tournamentNameInput.value = '';
                 createTournamentButton.disabled = false;
                 document.getElementById('app').innerHTML = await this.getHtmlForMain();
-            }, 2000);
+            }, 1500);
         } else if (event.target.id === 'join-tournament') {
             event.preventDefault();
             await this.tournament.displayOpenTournaments();
@@ -144,7 +144,7 @@ export class Dashboard extends BaseClass {
         alertElement.style.display = 'block';
         setTimeout(() => {
             this.hideMessage(id);
-        }, 2000);
+        }, 1500);
     }
     
     hideMessage(id) {
@@ -154,32 +154,36 @@ export class Dashboard extends BaseClass {
     }
 
     async getHtmlFormTournament() {
-        return `<div id="form-tournament container-fluid">
-                    <h1>Create tournament </h1>
-                    <div class="form-group">
-                        <form id="tournamentForm">
-                            <label for="tournamentName">Tournament name:</label>
-                            <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Enter the name of the tournament">
-                            <br>
-                            <div id="redWarning" class="alert alert-danger" role="alert"></div>
-                            <div id="greenNotif" class="alert alert-success" role="alert"></div>
-                            <button type="submit" id="createTournament" class="btn btn-dark btn-sm">Create tournament</button>
-                        </form>
+        return `<div id="form-tournament container">
+                    <div class="row justify-content-center">
+                        <h1 class="text-center">Create tournament</h1>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <form id="tournamentForm">
+                                    <label for="tournamentName">Tournament name:</label>
+                                    <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Pong masters">
+                                    <br>
+                                    <div id="redWarning" class="alert alert-danger" role="alert"></div>
+                                    <div id="greenNotif" class="alert alert-success" role="alert"></div>
+                                    <button type="submit" id="createTournament" class="btn btn-dark btn-sm">Create</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>`;
     };
 
     async getHtmlForMain() {
-        return `<div id="dashboard">
+        return `<div id="dashboard" class="container-fluid">
                     <div id="game-actions">
                         <div class="game-action">
                             <button id="launch-game-button" type="button">PLAY A MATCH</button>
                         </div>
                         <div class="game-action">
-                            <button id="join-tournament" type="button">JOIN A TOURNAMENT</button>
+                            <button id="join-tournament" type="button">JOIN TOURNAMENT</button>
                         </div>
                         <div class="game-action">
-                            <button id="launch-tournament" type="button">CREATE A TOURNAMENT</button>
+                            <button id="launch-tournament" type="button">CREATE TOURNAMENT</button>
                         </div>
                     </div>
                     <div id="game-stats">

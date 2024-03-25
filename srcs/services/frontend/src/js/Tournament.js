@@ -1,6 +1,6 @@
 import { BaseClass } from './BaseClass'
 import jwt_decode from 'jwt-decode';
-import { router } from './Router';
+import { router, navigateTo } from './Router';
 
 export class Tournament extends BaseClass {
     // constructor() {
@@ -124,7 +124,7 @@ export class Tournament extends BaseClass {
     async fetchJoinTournament(tournamentId) {
         const httpProtocol = window.location.protocol;
         const jwtAccess = localStorage.getItem('token');
-      
+
         const options = {
           method: 'POST',
           headers: {
@@ -158,7 +158,7 @@ export class Tournament extends BaseClass {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             if (response.ok) {
                 const userData = await response.json();
                 return userData;
@@ -181,102 +181,281 @@ export class Tournament extends BaseClass {
         players.forEach(player => {
             userIdToUsernameMap[player.id] = player.username;
         });
-    
+
         const matches = tournamentData.matches.filter(match => {
             return match.user_1 === currentUser.user_id || match.user_2 === currentUser.user_id;
         }).map(match => {
-            const user1Name = userIdToUsernameMap[match.user_1] || 'Unknown user';
-            const user2Name = userIdToUsernameMap[match.user_2] || 'Unknown user';
-            return `
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">${user1Name} vs ${user2Name}</h5>
-                        <button class="btn btn-primary" data-match-id="${match.id}">Play</button>
-                    </div>
-                </div>
-            `;
+            const opponentId = match.user_1 === currentUser.user_id ? match.user_2 : match.user_1;
+            const currentUserName = userIdToUsernameMap[currentUser.user_id] || 'Unknown user';
+            const opponentName = userIdToUsernameMap[opponentId] || 'Unknown user';
+            const score = (match.user_1 === currentUser.user_id) ? `${match.score_user_1} vs ${match.score_user_2}` : `${match.score_user_2} vs ${match.score_user_1}`;
+            const buttonText = match.status === "completed" ? "Finished" : "Play";
+            const buttonDisabled = match.status === "completed" ? "disabled" : "";
+            const matchStatus = match.status;
+
+            return `<div class="card mb-2">
+                        <div class="card-body">
+                            <h5 class="card-title">${currentUserName} vs ${opponentName}</h5>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="btn btn-primary" data-match-id="${match.id}" data-match-status="${matchStatus}" ${buttonDisabled}>${buttonText}</button>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <h4>Score:</h4>
+                                    <h5>${(match.status != "completed") ? "N/A" : score}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
         }).join('');
-    
-        document.getElementById('app').innerHTML = `<div class="tournamentMatches">
-                                                        <h3>Tournament: ${tournamentData.name}</h3>
-                                                        ${matches}
+
+        document.getElementById('app').innerHTML = `<div class="tournamentMatches container">
+                                                        <div class="row justify-content-center">
+                                                            <h3 class="text-center">Tournament: ${tournamentData.name}</h3>
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                                                ${matches}
+                                                            </div>
+                                                        </div>
                                                     </div>`;
-    
+
         const buttons = document.querySelectorAll('.tournamentMatches .btn-primary');
         buttons.forEach(button => {
-            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id')));
+            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id', 'data-match-status')));
         });
     }
 
-    async startMatch(matchId) {
-        console.log(`starting matchId: ${matchId}`);
-        history.pushState('', '', `/match/${matchId}`);
-        router();
+    async startMatch(matchId, matchStatus) {
+        if (matchStatus && matchStatus !== "completed") {
+            console.log(`Starting matchId: ${matchId}`);
+            history.pushState('', '', `/match/${matchId}`);
+            router();
+        } else {
+            console.log(`Match ${matchId} is already completed.`);
+        }
     }
 
-    async displayOpenTournaments() {
+    async createTournamentCard(tournament, currentUserId) {
+        const card = document.createElement('div');
+        card.setAttribute('class', 'card mb-3');
+    
+        const cardBody = document.createElement('div');
+        cardBody.setAttribute('class', 'card-body');
+    
+        const cardTitle = document.createElement('h5');
+        cardTitle.setAttribute('class', 'card-title');
+        cardTitle.textContent = tournament.name;
+    
+        const cardText = document.createElement('p');
+        const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
+    
+        players.forEach(player => {
+            if (currentUserId.user_id == player.id) {
+                const playersText = document.createTextNode(`${player.username}`);
+                cardText.appendChild(playersText);
+            }
+            else {
+                const playerLink = document.createElement('a');
+                playerLink.setAttribute('href', `/test/${player.id}`);
+                playerLink.textContent = player.username;
+                playerLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    console.log(`clicking to id: ${player.id}`);
+                    navigateTo(event.target.href);
+                });
+                cardText.appendChild(playerLink);
+                cardText.appendChild(document.createTextNode(', '));
+            }
+        });
+    
+        if (cardText.lastChild) {
+            cardText.removeChild(cardText.lastChild);
+        }
+    
+        const joinButton = document.createElement('button');
+        joinButton.setAttribute('class', 'btn btn-outline-info');
+        joinButton.textContent = 'Join';
+    
+        const spinner = document.createElement('span');
+        spinner.id = `spinner-${tournament.id}`;
+        spinner.className = 'spinner-border spinner-border-sm text-light';
+        spinner.style.display = 'none';
+    
+        const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
+        const isTournamentFull = tournament.status == "full";
+    
+        if (userAlreadyJoined) {
+            if (isTournamentFull) {
+                joinButton.setAttribute('class', 'btn btn-outline-success');
+                joinButton.textContent = 'Play';
+                joinButton.addEventListener('click', () => this.playTournament(tournament.id));
+            } else {
+                joinButton.setAttribute('class', 'btn btn-outline-secondary');
+                joinButton.disabled = true;
+                joinButton.textContent = 'Joined';
+            }
+        } else if (isTournamentFull) {
+            joinButton.setAttribute('class', 'btn btn-outline-primary');
+            joinButton.disabled = true;
+            joinButton.textContent = 'Complete';
+        } else {
+            joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
+            joinButton.appendChild(spinner);
+        }
+    
+        cardBody.appendChild(cardTitle);
+        cardBody.appendChild(cardText);
+        cardBody.appendChild(joinButton);
+        card.appendChild(cardBody);
+    
+        return card;
+    }
+    
+
+    async displayOpenTournaments(pageNumber = 1, pageSize = 3) {
         const openTournaments = await this.fetchOpenTournaments();
         const gameStatsDiv = document.getElementById('game-stats');
-    
-        gameStatsDiv.innerHTML = '';
-        gameStatsDiv.innerHTML = '<h2>Tournaments:</h2>';
+
+        gameStatsDiv.innerHTML = '<h2 class="text-center">Tournaments:</h2>';
     
         if (openTournaments.length === 0) {
-            gameStatsDiv.innerHTML = '<h2>No open tournaments available 🧐</h2>';
+            gameStatsDiv.innerHTML = '<div class="container"><h2 class="col text-center">No open tournaments available 🧐</h2></div>';
             return;
         }
     
-        const tournamentList = document.createElement('ul');
-        tournamentList.setAttribute('class', 'list-group');
-    
         const currentUserId = jwt_decode(localStorage.getItem('token'));
     
-        await Promise.all(openTournaments.map(async tournament => {
-            const listItem = document.createElement('li');
-            listItem.setAttribute('class', 'list-group-item');
+        const paginatedTournaments = openTournaments.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
     
-            const joinButton = document.createElement('button');
-            joinButton.setAttribute('class', 'btn btn-info');
-            joinButton.textContent = 'Join';
+        const tournamentContainer = document.createElement('div');
+        tournamentContainer.setAttribute('class', 'row');
     
-            joinButton.id = `join-button-${tournament.id}`;
-            const spinner = document.createElement('span');
-            spinner.id = `spinner-${tournament.id}`;
-            spinner.className = 'spinner-border spinner-border-sm text-light';
-            spinner.style.display = 'none';
+        await Promise.all(paginatedTournaments.map(async tournament => {
+            const col = document.createElement('div');
+            col.setAttribute('class', 'col-md-4');
     
-            const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
-            // const isTournamentFull = tournament.participants.length == 4;
-            const isTournamentFull = tournament.status == "full";
-    
-            const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
-            const usernames = players.map(player => player.username);
-            listItem.textContent = `${tournament.name} Players: ${usernames.join(', ')}`;
-    
-            if (userAlreadyJoined) {
-                if (isTournamentFull) {
-                    joinButton.setAttribute('class', 'btn btn-success');
-                    joinButton.textContent = 'Play';
-                    joinButton.addEventListener('click', () => this.playTournament(tournament.id));
-                } else {
-                    joinButton.setAttribute('class', 'btn btn-secondary');
-                    joinButton.disabled = true;
-                    joinButton.textContent = 'Joined';
-                }
-            } else if (isTournamentFull) {
-                joinButton.setAttribute('class', 'btn btn-primary');
-                joinButton.disabled = true;
-                joinButton.textContent = 'Complete';
-            } else {
-                joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
-                joinButton.appendChild(spinner);
-            }
-    
-            listItem.appendChild(joinButton);
-            tournamentList.appendChild(listItem);
+            const card = await this.createTournamentCard(tournament, currentUserId);
+            col.appendChild(card);
+            tournamentContainer.appendChild(col);
         }));
     
-        gameStatsDiv.appendChild(tournamentList);
+        gameStatsDiv.appendChild(tournamentContainer);
+
+        const totalPages = Math.ceil(openTournaments.length / pageSize);
+        const pagination = document.createElement('ul');
+        pagination.setAttribute('class', 'pagination justify-content-center mt-3');
+
+        this.createPaginationItem('<<', (pageNumber > 1), () => this.displayOpenTournaments(pageNumber - 1, pageSize), pagination, false);
+
+        const maxVisiblePages = 3;
+        const startPage = Math.max(1, pageNumber - Math.floor(maxVisiblePages / 2));
+        const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            this.createPaginationItem(i, i === pageNumber, () => this.displayOpenTournaments(i, pageSize), pagination, true);
+        }
+
+        this.createPaginationItem('>>', (pageNumber < totalPages), () => this.displayOpenTournaments(pageNumber + 1, pageSize), pagination, false);
+
+        gameStatsDiv.appendChild(pagination);
+    }
+
+    // async displayOpenTournaments(pageNumber = 1, pageSize = 3) {
+    //     const openTournaments = await this.fetchOpenTournaments();
+    //     const gameStatsDiv = document.getElementById('game-stats');
+
+    //     gameStatsDiv.innerHTML = '<h2 class="text-center">Tournaments:</h2>';
+
+    //     if (openTournaments.length === 0) {
+    //         gameStatsDiv.innerHTML = '<div class="container"><h2 class="col text-center">No open tournaments available 🧐</h2></div>';
+    //         return;
+    //     }
+
+    //     const paginatedTournaments = openTournaments.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+
+    //     const tournamentList = document.createElement('ul');
+    //     tournamentList.setAttribute('class', 'list-group');
+
+    //     const currentUserId = jwt_decode(localStorage.getItem('token'));
+
+    //     await Promise.all(paginatedTournaments.map(async tournament => {
+    //         const listItem = document.createElement('li');
+    //         listItem.setAttribute('class', 'list-group-item mt-3');
+
+    //         const joinButton = document.createElement('button');
+    //         joinButton.setAttribute('class', 'btn btn-outline-info');
+    //         joinButton.textContent = 'Join';
+
+    //         joinButton.id = `join-button-${tournament.id}`;
+    //         const spinner = document.createElement('span');
+    //         spinner.id = `spinner-${tournament.id}`;
+    //         spinner.className = 'spinner-border spinner-border-sm text-light';
+    //         spinner.style.display = 'none';
+
+    //         const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
+    //         const isTournamentFull = tournament.status == "full";
+
+    //         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
+    //         const usernames = players.map(player => player.username);
+    //         listItem.textContent = `${tournament.name} Players: ${usernames.join(', ')}`;
+
+    //         if (userAlreadyJoined) {
+    //             if (isTournamentFull) {
+    //                 joinButton.setAttribute('class', 'btn btn-outline-success');
+    //                 joinButton.textContent = 'Play';
+    //                 joinButton.addEventListener('click', () => this.playTournament(tournament.id));
+    //             } else {
+    //                 joinButton.setAttribute('class', 'btn btn-outline-secondary');
+    //                 joinButton.disabled = true;
+    //                 joinButton.textContent = 'Joined';
+    //             }
+    //         } else if (isTournamentFull) {
+    //             joinButton.setAttribute('class', 'btn btn-outline-primary');
+    //             joinButton.disabled = true;
+    //             joinButton.textContent = 'Complete';
+    //         } else {
+    //             joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
+    //             joinButton.appendChild(spinner);
+    //         }
+
+    //         listItem.appendChild(joinButton);
+    //         tournamentList.appendChild(listItem);
+    //     }));
+
+    //     gameStatsDiv.appendChild(tournamentList);
+
+    //     const totalPages = Math.ceil(openTournaments.length / pageSize);
+    //     const pagination = document.createElement('ul');
+    //     pagination.setAttribute('class', 'pagination justify-content-center mt-3');
+
+    //     this.createPaginationItem('<<', (pageNumber > 1), () => this.displayOpenTournaments(pageNumber - 1, pageSize), pagination, false);
+
+    //     const maxVisiblePages = 3;
+    //     const startPage = Math.max(1, pageNumber - Math.floor(maxVisiblePages / 2));
+    //     const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    //     for (let i = startPage; i <= endPage; i++) {
+    //         this.createPaginationItem(i, i === pageNumber, () => this.displayOpenTournaments(i, pageSize), pagination, true);
+    //     }
+
+    //     this.createPaginationItem('>>', (pageNumber < totalPages), () => this.displayOpenTournaments(pageNumber + 1, pageSize), pagination, false);
+
+    //     gameStatsDiv.appendChild(pagination);
+    // }
+
+    createPaginationItem(content, enabled, onClick, parentElement, pageItem) {
+        const item = document.createElement('li');
+        item.setAttribute('class', (enabled || pageItem) ? 'page-item' : 'page-item disabled');
+        if (enabled && pageItem)
+            item.classList.add('active'), item.classList.add('disabled');
+
+        const link = document.createElement('a');
+        link.setAttribute('class', 'page-link');
+        link.style.cursor = 'pointer';
+        link.textContent = content;
+        if (enabled || pageItem)
+            link.addEventListener('click', onClick);
+        item.appendChild(link);
+        parentElement.appendChild(item);
     }
 
     async getWaitingForGameHtml()
