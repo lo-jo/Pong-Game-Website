@@ -16,7 +16,6 @@ User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print("connect chat")
         query_string = self.scope["query_string"]
         token_params = parse_qs(query_string.decode("utf-8")).get("token", [""])[0]
         current_user = await self.get_user_from_token(token_params)
@@ -31,17 +30,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name = f'chat_{self.room_name}'
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
             await self.accept()
-            welcome_message = f"{current_user.username} just joined the chat."
-            bot = f"Server"
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'message',
-                    'message': welcome_message,
-                    'senderUsername': bot,
-                }
-            # store the last connection time to the group in database
-    )
+
+            unread_messages = await self.get_unread_messages(target)
+            for message in unread_messages:
+                print("UNREAD MESSAGE:", message)
+                await self.send_unread_msg(message)
+                await self.mark_msg_as_read(message)
+
+
+    async def send_unread_msg(self, message):
+        await self.send(text_data=json.dumps({
+            'type': 'message',
+            'senderUsername': message.sender.username,
+            'message': message.message,
+            'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }))
+
+    @database_sync_to_async
+    def mark_msg_as_read(self, message):
+        message.is_read = True
+        message.save()
+
+    @database_sync_to_async
+    def get_unread_messages(self, target):
+        return Message.objects.filter(thread_name=f'chat_{self.room_name}', is_read=False)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -59,8 +71,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message = data['message']
                 receiver_id = user.username
                 sender = await self.get_user(receiver_id.replace('"', ''))
-                print("SENDER", sender)
-                print(self.room_group_name)
                 if await self.is_blocked(sender, self.room_group_name):
                     message = "You have blocked this user"
                     receiver_id = "ERROR"

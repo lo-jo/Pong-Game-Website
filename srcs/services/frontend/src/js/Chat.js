@@ -12,7 +12,7 @@ export class Chat extends BaseClass {
 
     async handleDocumentClick(event) {
         const target = event.target;
-        // console.log(`event.target.id: ${event.srcElement}`); 
+        console.log(`event.target.id: ${event.srcElement}`); 
         if (target.tagName === 'BUTTON' || target.closest('button')) 
         {
             event.preventDefault();
@@ -61,6 +61,11 @@ export class Chat extends BaseClass {
 
     }
 
+    async auto_scroll_down(){
+        const winchat = document.getElementById('chatLog');
+        winchat.scrollTop = winchat.scrollHeight;
+    }
+
     async startConvo(targetId) {
         if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
             // this.chatSocket.close();
@@ -77,11 +82,11 @@ export class Chat extends BaseClass {
             };
         }
         this.chatSocket.onmessage = function (e) {
-            console.log("ON MESSAGE EVENT", e);
             const data = JSON.parse(e.data);
             console.log(e.data);
             // document.querySelector('#chatLog').innerText += (data.senderUsername + ": " + data.message + '\n');
             document.querySelector('#chatLog').innerHTML += this.generateChatBubble(data.senderUsername, data.message, data.time)
+            this.auto_scroll_down();
         }.bind(this);
         this.chatSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
@@ -112,7 +117,7 @@ export class Chat extends BaseClass {
         const chatLog = document.createElement('div');
         chatLog.setAttribute('id', 'chatLog');
         chatLog.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
-        chatLog.style.overflowY = 'scroll'; // Add scroll for overflow
+        chatLog.style.overflowY = 'auto'; // Add scroll for overflow
         chatLog.style.height = '200px'; // Adjust height as needed
         chatLog.style.border = '1px solid #ccc'; // Add border for visualization
         chatLog.style.padding = '10px'; // Add padding for visualization
@@ -130,7 +135,7 @@ export class Chat extends BaseClass {
         chatInputField.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
         chatInputField.setAttribute('id', 'chat-message-input');
         chatInputField.setAttribute('type', 'text');
-        chatInputField.setAttribute('placeholder', `Send message to ${targetUsername}`);
+        chatInputField.setAttribute('placeholder', `Send message toOO ${targetUsername}`);
         const inputGroupAppend = document.createElement('div');
         inputGroupAppend.setAttribute('class', 'input-group-append');
         const iconSpan = document.createElement('span');

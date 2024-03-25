@@ -11,6 +11,7 @@ class Message(models.Model):
     thread_name = models.CharField(null=True, blank=True, max_length=200)
     # Creation time of the message sent
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f'{self.sender.username}-{self.thread_name}' if self.sender else f'{self.message}-{self.thread_name}'
