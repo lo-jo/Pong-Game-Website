@@ -43,7 +43,7 @@ body {
   align-items: center;
   transform-style: preserve-3d;
   position: absolute;
-  background-color: #7000ff;
+  background-color: #000000;
   top: calc(50%);
   left: calc(50%);
   transform: translate(-50%, -30%);

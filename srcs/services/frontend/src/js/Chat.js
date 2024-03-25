@@ -12,9 +12,10 @@ export class Chat extends BaseClass {
 
     async handleDocumentClick(event) {
         const target = event.target;
-        console.log(`event.target.id: ${event.srcElement}`); 
+        console.log(target); 
         if (target.tagName === 'BUTTON' || target.closest('button')) 
         {
+            const link = target.closest('a');
             event.preventDefault();
             console.log('clicked send message', target.id);
             // console.log("inner text sibling", target.nextSibling.innerText);
@@ -50,9 +51,9 @@ export class Chat extends BaseClass {
         <div class="d-flex flex-row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
 
         <div>
-          <p class="small p-2 ms-3 mb-0 rounded-3" style="background-color: #f5f6f7;">
+          <p class="small p-2 ms-3 mb-0 rounded-3" style="background-color: #FFFFFC;">
           ${message}</p>
-          <p class="small ms-3 mb-0 rounded-3 text-muted">${time}</p>
+          <p class="time ms-3 mb-0 rounded-3 text-muted">${time}</p>
         </div>
       </div>
             `;
@@ -110,21 +111,17 @@ export class Chat extends BaseClass {
     }
 
     async initChatWindow(targetId, targetUsername, event) {
+        const chatHeader = document.getElementById('chatHeader');
+        console.log(targetUsername);
+        chatHeader.innerHTML = `<h5 class="chatHead">#${targetId} {insertusernameherelol}</h5>`;
+
         const chatWindow = document.getElementById('chatWindow');
         chatWindow.innerHTML = '';
         
         // Create a div for chat log
         const chatLog = document.createElement('div');
         chatLog.setAttribute('id', 'chatLog');
-        chatLog.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
-        chatLog.style.overflowY = 'auto'; // Add scroll for overflow
-        chatLog.style.height = '200px'; // Adjust height as needed
-        chatLog.style.border = '1px solid #ccc'; // Add border for visualization
-        chatLog.style.padding = '10px'; // Add padding for visualization
-        chatLog.style.marginBottom = '10px'; // Add margin for visualization
-        chatLog.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Add transparent background
-        chatLog.style.borderRadius = '5px'; // Add border-radius for visualization
-        chatLog.style.overflowWrap = 'break-word'; // Ensure long words wrap correctly
+        chatLog.setAttribute('class', 'chatLog'); // Add Bootstrap form-control class
         chatWindow.appendChild(chatLog);
     
         const chatInput = document.getElementById('chatInput');
@@ -135,9 +132,13 @@ export class Chat extends BaseClass {
         chatInputField.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
         chatInputField.setAttribute('id', 'chat-message-input');
         chatInputField.setAttribute('type', 'text');
+        chatInputField.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+        chatInputField.style.borderRadius = '0px';
+        chatInputField.style.border = '0px';
         chatInputField.setAttribute('placeholder', `Send message toOO ${targetUsername}`);
         const inputGroupAppend = document.createElement('div');
         inputGroupAppend.setAttribute('class', 'input-group-append');
+        inputGroupAppend.style.borderRadius = '0px';
         const iconSpan = document.createElement('span');
         iconSpan.setAttribute('class', 'input-group-text');
         iconSpan.innerHTML = '<i class="bi bi-arrow-right-circle""></i>';
@@ -147,11 +148,12 @@ export class Chat extends BaseClass {
         chatInput.appendChild(inputGroup);
     
         const blockDiv = document.getElementById('blockUser');
-        blockDiv.innerHTML = '';
+        blockDiv.innerText = "";
         const blockLink = document.createElement('a');
         blockLink.href = "#";
         blockLink.setAttribute('id', `block_${targetId}`)
-        blockLink.innerText = `Block ${targetUsername}`;
+        // blockLink.innerText = "";
+        blockLink.innerHTML = '<i class="bi bi-slash-circle"">  BLOCK</i>'
         blockLink.addEventListener('click', function(event) {
             event.preventDefault(); 
             this.blockFriendUser(`${targetId}`); 
@@ -197,13 +199,9 @@ export class Chat extends BaseClass {
             const friendId = friend[Object.keys(friend)[1]];
             
             try {
-                // Await the getUserData promise
                 const friendData = await this.getFriendData(friendId);
-                console.log("FRIEND DATA", friendData);
-    
                 const divRow = document.createElement('div');
-                divRow.classList.add('row', 'friend-row', 'bg-dark', 'text-white', 'p-0', 'mb-0');
-    
+                divRow.classList.add('row', 'friend-row', 'text-white');
                 const contentContainer = document.createElement('div');
                 contentContainer.classList.add('d-flex', 'align-items-center');
     
@@ -217,7 +215,7 @@ export class Chat extends BaseClass {
                 messageButton.appendChild(chatIcon);
     
                 const image = document.createElement('img');
-                image.setAttribute('src', `${friendData.profile_pic}`); // Replace 'image-url.jpg' with your image URL
+                image.setAttribute('src', `${friendData.profile_pic}`);
                 image.setAttribute('class', 'chatvatar');
     
                 const link = document.createElement('a');
@@ -237,7 +235,6 @@ export class Chat extends BaseClass {
                 friendListContainer.appendChild(divRow);
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                // Handle error accordingly
             }
         }
     }
@@ -312,7 +309,7 @@ export class Chat extends BaseClass {
                 <h1 class="chat-title">Messages</i></h1>
             </div>
 
-            <div class="col-3">
+            <div class="col-3 mr-10">
                 <div class="row" id="friendList">
                 </div>
             </div>
@@ -336,5 +333,4 @@ export class Chat extends BaseClass {
         }
     }
 } 
-/* <input class="form-control form-control-sm" id="target" placeholder="Who do you want to send a msg to ?" type="text">
-<button type="submit" id="sendButton" class="btn btn-dark btn-sm">JOIN</button></div> */
+
