@@ -1,4 +1,10 @@
-export const initGameTwoD = () => {
+export const initGameTwoD = (data) => {
+
+    const { usuario_1 } = data;
+    console.log(usuario_1);
+
+    const paddle_1 = createPaddle('user', usuario_1);
+
 	// gameState = 'start';
 	// // document.getElementById('app').innerHTML = '';
 	// // document.getElementById('app').className = 'container';
@@ -24,21 +30,35 @@ export const initGameTwoD = () => {
     const board_game = document.getElementById('board-game');
 
 
-    const confirm_match_button = document.getElementById('confirm-match');
-    if (confirm_match_button) {
-        board_game.removeChild(confirm_match_button);
-    } else {
-        console.error("Element with ID 'confirm-match' not found.");
-    }
+    // const confirm_match_button = document.getElementById('confirm-match');
+    // if (confirm_match_button) {
+    //     board_game.removeChild(confirm_match_button);
+    // } else {
+    //     console.error("Element with ID 'confirm-match' not found.");
+    // }
 
-    // // board_game.removeChild(confirm_match_button);
+    // // // board_game.removeChild(confirm_match_button);
 
-    // const board = createBoard('board-game');
-    const ball = createBall('ball');
-	board_game.appendChild(ball);
-	// board.appendChild(timer);
+    // // const board = createBoard('board-game');
+    // const ball = createBall('ball');
+	board_game.appendChild(paddle_1);
+	// board_game.appendChild(ball);
+
+    // // board.appendChild(timer);
 
 }
+
+const createPaddle = ( className, user ) => {
+    console.log('createPaddle call()');
+    const paddle = document.createElement('div');
+    paddle.className = `${className}-paddle`;
+
+    // const { size_x , size_y} = user;
+    
+    // paddle.style.setProperty("width", `${size_x}`);
+    // paddle.style.setProperty("height", `${size_y}`);
+    return (paddle);
+};
 
 const createBoard = (className) => {
     const boardContainer = document.createElement('div');

@@ -78,7 +78,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
 
     async def websocket_disconnect(self, close_code):
-        await self.send_to_group('game_state', 'someone_left')
+        # await self.send_to_group('game_state', 'someone_left')
+        await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
         print(f"WEBSOCKET DISCONNECTTTTTTTTTTTT   {close_code}")
 
 
@@ -189,12 +190,14 @@ class PongConsumer(AsyncWebsocketConsumer):
                 match.status = 'playing'
                 await sync_to_async(match.save)()
                 print("//////////////////// SENDING WELCOME MESSAGE HEREEEEE //////////////////////////////")
-                await self.send_to_group('game_state', 'welcome')
+                # await self.send_to_group('game_state', 'welcome')
+                await self.send_to_group('game_state', json.dumps({'event' : 'welcome'}))
                 asyncio.create_task(self.game_loop())
                 # await self.main_logic()
             elif match.status == 'playing':
                 print("//////////////////// SENDING WELCOME MESSAGE ICIIIII //////////////////////////////")
-                await self.send_to_group('game_state', 'welcome')
+                # await self.send_to_group('game_state', 'welcome')
+                await self.send_to_group('game_state', json.dumps({'event' : 'welcome'}))
                 # print("//////////////////// Creating thread for game //////////////////////////////")
                 print("HEREEE WE LAUCH THE GAME")
                 print(self.debug_in_playing)
@@ -299,10 +302,16 @@ class PongConsumer(AsyncWebsocketConsumer):
             'left' : 0.2
         }
 
-        await self.send_to_group('game_element', json.dumps(self.usuario_1))
+
+        init_pong_game_data = {
+            'event' : 'init_pong_game',
+            'usuario_1' : self.usuario_1
+        }
+
+        await self.send_to_group('game_state', json.dumps(init_pong_game_data))
 
 
-        await self.send_to_group('game_state', 'init_pong_game')
+        # await self.send_to_group('game_state', 'init_pong_game')
 
         self.board = {
             'x' : 1.0,
@@ -327,47 +336,38 @@ class PongConsumer(AsyncWebsocketConsumer):
             'speed_y': 0.05,
         }
 
-        self.usuario_1 = {
-            'elem' : 'user',
-            'which' : 1,
-            'size_x' : 30,
-            'size_y' : 90,
-            'top' : 0.2,
-            'left' : 0.2
-        }
-
-        await self.send_to_group('game_element', json.dumps(self.usuario_1))
+        # await self.send_to_group('game_element', json.dumps(self.usuario_1))
 
 
-        asyncio.create_task(self.game_timer())
+        # asyncio.create_task(self.game_timer())
 
-        while self.game_finish == False:
-            self.ball['top'] += self.ball['speed_y']
-            if self.ball['top'] >= 0.95 or self.ball['top'] <= 0:
-                self.ball['speed_y'] *= -1
+        # while self.game_finish == False:
+        #     self.ball['top'] += self.ball['speed_y']
+        #     if self.ball['top'] >= 0.95 or self.ball['top'] <= 0:
+        #         self.ball['speed_y'] *= -1
             
-            # Movimiento horizontal
-            self.ball['left'] += self.ball['speed_x']
-            if self.ball['left'] >= 0.95 or self.ball['left'] <= 0:
-                self.ball['speed_x'] *= -1
-            # self.ball['top'] += self.ball['speed']
+        #     # Movimiento horizontal
+        #     self.ball['left'] += self.ball['speed_x']
+        #     if self.ball['left'] >= 0.95 or self.ball['left'] <= 0:
+        #         self.ball['speed_x'] *= -1
+        #     # self.ball['top'] += self.ball['speed']
     
-            # if self.ball['top'] >= 0.95 or self.ball['top'] <= 0.05:
-            #     self.ball['speed'] *= -1
+        #     # if self.ball['top'] >= 0.95 or self.ball['top'] <= 0.05:
+        #     #     self.ball['speed'] *= -1
             
-            # self.ball['left'] += self.ball['speed']
+        #     # self.ball['left'] += self.ball['speed']
     
-            # if self.ball['left'] >= 0.9 or self.ball['left'] <= 0.1:
-            #     self.ball['speed'] *= -1
+        #     # if self.ball['left'] >= 0.9 or self.ball['left'] <= 0.1:
+        #     #     self.ball['speed'] *= -1
 
-            # # Comprueba si la pelota alcanza los límites verticales y cambia su dirección
-            # if self.ball['top'] >= 1 or self.ball['top'] <= 0:
-            #     self.ball['velocity_y'] *= -1
+        #     # # Comprueba si la pelota alcanza los límites verticales y cambia su dirección
+        #     # if self.ball['top'] >= 1 or self.ball['top'] <= 0:
+        #     #     self.ball['velocity_y'] *= -1
 
-            # Actualiza la posición de la pelota en el cliente
-            await self.send_to_group('game_element', json.dumps(self.ball))
+        #     # Actualiza la posición de la pelota en el cliente
+        #     await self.send_to_group('game_element', json.dumps(self.ball))
 
-            await asyncio.sleep(0.1)
+        #     await asyncio.sleep(0.1)
 
         print("MATCH FINISHHHHH")
         match = await sync_to_async(Match.objects.get)(id=self.match_id)

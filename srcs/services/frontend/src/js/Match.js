@@ -36,7 +36,7 @@ export class Match extends BaseClass {
                     break;
                 case 'game_state':
                     const { game_state } = data;
-                    this.updateGameState(game_state, data);
+                    this.updateGameState(game_state);
                     break;
                 case 'other_user':
                     const { other_user } = data
@@ -99,11 +99,10 @@ export class Match extends BaseClass {
     }
 
     
-    updateGameState(game_state, data)
+    updateGameState(game_state_data)
     {
-        console.log(game_state);
-        // const { event } = g 
-        switch (game_state)
+        const game_state = JSON.parse(game_state_data);
+        switch (game_state.event)
         {
             case 'welcome':
                 console.log("Welcome to this match");
@@ -112,7 +111,8 @@ export class Match extends BaseClass {
                 break;
             case 'init_pong_game':
                 console.log('Draw board in frontend!')
-                initGameTwoD();
+                console.log(game_state);
+                initGameTwoD(game_state);
                 break;
             case 'someone_left':
                 console.log('Someone left');
