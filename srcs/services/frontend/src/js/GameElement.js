@@ -1,8 +1,20 @@
+export const initKeyEvents = () => {
+    document.addEventListener('keydown', (e) => {
+        switch(e.key){
+            case 'w':
+                console.log("`w` pressed");
+                break;
+            case 's':
+                console.log("`w` pressed");
+                break;       
+        }
+    });
+}
+
 export const initGameTwoD = (data) => {
 
     const { usuario_1 } = data;
     const { ball_game } = data;
-    // console.log(usuario_1);
 
     const ball = createBall('ball', ball_game);
     const paddle_1 = createPaddle('user', usuario_1);
@@ -39,15 +51,8 @@ export const initGameTwoD = (data) => {
         console.error("Element with ID 'confirm-match' not found.");
     }
 
-    // // board_game.removeChild(confirm_match_button);
-
-    // // const board = createBoard('board-game');
-    // const ball = createBall('ball');
 	board_game.appendChild(ball);
 	board_game.appendChild(paddle_1);
-
-    // // board.appendChild(timer);
-
 }
 
 const createPaddle = ( className, user ) => {
@@ -64,14 +69,9 @@ const createPaddle = ( className, user ) => {
     paddle.style.setProperty("height", `calc(${height}%)`);
 
     const { top, bottom, left, right } = user;
-    console.log(top, bottom, left, right);
-    console.log(top * 100, bottom * 100, left * 100, right * 100);
-
 
     paddle.style.setProperty("top", `calc(${top * 100}%)`);
     paddle.style.setProperty("left", `calc(${left * 100}%)`);
-    paddle.style.setProperty("botton", `calc(${bottom * 100}%)`);
-    paddle.style.setProperty("right", `calc(${right * 100}%)`);
     return (paddle);
 };
 

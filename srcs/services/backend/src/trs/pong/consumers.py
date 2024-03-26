@@ -89,7 +89,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         type_message = data.get('type_message')
 
-        # print(f"IN RECEIVE: {type_message}")
         match type_message:
             case 'ws_handshake':
                 # print('ws_handshake case')
@@ -129,10 +128,6 @@ class PongConsumer(AsyncWebsocketConsumer):
                     print(self.game_user_1)
                     await self.send_to_group('other_user', json.dumps(self.game_user_1))
 
-
-                # print(f'Here user_1: {self.game_user_1}')
-                # print(f'Here user_2: {self.game_user_2}')
-
             case 'other_user':
                 print("-------------------------- Receiving other user -------------------- ")
                 other_user = data.get('other_user')
@@ -148,6 +143,29 @@ class PongConsumer(AsyncWebsocketConsumer):
                     self.debug_in_playing = True
                     if other_user_data["user_id"] == 2:
                         self.game_user_2 = other_user
+
+            case 'game_event' :
+                print("-------------------------- Receiving game event -------------------- ")
+                game_event = data.get('game_event')
+                user_jwt_token = data.get('token')
+                decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
+                user_id = decoded_token['user_id']
+
+                if user_id == self.game_user_1["user_id"]:
+                    if game_event == 'move_down':
+                        print("MOVING DOWN")
+                        self.usuario_1["top"] += 0.02
+                        # self.usuario_1 = {
+                        #     'elem' : 'user',
+                        #     'which' : 1,
+                        #     'size_x' : 0.05,
+                        #     'size_y' : 0.18,
+                        #     'top' : 0.02,
+                        #     'bottom' : 0.22,
+                        #     'left' : 0.02,
+                        #     'right' : 0.07
+                        # }
+
 
 
         # data = json.loads(text_data)
@@ -166,7 +184,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         #     print("Someone wants to know the score")
             
     async def receive_ws_handshake(self, ws_handshake_message, data):
-        # print('receive_ws_handshake () ////////////////////////******************')
         if ws_handshake_message == 'authorization':
             user_jwt_token = data.get('authorization')
             decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
@@ -177,27 +194,14 @@ class PongConsumer(AsyncWebsocketConsumer):
                 self.ws_handshake = True
         elif ws_handshake_message == 'confirmation':
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            # print(f'Match statusssssssss {match.status}')
             if match.status == 'pending':
                 match.status = 'joined'
                 await sync_to_async(match.save)()
             elif match.status == 'joined':
                 match.status = 'playing'
                 await sync_to_async(match.save)()
-                # print("//////////////////// SENDING WELCOME MESSAGE HEREEEEE //////////////////////////////")
-                # await self.send_to_group('game_state', 'welcome')
                 await self.send_to_group('game_state', json.dumps({'event' : 'welcome'}))
                 asyncio.create_task(self.game_loop())
-                # await self.main_logic()
-            elif match.status == 'playing':
-                # print("//////////////////// SENDING WELCOME MESSAGE ICIIIII //////////////////////////////")
-                # await self.send_to_group('game_state', 'welcome')
-                await self.send_to_group('game_state', json.dumps({'event' : 'welcome'}))
-                # print("//////////////////// Creating thread for game //////////////////////////////")
-                # print("HEREEE WE LAUCH THE GAME")
-                # print(self.debug_in_playing)
-                if self.debug_in_playing == True:
-                    asyncio.create_task(self.game_loop())
 
 
 
@@ -220,7 +224,6 @@ class PongConsumer(AsyncWebsocketConsumer):
     
     # Senders
     async def send_initial_data(self):
-        # print('send_initial_data()')
         self.db_user_1 = await self.user_in_db(self.match_info["user_1"])
         self.db_user_2 = await self.user_in_db(self.match_info["user_2"])
         users_data = {
@@ -249,31 +252,11 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def send_game_state(self, event):
         await self.send(text_data=json.dumps(event))
 
-
-    # async def check_user_in_match_db(self, user_id)
-    #     try:
-    #         match = await sync_to_async(Match.objects.get)(id=self.match_id)
-    #         match_json = MatchSerializer(match)
-    #         return match_json.data
-    #     except Match.DoesNotExist:
-    #         return None
-
-    async def main_logic(self):
-        await asyncio.gather(
-            self.game_timer(),
-            self.game_loop()
-        )
-    
     async def game_timer(self):
         while self.time_remaining >= 0:
-            # print(f"In timer {self.time_remaining}")
             await self.send_to_group('timer', self.time_remaining)
-            # print("In timer after sending")
             await asyncio.sleep(1)
-            # print("In timer after sleeping")
             self.time_remaining = self.time_remaining - 1
-            # print(self.time_remaining)
-
 
         print("**********&&&&&&&&&&&&&&& hereeeeeee &&&&&&&&&&&&&&&&&&& /////////////////")
         self.game_finish = True
@@ -296,26 +279,14 @@ class PongConsumer(AsyncWebsocketConsumer):
             'top' : 0.02,
             'bottom' : 0.22,
             'left' : 0.02,
-            'right' : 0.023
+            'right' : 0.07
         }
-
-        # self.ball = {
-        #     'elem' : 'ball',
-        #     'size_x' : 0.03,
-        #     'size_y' : 0.05,
-        #     'top' : 0.5,
-        #     'bottom' : 0.55,
-        #     'left' : 0.5,
-        #     'right' : 0.53,
-        #     'speed_x': get_random_speed(),
-        #     'speed_y': get_random_speed()
-        # }
 
         self.ball = {
             'elem' : 'ball',
             'size_x' : 0.03,
             'size_y' : 0.05,
-            'top' : 0.5,
+            'top' : 0.1,
             'left' : 0.5,
             'speed_x': get_random_speed(),
             'speed_y': get_random_speed()
@@ -346,22 +317,19 @@ class PongConsumer(AsyncWebsocketConsumer):
         # await asyncio.sleep(5)
         
         while self.game_finish == False:
-            self.ball['top'] += self.ball['speed_y']
-            if self.ball['top'] <= 0.03 or self.ball['top'] >= 0.95:
-                self.ball['speed_y'] *= -1
+            # if self.ball['top'] <= 0.03 or self.ball['top'] >= 0.95:
+            #     self.ball['speed_y'] *= -1
             
-            self.ball['left'] += self.ball['speed_x']
-            if self.ball['left'] <= 0.03 or self.ball['left'] >= 0.95:
+            if self.ball['left'] <= 0.015 or self.ball['left'] >= 0.95:
                 self.ball['speed_x'] *= -1
 
-            if self.ball['left'] <= (self.usuario_1["left"] + self.usuario_1["size_x"]):
-                print(self.ball)
-                print(self.usuario_1)
+            if self.ball['left'] <= 0.1:
                 if check_hit(self.ball['top'], self.ball['size_y'], self.usuario_1['top'], self.usuario_1['size_y']):
-                    print("Hit paddle!")
-                else:
-                    print("No hit!")
-                await asyncio.sleep(10)
+                    self.ball['speed_x'] *= -1
+
+            self.ball['left'] += self.ball['speed_x']
+            
+            print(self.usuario_1)
             
             # Sending ball info
             await self.send_to_group('game_element', json.dumps(self.ball))

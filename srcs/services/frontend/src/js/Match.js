@@ -1,6 +1,6 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
-import { initGameTwoD, drawBall } from './GameElement';
+import { initGameTwoD, initKeyEvents , drawBall } from './GameElement';
 
 
 export class Match extends BaseClass {
@@ -92,7 +92,6 @@ export class Match extends BaseClass {
                 this.showMessageAndRedirect(`You don'have authorization to this match.`);
                 break;
             case 'initial_data':
-                // console.log(`drawConfirmBoard!`);
                 const { user_1_info, user_2_info } = data
                 this.drawConfirmBoard(user_1_info, user_2_info)
         }
@@ -105,13 +104,11 @@ export class Match extends BaseClass {
         switch (game_state.event)
         {
             case 'welcome':
-                console.log("Welcome to this match");
                 const jwtToken = localStorage.getItem('token');
                 this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}` , 'screen_info' : this.getScreenParams()}));
                 break;
             case 'init_pong_game':
-                console.log('Draw board in frontend!')
-                // console.log(game_state);
+                this.initKeyEvents();
                 initGameTwoD(game_state);
                 break;
             case 'someone_left':
@@ -136,10 +133,6 @@ export class Match extends BaseClass {
                 break;
         }
     }
-    // confirmMatch()
-    // {
-    //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-    // }
 
     /*Functions to send data*/
     getScreenParams()
@@ -250,11 +243,21 @@ export class Match extends BaseClass {
         app.appendChild(appContainer);
     }
 
-    // getHtmlForWaitingSpinner() {
-    //     document.getElementById('app').innerHTML =  `<div class="spinner-border" role="status">
-    //                                                     <span class="visually-hidden">Loading...</span>
-    //                                                 </div>`;
-    // }
+    initKeyEvents = () => {
+        const jwtToken = localStorage.getItem('token');
+        document.addEventListener('keydown', (e) => {
+            switch(e.key){
+                case 'w':
+                    console.log("`w` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
+                    break;
+                case 's':
+                    console.log("`s` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));
+                    break;       
+            }
+        });
+    }
 }
 
 
