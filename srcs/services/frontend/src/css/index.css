@@ -70,3 +70,12 @@ body {
   transform: translate(-50%, -48%);
 }
 
+.avatar {
+    display: block;
+    max-width:100px !important;
+    max-height:100px !important;
+    width: auto;
+    height: auto;
+	  border-radius: 50%;
+}
+
