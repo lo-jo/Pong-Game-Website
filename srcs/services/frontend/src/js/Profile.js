@@ -1,4 +1,5 @@
 import { BaseClass } from './BaseClass';
+import { navigateTo } from './Router';
 
 class User{
     constructor(username, pic, id, email, bio) {
@@ -7,7 +8,8 @@ class User{
         this.id = id;
         this.email = email;
         this.bio = bio;
-      }
+        this.friendMap = new Map();
+    }
     getProfilePicPath() {
         return "http://localhost:8000" + this.pic;
     }
@@ -22,34 +24,8 @@ class User{
 export class Profile extends BaseClass {
     constructor() {
         super();
-        // this.displayProfile();
     }
-    // addFriend = (user) => {
-    //     const jwtAccess = localStorage.getItem('token');
-    //     fetch(user.getFriendReq(), {
-    //         method: 'POST',
-    //         headers: {
-    //             'Authorization': `Bearer ${jwtAccess}`,
-    //             'Content-Type': 'application/json',
-    //         },
-    //     })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             throw new Error('Error');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         // Handle successful login, e.g., store token in local storage
-    //         console.log('Succesfully signed up', data);
-    //         console.log("data: ", data);
-    //         alert("SUCCESFULLY ADDED AS FRIEND")
-    //     })
-    //     .catch(error => {
-    //         console.error('Impossible friendship : ', error);
-    //         alert("ERRRRRRROR");
-    //     });
-    // }
+
     displayStatus = (user) =>  {
         const jwtAccess = localStorage.getItem('token');
     
@@ -108,46 +84,101 @@ export class Profile extends BaseClass {
             document.getElementById('username').innerText = data.username;
             console.log("TARGET USER", data.username);
             history.pushState('','', `/profile`);
-            // document.getElementById("pic").src = currentUser.getProfilePicPath();
-            // document.getElementById('email').innerText = currentUser.email;
-            // document.getElementById('bio').innerText = currentUser.bio;
-            // document.getElementById('nb').innerText = currentUser.id;
-            // this.displayStatus(currentUser);
-            // this.updateAccordionContent(currentUser);
-            
         })
         .catch(error => console.error('Error:', error));
         
     }
 
-    generateFriendElements(friends) {
+    async getFriendData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async generateFriendElements(friendMap) {
         const friendListContainer = document.getElementById('friendList');
         friendListContainer.innerHTML = '';
     
-        const ul = document.createElement('ul');
-        friends.forEach(friend => {
-            const li = document.createElement('li');
-            const friendUsername = friend[Object.keys(friend)[0]];
-            const friendId = friend[Object.keys(friend)[1]];
+        for (const [friendId, friend] of friendMap.entries()) {
+            const divRow = document.createElement('div');
+            divRow.classList.add('row', 'friend-row', 'text-white');
+            const friendUsername = friend.username;
+            const friendProfilePic = friend.profile_pic;
+            
+            const contentContainer = document.createElement('div');
+            contentContainer.classList.add('d-flex', 'align-items-center');
+            
+            const image = document.createElement('img');
+            image.setAttribute('src', friendProfilePic);
+            image.setAttribute('class', 'friendvatar');
+            
             const link = document.createElement('a');
+            link.addEventListener('click', (event) => {
+                if (event.target.tagName === 'A') {
+                    event.preventDefault();
+                    navigateTo(event.target.href);
+                }
+            });
             link.href = `/test/${friendId}`;
-            //const butt = document.createElement('button');
-            //butt.setAttribute('class', 'btn btn-link');
-            link.innerText = `${friendUsername}`;
-            // li.appendChild(butt);
-            li.appendChild(link);
-            // butt.addEventListener('click', (event) => {
-            //     event.preventDefault();
-            //     this.displayFriendProfile(friendId);
-            // });
-            ul.appendChild(li);
-
-        });
+            link.innerText = ` ${friendUsername}`;
     
-        friendListContainer.appendChild(ul);
+            contentContainer.appendChild(image);
+            contentContainer.appendChild(link);
+            
+            divRow.appendChild(contentContainer);
+            friendListContainer.appendChild(divRow);
+        }
     }
 
-    getFriendList = (user) => {
+    async getFriendData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async getFriendList(user) {
         const jwtAccess = localStorage.getItem('token');
         fetch(user.getFriendReq(), {
             method: 'GET',
@@ -162,19 +193,21 @@ export class Profile extends BaseClass {
             }
             return response.json();
         })
-        .then(data => {
-            console.log("data: ", data);
-            this.generateFriendElements(data);
+        .then(async data => {
+            user.friendMap.clear();
+            for (const friend of data) {
+                try {
+                    const friendData = await this.getFriendData(friend.recipient_id);
+                    user.friendMap.set(friend.recipient_id, friendData);
+                } catch (error) {
+                    console.error('Error fetching friend data:', error);
+                }
+            }
+            this.generateFriendElements(user.friendMap);
         })
         .catch(error => {
             console.error('Error fetching friendlist : ', error);
         });
-    }
-
-    updateAccordionContent = (user) => {
-        const accordionBody = document.getElementById('friendList');
-        this.getFriendList(user);
-
     }
 
     displayProfile() {
@@ -199,7 +232,6 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
-
             const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
             document.getElementById('username').innerText = currentUser.username;
             document.getElementById("pic").src = currentUser.getProfilePicPath();
@@ -207,15 +239,7 @@ export class Profile extends BaseClass {
             document.getElementById('bio').innerText = currentUser.bio;
             document.getElementById('nb').innerText = currentUser.id;
             this.displayStatus(currentUser);
-            this.updateAccordionContent(currentUser);
-            // const friendRequestLink = document.createElement('a');
-            // friendRequestLink.href = '#';
-            // friendRequestLink.innerText = 'Send Friend Request';
-            // friendRequestLink.addEventListener('click', (event) => {
-            //     event.preventDefault();
-            //     this.addFriend(currentUser);
-            // });
-            // document.getElementById('friendRequest').appendChild(friendRequestLink);
+            this.getFriendList(currentUser);
         })
         .catch(error => console.error('Error:', error));
     }

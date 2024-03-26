@@ -15,11 +15,11 @@ export class Chat extends BaseClass {
         console.log(target); 
         if (target.tagName === 'BUTTON' || target.closest('button')) 
         {
-            const link = target.closest('a');
+            const link = document.querySelector(`[id*="profile_${target.id}"]`);
             event.preventDefault();
             console.log('clicked send message', target.id);
             // console.log("inner text sibling", target.nextSibling.innerText);
-            this.initChatWindow(target.id, target.innerText, event);
+            this.initChatWindow(target.id, link.innerText, event);
         }
     }
 
@@ -42,8 +42,6 @@ export class Chat extends BaseClass {
             console.log("Blocked", targetId);
         })
         .catch(error => console.error('Error:', error));
-        
-    
     }
 
     generateChatBubble(sender, message, time){
@@ -51,15 +49,12 @@ export class Chat extends BaseClass {
         <div class="d-flex flex-row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
 
         <div>
-          <p class="small p-2 ms-3 mb-0 rounded-3" style="background-color: #FFFFFC;">
+          <p class="small p-2 ms-3 mb-0 rounded-3 custom-text-color" style="background-color: #FFFFFC;">
           ${message}</p>
           <p class="time ms-3 mb-0 rounded-3 text-muted">${time}</p>
         </div>
       </div>
             `;
-
-
-
     }
 
     async auto_scroll_down(){
@@ -113,7 +108,7 @@ export class Chat extends BaseClass {
     async initChatWindow(targetId, targetUsername, event) {
         const chatHeader = document.getElementById('chatHeader');
         console.log(targetUsername);
-        chatHeader.innerHTML = `<h5 class="chatHead">#${targetId} {insertusernameherelol}</h5>`;
+        chatHeader.innerHTML = `<h5 class="chatHead">#${targetUsername}</h5>`;
 
         const chatWindow = document.getElementById('chatWindow');
         chatWindow.innerHTML = '';
@@ -135,7 +130,7 @@ export class Chat extends BaseClass {
         chatInputField.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
         chatInputField.style.borderRadius = '0px';
         chatInputField.style.border = '0px';
-        chatInputField.setAttribute('placeholder', `Send message toOO ${targetUsername}`);
+        chatInputField.setAttribute('placeholder', `Send message to ${targetUsername}`);
         const inputGroupAppend = document.createElement('div');
         inputGroupAppend.setAttribute('class', 'input-group-append');
         inputGroupAppend.style.borderRadius = '0px';
@@ -146,7 +141,7 @@ export class Chat extends BaseClass {
         inputGroup.appendChild(chatInputField);
         inputGroup.appendChild(inputGroupAppend);
         chatInput.appendChild(inputGroup);
-    
+
         const blockDiv = document.getElementById('blockUser');
         blockDiv.innerText = "";
         const blockLink = document.createElement('a');
@@ -219,6 +214,7 @@ export class Chat extends BaseClass {
                 image.setAttribute('class', 'chatvatar');
     
                 const link = document.createElement('a');
+                link.setAttribute('id', `profile_${friendId}${friendUsername}`)
                 link.addEventListener('click', (event) => {
                     if (event.target.tagName === 'A') {
                         event.preventDefault();
@@ -238,10 +234,6 @@ export class Chat extends BaseClass {
             }
         }
     }
-    
-    
-    
-    
 
     async displayFriendList() {
         await fetch(`http://localhost:8000/users/friendship/${this.profileData.username}/`, {

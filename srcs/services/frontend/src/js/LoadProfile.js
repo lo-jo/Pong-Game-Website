@@ -64,6 +64,7 @@ export class LoadProfile
             else{
                 const friendRequestLink = document.createElement('button');
                 friendRequestLink.setAttribute('class', 'btn btn-dark');
+                friendRequestLink.setAttribute('id', 'addButton');
                 friendRequestLink.href = '#';
                 friendRequestLink.innerText = 'Add as friend';
                 friendRequestLink.addEventListener('click', (event) => {
@@ -99,7 +100,7 @@ export class LoadProfile
                 document.getElementById('status').classList.remove('bg-success');
                 document.getElementById('status').classList.add('bg-danger');
             } else {
-                document.getElementById('status').innerText = 'ON';
+                // document.getElementById('status').innerText = 'ON';
             }
             this.getFriendshipStatus(user);
         })
@@ -122,7 +123,10 @@ export class LoadProfile
             return response.json();
         })
         .then(data => {
-            alert("SUCCESFULLY ADDED AS FRIEND")
+            document.getElementById('addButton').remove();
+            const friendAddedText = document.createElement('text');
+            friendAddedText.innerText = `You and ${user.username} are friends :)`;
+            document.getElementById('friendRequest').appendChild(friendAddedText);
         })
         .catch(error => {
             console.error('Impossible friendship : ', error);

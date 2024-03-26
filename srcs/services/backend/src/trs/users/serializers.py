@@ -30,13 +30,13 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         print("value:", value)
         user = self.context['request'].user
         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
-            raise serializers.ValidationError({"username": "This username is already in use."})
+            raise serializers.ValidationError({"This username is already in use."})
         return value
 
     def validate_email(self, value):
         user = self.context['request'].user
         if User.objects.exclude(pk=user.pk).filter(email=value).exists():
-            raise serializers.ValidationError({"email": "This email is already in use."})
+            raise serializers.ValidationError({"This email is already in use."})
         return value
 
     def validate_bio(self, value):
@@ -69,9 +69,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
                 instance.qr_code = None
         if profile_pic:
             if instance.profile_pic and not user.profile_pic.name.startswith('users/profile_pic/default'):
-                print("if profile pic is new and not a default pic")
                 if os.path.isfile(user.profile_pic.path):
-                    print("INSTANCE PP PATH", instance.profile_pic.path)
                     os.remove(user.profile_pic.path)
             instance.profile_pic = profile_pic
         instance.save()
