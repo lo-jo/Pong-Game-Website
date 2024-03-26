@@ -82,8 +82,9 @@ function createTunnel() {
   innerTunnelDiv.style.height = "100vh";
 
 
-  const mainDiv = document.createElement("div");
-  mainDiv.setAttribute('id', 'app')
+  // const mainDiv = document.createElement("div");
+  // mainDiv.setAttribute('id', 'app')
+  // mainDiv.setAttribute('class', 'container')
   // mainDiv.style.transformStyle = "preserve-3d";
   // mainDiv.style.position = "absolute";
   // mainDiv.style.top = "calc(50%)";
@@ -99,7 +100,7 @@ function createTunnel() {
 
   scrollTunnelDiv.appendChild(innerTunnelDiv);
   tunnelDiv.appendChild(scrollTunnelDiv);
-  tunnelDiv.appendChild(mainDiv);
+  // tunnelDiv.appendChild(mainDiv);
 
   return tunnelDiv;
 }

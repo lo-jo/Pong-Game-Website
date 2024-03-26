@@ -39,7 +39,8 @@ export const routes = {
     '/profile' : {
         path : '/profile',
         view : Profile,
-        auth : true
+        auth : true,
+        css : './css/profile.css'
     },
     '/settings' : {
         path : '/settings',
@@ -61,7 +62,8 @@ export const routes = {
     '/test/:id' : {
         view : LoadProfile,
         dinamic : true,
-        auth : true
+        auth : true,
+        css : './css/profile.css'
     },
     '/logout' : {
         path : '/logout',

@@ -1,28 +1,51 @@
 /* Dashboard styles */
 
+/* LIST TOURNAMENTS */
+
+
 /* FORMS */
 @keyframes fadeOut {
     0% { opacity: 1; }
     100% { opacity: 0; }
-  }
-  
+}
+
 #redWarning, #greenNotif {
     display: none;
     animation: fadeOut 6s ease forwards;
 }
 
-.tournamentMatches {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+.tournamentMatches .card, #game-stats .list-group-item, .page-link {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-.card {
-    width: 70%;
+.tournamentMatches button {
+    background-color: #FF003D;
+    border: #FF003D;
+}
+
+.active > .page-link, .disabled > .page-link{
+    background-color: #ffffff;
+    color: #FF003D;
+}
+
+.tournamentMatches button:hover, .page-link:hover {
+    background-color: #ffffff;
+    color: #FF003D;
+}
+
+.list-group-item button:hover {
+    color: #ffffff;
+}
+
+.tournamentMatches button:disabled {
+    background-color: #7a7070;
+    color: #ffffff;
 }
 
 /* GAME */
-#game-actions{
+#game-actions {
     width: 55%;
     display: flex;
     flex-direction: column;
@@ -38,8 +61,14 @@
     width: 80%;
     padding: 2%;
     background-color: inherit;
-    border : 4px solid white;
+    border : 2px solid white;
     color: white;
+}
+
+.game-action button:hover{
+    background-color: #ffffff;
+    border-color :#615f5f;
+    color: #000000;
 }
 
 #game-stats{

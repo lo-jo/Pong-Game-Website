@@ -11,8 +11,8 @@ from asgiref.sync import async_to_sync
 # Own imports
 from .models import Match, Tournament, Participant
 from .serializers import MatchSerializer, TournamentSerializer, ParticipantSerializer
-from django.db.models import Count
 from django.db import transaction
+from itertools import combinations
 
 class PongDashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -219,7 +219,7 @@ class JoinTournamentView(APIView):
                 
                 # Check if the tournament is complete
                 if tournament.participants.count() == 4:
-                    tournament.status = 'complete'
+                    tournament.status = 'full'
                     tournament.save()
                     self.create_matches_for_tournament(tournament)
 
@@ -236,13 +236,12 @@ class JoinTournamentView(APIView):
         participants = tournament.participants.all()
 
         if participants.count() == 4:
-            for i, p1 in enumerate(participants):
-                for p2 in participants[i+1:]:
-                    Match.objects.create(
-                        user_1=p1.user_id,
-                        user_2=p2.user_id,
-                        tournament=tournament
-                    )
+            for p1, p2 in combinations(participants, 2):
+                Match.objects.create(
+                    user_1=p1.user_id,
+                    user_2=p2.user_id,
+                    tournament=tournament
+                )
 
 class DeleteAllMatches(APIView):
     def post(self, request, format=None):
