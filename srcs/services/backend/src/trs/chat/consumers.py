@@ -43,7 +43,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'message',
             'senderUsername': message.sender.username,
             'message': message.message,
-            'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            'time': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }))
 
     @database_sync_to_async
@@ -72,7 +72,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 receiver_id = user.username
                 sender = await self.get_user(receiver_id.replace('"', ''))
                 if await self.is_blocked(sender, self.room_group_name):
-                    message = "You have blocked this user"
+                    message = "Action cannot be completed. User has been blocked."
                     receiver_id = "ERROR"
                     await self.channel_layer.group_send(
                     self.room_group_name,
@@ -101,7 +101,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message = event['message']
             username = event['senderUsername']
             timestamp = timezone.now()
-            formatted_timestamp = timestamp.strftime('%A %H:%M')
+            formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
             # Send the message to the connected client
             await self.send(
@@ -113,21 +113,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
                 )
             )
-
-    # async def chat_message(self, event):
-    #         message = event['message']
-    #         username = event['senderUsername']
-    #         # messages = event['messages']
-
-    #         await self.send(
-    #             text_data=json.dumps(
-    #                 {
-    #                     'message': message,
-    #                     'senderUsername': username,
-    #                     'messages': messages,
-    #                 }
-    #             )
-    #         )
 
     @database_sync_to_async
     def get_user(self, username):
@@ -165,9 +150,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def is_blocked(self, user, thread_name):
-        # sender id
         blocking_id = user.id
-        # receiver id
         blocked_id = self.scope['url_route']['kwargs']['id'] 
 
         try:

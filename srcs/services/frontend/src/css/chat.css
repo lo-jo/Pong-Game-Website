@@ -33,13 +33,15 @@ a{
     color :#a676ff;
 }
 .chatLog {
-    overflow-y: auto;
+    /* overflow-y: auto; */
     height:200px;
+    /* width : 90%; */
+    /* margin-left : 10px; */
+    /* margin-right : 10px */
     /* border:1px solid #FFFFFC; */
     padding:15px;
     margin-bottom:10px;
     background-color: rgba(255, 255, 252, 0.4);
-    /* border-radius:5px; */
     overflow-wrap: break-word;
 }
 
@@ -51,4 +53,8 @@ a{
 
 .time {
     font-size: 0.7vw;
+}
+
+.custom-text-color {
+    color: #ff0000; /* Specify your desired text color */
 }

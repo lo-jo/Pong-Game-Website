@@ -38,44 +38,7 @@ export class Register extends BaseClass
             // this.registerButton.disabled = false;
         }
     }
-    // async handleButtonClick(event) {
-    //     console.log("We are at submitRegister!");
-    //     const username = document.getElementById('username').value;
-    //     const password = document.getElementById('password').value;
-    //     const email = document.getElementById('email').value;
-    //     console.log(`username ${username} password: ${password} email: ${email}`);
-        
-    //     await fetch('http://localhost:8000/users/register/', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'X-CSRFToken': this.getCookie('csrftoken'), // Include CSRF token
-    //         },
-    //         body: JSON.stringify({ username, email, password }),
-    //     })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             const msg = await response.text();
-    //             // document.getElementById('app').innerHTML = "Invalid Credentials";
-    //             this.displayMessage(msg, false);
-    //             throw new Error('Invalid credentials');
-                
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         // Handle successful login, e.g., store token in local storage
-    //         // console.log('Succesfully signed up', data);
-    //         // console.log("data: ", data);
-    //         // document.getElementById('app').innerHTML = "successfully signed up";
-    //         // Redirect to another page or perform additional actions
-    //         history.pushState({}, '', '/login');
-    //         router();
-    //     })
-    //     .catch(error => {
-    //         console.error('ERROR : ', error);
-    //     });
-    // }
+
     async handleButtonClick(event) {
         console.log("We are at submitRegister!");
         const username = document.getElementById('username').value;

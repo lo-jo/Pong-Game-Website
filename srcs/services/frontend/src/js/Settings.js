@@ -6,7 +6,6 @@ export class Settings extends BaseClass {
         this.addDocumentClickListener();
         this.token = localStorage.getItem('token');
         this.userData;
-
     }
 
     async getUserData() {
@@ -65,9 +64,22 @@ export class Settings extends BaseClass {
         {
             console.error("ERROR POSTING OTP");
         }
-        else {
-            console.log("BRAVO BITCH");
-        }
+    }
+
+    hideMessage(id) {
+        const alertElement = document.getElementById("redWarning");
+        alertElement.textContent = '';
+        alertElement.style.display = 'none';
+    }
+
+    displayMessage(message, flag) {
+        const id = (flag) ? ".alert-success" : ".alert-danger";
+        const alertElement = document.getElementById("redWarning");
+        alertElement.textContent = message;
+        alertElement.style.display = 'block';
+        setTimeout(() => {
+            this.hideMessage(id);
+        }, 1500);
     }
 
     async handleButtonClick(event) {
@@ -76,7 +88,7 @@ export class Settings extends BaseClass {
         const bio = document.getElementById('newbio').value;
         const profile_pic = document.getElementById('newavatar');
         console.log("ISCHECKED VALUE", this.isChecked)
-
+    
         // Prepare data object for JSON
         const jsonData = {};
         if (username.trim() !== '') {
@@ -90,7 +102,7 @@ export class Settings extends BaseClass {
         }
         if (this.isChecked != null)
             jsonData.otp_enabled = this.isChecked;
-   
+    
         // Create FormData for file upload
         const formData = new FormData();
         if (profile_pic.files && profile_pic.files.length > 0) {
@@ -100,42 +112,41 @@ export class Settings extends BaseClass {
         }
         else
             console.log('No file selected');
-
+    
         // Merge JSON and file data into FormData
         for (const [key, value] of Object.entries(jsonData)) {
             formData.append(key, value);
         }
     
-        fetch(`http://localhost:8000/users/update_profile/${this.userData.id}/`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${this.token}`,
-            },
-            body: formData,
-        })
-        .then(response => {
+        try {
+            const response = await fetch(`http://localhost:8000/users/update_profile/${this.userData.id}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                },
+                body: formData,
+            });
+    
             if (!response.ok) {
-                
-                // console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
+                const responseData = await response.text();
+                const cleanedResponse = responseData.replace(/["'{}[\]]/g, '');
+                this.displayMessage(cleanedResponse, false);
                 throw new Error('Invalid submission');
             }
-            return response.json();
-        })
-        .then(data => {
+    
+            const data = await response.json();
             console.log(data);
-            // console.log(JSON.stringify({ username, email, bio, profile_pic, isChecked}));
-            document.getElementById('app').innerHTML = "Profile succesfully updated";
+            document.getElementById('app').innerHTML = "Profile successfully updated";
             this.removeEventListeners();
-        })
-        .catch(error => {
+    
+            if (this.isChecked === true && this.isChecked !== this.formerState && this.userData.otp_enabled === false) {
+                await this.enableTwoFa();
+            }
+        } catch (error) {
             console.error('Failed to update profile', error);
-        });
-
-        if (this.isChecked == true && this.isChecked != this.formerState && this.userData.otp_enabled == false){
-            await this.enableTwoFa();
         }
     }
-
+    
     async getHtmlForMain() {
         await this.getUserData();
         let switchValue = null;
@@ -164,8 +175,9 @@ export class Settings extends BaseClass {
                 <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
                 <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA   <i class="bi bi-question-circle"></i></p></label>
             </div>
-            <br>
             <button type="submit" id="editButton" class="btn btn-dark btn-sm">Submit</button>
+            <div id="redWarning" class="alert alert-danger" role="alert" style="display :none;"></div>
+            
         </form>
         </div>`
     }
