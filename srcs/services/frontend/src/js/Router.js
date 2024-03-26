@@ -45,7 +45,8 @@ export const routes = {
     '/settings' : {
         path : '/settings',
         view : Settings,
-        auth : true
+        auth : true,
+        css : './css/settings.css'
     },
     '/chat' : {
         path : '/chat',

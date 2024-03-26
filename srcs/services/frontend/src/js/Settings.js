@@ -162,7 +162,7 @@ export class Settings extends BaseClass {
 
             <div class="form-check form-switch" id="twoFA">
                 <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
-                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"></label>
+                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA   <i class="bi bi-question-circle"></i></p></label>
             </div>
             <br>
             <button type="submit" id="editButton" class="btn btn-dark btn-sm">Submit</button>
