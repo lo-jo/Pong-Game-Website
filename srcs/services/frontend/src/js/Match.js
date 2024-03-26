@@ -27,7 +27,7 @@ export class Match extends BaseClass {
         this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { type_message } = data
-            console.log(`TYPE MESSAGE ${type_message}`);
+            // console.log(`TYPE MESSAGE ${type_message}`);
             switch(type_message)
             {
                 case 'ws_handshake':
@@ -40,7 +40,7 @@ export class Match extends BaseClass {
                     break;
                 case 'other_user':
                     const { other_user } = data
-                    console.log(other_user);
+                    // console.log(other_user);
                     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
@@ -48,9 +48,9 @@ export class Match extends BaseClass {
                     this.updateTimer(timer);
                     break;
                 case 'game_element':
-                    console.log(data);
+                    // console.log(data);
                     const { game_element } = data;
-                    console.log(game_element);
+                    // console.log(game_element);
                     this.updateGameElement(game_element);
                     break;
             }
@@ -77,8 +77,8 @@ export class Match extends BaseClass {
     /*Methods for match handshake*/
     ws_handshake(ws_handshake_message, data)
     {
-        console.log('In ws_handshake()');
-        console.log(ws_handshake_message);
+        // console.log('In ws_handshake()');
+        // console.log(ws_handshake_message);
         switch(ws_handshake_message)
         {
             case 'match_do_not_exist':
@@ -92,7 +92,7 @@ export class Match extends BaseClass {
                 this.showMessageAndRedirect(`You don'have authorization to this match.`);
                 break;
             case 'initial_data':
-                console.log(`drawConfirmBoard!`);
+                // console.log(`drawConfirmBoard!`);
                 const { user_1_info, user_2_info } = data
                 this.drawConfirmBoard(user_1_info, user_2_info)
         }
@@ -111,7 +111,7 @@ export class Match extends BaseClass {
                 break;
             case 'init_pong_game':
                 console.log('Draw board in frontend!')
-                console.log(game_state);
+                // console.log(game_state);
                 initGameTwoD(game_state);
                 break;
             case 'someone_left':
