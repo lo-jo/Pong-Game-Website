@@ -8,7 +8,23 @@
 }
 
 .card-body {
-    opacity : .4;
+    opacity : .6;
+    background-color : #7000ff;
     height: 120% !important;
     overflow-y: auto;
+}
+
+.friendvatar {
+    display: block!important;
+    max-width:50px !important;
+    max-height:50px !important;
+    margin-right : 6px;
+    width: auto;
+    height: auto;
+	  border-radius: 50%;
+}
+
+a{
+    text-decoration: none;
+    color: #FCFF76;
 }
