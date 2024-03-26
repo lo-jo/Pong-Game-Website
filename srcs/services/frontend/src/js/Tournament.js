@@ -247,31 +247,29 @@ export class Tournament extends BaseClass {
     
         const cardText = document.createElement('p');
         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
-    
-        players.forEach(player => {
-            if (currentUserId.user_id == player.id) {
-                const playersText = document.createTextNode(`${player.username}`);
-                cardText.appendChild(playersText);
-            }
+
+        players.forEach((player, index) => {
+            let playerLink;
+            if (currentUserId.user_id == player.id)
+                playerLink = document.createElement('p');
             else {
-                const playerLink = document.createElement('a');
+                playerLink = document.createElement('a');
                 playerLink.setAttribute('href', `/test/${player.id}`);
-                playerLink.textContent = player.username;
                 playerLink.addEventListener('click', (event) => {
                     event.preventDefault();
                     console.log(`clicking to id: ${player.id}`);
                     navigateTo(event.target.href);
                 });
-                cardText.appendChild(playerLink);
-                cardText.appendChild(document.createTextNode(', '));
+            }
+            playerLink.textContent = player.username;
+            cardText.appendChild(playerLink);
+            if (index < players.length - 1) {
+                playerLink.textContent += ", ";
             }
         });
     
-        if (cardText.lastChild) {
-            cardText.removeChild(cardText.lastChild);
-        }
-    
         const joinButton = document.createElement('button');
+        joinButton.id = `join-button-${tournament.id}`;
         joinButton.setAttribute('class', 'btn btn-outline-info');
         joinButton.textContent = 'Join';
     
@@ -331,7 +329,7 @@ export class Tournament extends BaseClass {
     
         await Promise.all(paginatedTournaments.map(async tournament => {
             const col = document.createElement('div');
-            col.setAttribute('class', 'col-md-4');
+            col.setAttribute('class', 'row');
     
             const card = await this.createTournamentCard(tournament, currentUserId);
             col.appendChild(card);

@@ -1,10 +1,10 @@
-.avatar {
+.avatar, #pic {
     display: block;
     max-width:100px !important;
     max-height:100px !important;
     width: auto;
     height: auto;
-	  border-radius: 50%;
+	border-radius: 50%;
 }
 
 .card-body {

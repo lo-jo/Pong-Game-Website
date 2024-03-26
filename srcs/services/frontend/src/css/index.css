@@ -14,13 +14,13 @@ body {
   margin-top: 2rem;
 }
 
-/* #nav-bar{
+/******* #nav-bar{
   width: 80%;
   margin-left: 10%;
   padding: 0.8rem;
   display: flex;
   justify-content: space-around;
-} */
+} *******/
 
 #nav-bar{
   width: 100%;
@@ -49,7 +49,7 @@ body {
 }
 
 #app {
-  /* display: flex;
+  /********* display: flex;
   justify-content: center;
   align-items: center;
   transform-style: preserve-3d;
@@ -57,16 +57,15 @@ body {
   /* height: 50%; */
   /* width: 51vw;
   height: 52.2vh; */
+  /****************/
   position: absolute;
   width: 72%;
   min-height: fit-content;
   z-index: 1;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  /* border: 2px solid #ffffff; */
   border-radius: 10px;
   top: calc(50%);
   left: calc(50%);
   transform: translate(-50%, -48%);
 }
-

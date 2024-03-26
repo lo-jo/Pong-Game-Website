@@ -216,7 +216,6 @@ export class Profile extends BaseClass {
             //     this.addFriend(currentUser);
             // });
             // document.getElementById('friendRequest').appendChild(friendRequestLink);
-            
         })
         .catch(error => console.error('Error:', error));
     }
