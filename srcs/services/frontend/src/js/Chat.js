@@ -12,7 +12,6 @@ export class Chat extends BaseClass {
 
     async handleDocumentClick(event) {
         const target = event.target;
-        console.log(target); 
         if (target.tagName === 'BUTTON' || target.closest('button')) 
         {
             const link = document.querySelector(`[id*="profile_${target.id}"]`);
@@ -23,8 +22,59 @@ export class Chat extends BaseClass {
         }
     }
 
+
+    async notifyGame(targetId){
+        const requestBody = {
+            message: `@${this.profileData.username} invited you to a Pong Game ! Go to Dashboard to start playing !`,
+            sender: this.profileData.username,
+            recipient: targetId
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:8000/notify/invite/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+        } catch (error) {
+            // Handle error here
+            console.error('Error creating match:', error);
+        }
+    }
+
+    async createMatch(targetId){
+        const requestBody = {
+            user_1: this.profileData.id,
+            user_2: targetId
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/matches/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+    
+            const message = "You're invited to a game of pong! Go to DASHBOARD to start playing.";
+            this.chatSocket.send(JSON.stringify({
+                type: 'message',
+                token: this.token,
+                message: message,
+            }));
+            await this.notifyGame(targetId);
+        } catch (error) {
+            // Handle error here
+            console.error('Error creating match:', error);
+        }
+    }
+
     async blockFriendUser(targetId){
-        console.log("Blocking", targetId);
         await fetch(`http://localhost:8000/chat/block-user/${targetId}`, {
             method: 'POST',
             headers: {
@@ -107,7 +157,6 @@ export class Chat extends BaseClass {
 
     async initChatWindow(targetId, targetUsername, event) {
         const chatHeader = document.getElementById('chatHeader');
-        console.log(targetUsername);
         chatHeader.innerHTML = `<h5 class="chatHead">#${targetUsername}</h5>`;
 
         const chatWindow = document.getElementById('chatWindow');
@@ -146,14 +195,26 @@ export class Chat extends BaseClass {
         blockDiv.innerText = "";
         const blockLink = document.createElement('a');
         blockLink.href = "#";
-        blockLink.setAttribute('id', `block_${targetId}`)
+        blockLink.setAttribute('id', `block_${targetId}`);
         // blockLink.innerText = "";
-        blockLink.innerHTML = '<i class="bi bi-slash-circle"">  BLOCK</i>'
+        blockLink.innerHTML = '<i class="bi bi-slash-circle"">  BLOCK</i>';
         blockLink.addEventListener('click', function(event) {
             event.preventDefault(); 
             this.blockFriendUser(`${targetId}`); 
         }.bind(this));
+
+        const inviteDiv = document.getElementById('invitePong');
+        inviteDiv.innerText = "";
+        const inviteLink = document.createElement('a');
+        inviteLink.href = "#";
+        inviteLink.setAttribute('id', `invite_${targetId}`);
+        inviteLink.innerHTML = '<i class="bi bi-joystick">  INVITE</i>';
+        inviteLink.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            this.createMatch(`${targetId}`); 
+        }.bind(this));
         blockDiv.appendChild(blockLink);
+        inviteDiv.appendChild(inviteLink);
     
         await this.startConvo(targetId);
     }
@@ -310,7 +371,9 @@ export class Chat extends BaseClass {
                 <div class="row" id="chatHeader"></div>
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>
-                <div class="row" id="blockUser"></div>
+                <div class="row" id="chatFooter">
+                    <div class="col" id="blockUser"></div>
+                    <div class="col" id="invitePong"></div>
             </div>
         </div>
             `;

@@ -33,9 +33,7 @@ export class Register extends BaseClass
     async handleDocumentClick(event) {
         if (event.target.id === 'register') {
             event.preventDefault();
-            // this.registerButton.disabled = true;
             await this.handleButtonClick(event);
-            // this.registerButton.disabled = false;
         }
     }
 
@@ -44,7 +42,6 @@ export class Register extends BaseClass
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const email = document.getElementById('email').value;
-        console.log(`username ${username} password: ${password} email: ${email}`);
         
         try {
             const response = await fetch('http://localhost:8000/users/register/', {

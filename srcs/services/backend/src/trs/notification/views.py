@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .models import PublicRoom
 
 
@@ -12,8 +13,8 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import PublicRoom
-from .serializers import PublicRoomSerializer
+from .models import PublicRoom, Notification
+from .serializers import PublicRoomSerializer, NotificationSerializer
 
 
 class NotifyUserView(APIView):
@@ -28,3 +29,23 @@ class NotifyUserView(APIView):
         except PublicRoom.DoesNotExist:
             return Response({'error': f'{username} is not in the PublicRoom.'})
             # , status=status.HTTP_404_NOT_FOUND)
+
+class SendNotificationView(APIView):
+    def post(self, request):
+        serializer = NotificationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            message = serializer.validated_data['message']
+            sender_id = request.data.get('sender')
+            recipient_id = request.data.get('recipient')
+            if sender_id and recipient_id:
+                try:
+                    sender = User.objects.get(username=sender_id)
+                    recipient = User.objects.get(pk=recipient_id)
+                    notification = Notification.objects.create(message=message, sender=sender, recipient=recipient)
+                    return Response(NotificationSerializer(notification).data, status=status.HTTP_201_CREATED)
+                except User.DoesNotExist:
+                    return Response({"error": "Sender or recipient does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": "Sender and recipient IDs are required"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
