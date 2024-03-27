@@ -27,7 +27,7 @@ export class Match extends BaseClass {
         this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { type_message } = data
-            console.log(`TYPE MESSAGE ${type_message}`);
+            // console.log(`TYPE MESSAGE ${type_message}`);
             switch(type_message)
             {
                 case 'ws_handshake':
@@ -36,21 +36,27 @@ export class Match extends BaseClass {
                     break;
                 case 'game_state':
                     const { game_state } = data;
-                    this.updateGameState(game_state, data);
+                    this.updateGameState(game_state);
                     break;
                 case 'other_user':
-                    const { other_user } = data
+                    const { other_user } = data;
+                    console.log(`sending other user!`);
                     console.log(other_user);
                     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
                     const { timer } = data
                     this.updateTimer(timer);
+                    break;
                 case 'game_element':
-                    console.log(data);
+                    // console.log(data);
                     const { game_element } = data;
-                    console.log(game_element);
+                    // console.log(game_element);
                     this.updateGameElement(game_element);
+                    break;
+                case 'debug':
+                    console.log("One message from debug!");
+                    break;
             }
         };
 
@@ -75,8 +81,6 @@ export class Match extends BaseClass {
     /*Methods for match handshake*/
     ws_handshake(ws_handshake_message, data)
     {
-        console.log('In ws_handshake()');
-        console.log(ws_handshake_message);
         switch(ws_handshake_message)
         {
             case 'match_do_not_exist':
@@ -87,32 +91,31 @@ export class Match extends BaseClass {
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
             case 'failed_authorization':
-                this.showMessageAndRedirect(`You don'have authorization to this match.`);
+                this.showMessageAndRedirect(`You don't have authorization to this match.`);
                 break;
             case 'initial_data':
-                console.log(`drawConfirmBoard!`);
                 const { user_1_info, user_2_info } = data
-                this.drawConfirmBoard(user_1_info, user_2_info)
+                this.initGame(user_1_info, user_2_info);
         }
     }
 
     
-    updateGameState(game_state, data)
+    updateGameState(game_state_data)
     {
-        console.log(game_state);
-        switch (game_state)
+        const game_state = JSON.parse(game_state_data);
+        switch (game_state.event)
         {
-            case 'welcome':
-                console.log("Welcome to this match");
-                const jwtToken = localStorage.getItem('token');
-                this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}` , 'screen_info' : this.getScreenParams()}));
-                break;
             case 'init_pong_game':
-                console.log('Draw board in frontend!')
-                initGameTwoD();
+                this.initKeyEvents();
+                initGameTwoD(game_state);
                 break;
             case 'someone_left':
                 console.log('Someone left');
+                break;
+            case 'broadcasted_game_event':
+                console.log('Hay que broadcast el event!')
+                const { broadcasted_game_event } = game_state;
+                console.log(broadcasted_game_event);
                 break;
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
@@ -126,14 +129,13 @@ export class Match extends BaseClass {
             case 'ball':
                 drawBall(game_element);
                 break;
+            case 'user':
+                drawUser(game_element);
+                break;
             default:
                 break;
         }
     }
-    // confirmMatch()
-    // {
-    //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-    // }
 
     /*Functions to send data*/
     getScreenParams()
@@ -171,6 +173,7 @@ export class Match extends BaseClass {
             }
         }, 1000);
     }
+
     
     updateTimer(seconds_string) {
         const seconds = parseInt(seconds_string, 10);
@@ -182,8 +185,16 @@ export class Match extends BaseClass {
         document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
     
-    drawConfirmBoard(user_1_info, user_2_info){
+    initGame(user_1_info, user_2_info)
+    {
+        console.log(`initGame call()`);
+        this.initBoard(user_1_info, user_2_info);
+        this.showTimerBeforeMatch();
+    }
 
+    initBoard(user_1_info, user_2_info)
+    {
+        console.log(`Drawing initial board`)
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -220,14 +231,14 @@ export class Match extends BaseClass {
 
         appContainer.appendChild(game_header);
 
-        // Confirmation button 
-        const confirmMatchButton = document.createElement('button');
-        confirmMatchButton.setAttribute('id', 'confirm-match');
-        confirmMatchButton.classList.add('btn', 'btn-light', 'center');
-        confirmMatchButton.textContent = 'Ready';
-        confirmMatchButton.addEventListener('click', () => {
-            this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-        });
+        // // Confirmation button 
+        // const confirmMatchButton = document.createElement('button');
+        // confirmMatchButton.setAttribute('id', 'confirm-match');
+        // confirmMatchButton.classList.add('btn', 'btn-light', 'center');
+        // confirmMatchButton.textContent = 'Ready';
+        // confirmMatchButton.addEventListener('click', () => {
+        //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+        // });
 
         /*Creating board game, parent of ball and paddles*/
         const board_game = document.createElement('div');
@@ -235,7 +246,7 @@ export class Match extends BaseClass {
         board_game.classList.add('board-game');
 
         /*Adding confirmation button*/
-        board_game.appendChild(confirmMatchButton);
+        // board_game.appendChild(confirmMatchButton);
 
         /*Adding board game to app div */
         appContainer.appendChild(board_game);
@@ -244,11 +255,39 @@ export class Match extends BaseClass {
         app.appendChild(appContainer);
     }
 
-    // getHtmlForWaitingSpinner() {
-    //     document.getElementById('app').innerHTML =  `<div class="spinner-border" role="status">
-    //                                                     <span class="visually-hidden">Loading...</span>
-    //                                                 </div>`;
-    // }
+    showTimerBeforeMatch(){
+        console.log(`showTimerBeforeMatch call()`);
+        const board_game = document.getElementById('board-game');
+        let seconds_div = document.createElement('div');
+        seconds_div.setAttribute('id', 'seconds');
+        board_game.appendChild(seconds_div);
+        let seconds = 5;
+        let total = seconds
+        let timeinterval = setInterval(() => {
+            total = --total;
+            seconds_div.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+            }
+        }, 1000);
+    }
+
+    initKeyEvents = () => {
+        const jwtToken = localStorage.getItem('token');
+        document.addEventListener('keydown', (e) => {
+            switch(e.key){
+                case 'w':
+                    console.log("`w` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
+                    break;
+                case 's':
+                    console.log("`s` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));
+                    break;       
+            }
+        });
+    }
 }
 
 
