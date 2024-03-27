@@ -24,6 +24,10 @@
   background-color: #ff003d;
 }
 
+#seconds{
+  background-color: aqua;
+}
+
 .user-info {
   font-size: 22px;
   /* margin: 5px; */

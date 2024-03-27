@@ -39,9 +39,14 @@ export class Match extends BaseClass {
                     this.updateGameState(game_state);
                     break;
                 case 'other_user':
+                    console.log("I received other user!");
                     const { other_user } = data
-                    // console.log(other_user);
-                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    console.log(other_user);
+
+                    // console.log('Sending other_user!');
+                    console.log(typeof other_user);
+                    // console.log()
+                    // this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
                     const { timer } = data
@@ -52,6 +57,9 @@ export class Match extends BaseClass {
                     const { game_element } = data;
                     // console.log(game_element);
                     this.updateGameElement(game_element);
+                    break;
+                case 'debug':
+                    console.log("One message from debug!");
                     break;
             }
         };
@@ -77,8 +85,6 @@ export class Match extends BaseClass {
     /*Methods for match handshake*/
     ws_handshake(ws_handshake_message, data)
     {
-        // console.log('In ws_handshake()');
-        // console.log(ws_handshake_message);
         switch(ws_handshake_message)
         {
             case 'match_do_not_exist':
@@ -89,11 +95,11 @@ export class Match extends BaseClass {
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
             case 'failed_authorization':
-                this.showMessageAndRedirect(`You don'have authorization to this match.`);
+                this.showMessageAndRedirect(`You don't have authorization to this match.`);
                 break;
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
-                this.drawConfirmBoard(user_1_info, user_2_info)
+                this.initGame(user_1_info, user_2_info);
         }
     }
 
@@ -105,7 +111,7 @@ export class Match extends BaseClass {
         {
             case 'welcome':
                 const jwtToken = localStorage.getItem('token');
-                this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}` , 'screen_info' : this.getScreenParams()}));
+                this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}`}));
                 break;
             case 'init_pong_game':
                 this.initKeyEvents();
@@ -170,6 +176,7 @@ export class Match extends BaseClass {
             }
         }, 1000);
     }
+
     
     updateTimer(seconds_string) {
         const seconds = parseInt(seconds_string, 10);
@@ -181,8 +188,16 @@ export class Match extends BaseClass {
         document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
     
-    drawConfirmBoard(user_1_info, user_2_info){
+    initGame(user_1_info, user_2_info)
+    {
+        console.log(`initGame call()`);
+        this.initBoard(user_1_info, user_2_info);
+        this.showTimerBeforeMatch();
+    }
 
+    initBoard(user_1_info, user_2_info)
+    {
+        console.log(`Drawing initial board`)
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -219,14 +234,14 @@ export class Match extends BaseClass {
 
         appContainer.appendChild(game_header);
 
-        // Confirmation button 
-        const confirmMatchButton = document.createElement('button');
-        confirmMatchButton.setAttribute('id', 'confirm-match');
-        confirmMatchButton.classList.add('btn', 'btn-light', 'center');
-        confirmMatchButton.textContent = 'Ready';
-        confirmMatchButton.addEventListener('click', () => {
-            this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-        });
+        // // Confirmation button 
+        // const confirmMatchButton = document.createElement('button');
+        // confirmMatchButton.setAttribute('id', 'confirm-match');
+        // confirmMatchButton.classList.add('btn', 'btn-light', 'center');
+        // confirmMatchButton.textContent = 'Ready';
+        // confirmMatchButton.addEventListener('click', () => {
+        //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+        // });
 
         /*Creating board game, parent of ball and paddles*/
         const board_game = document.createElement('div');
@@ -234,13 +249,31 @@ export class Match extends BaseClass {
         board_game.classList.add('board-game');
 
         /*Adding confirmation button*/
-        board_game.appendChild(confirmMatchButton);
+        // board_game.appendChild(confirmMatchButton);
 
         /*Adding board game to app div */
         appContainer.appendChild(board_game);
         
         /*Adding all the app container*/
         app.appendChild(appContainer);
+    }
+
+    showTimerBeforeMatch(){
+        console.log(`showTimerBeforeMatch call()`);
+        const board_game = document.getElementById('board-game');
+        let seconds_div = document.createElement('div');
+        seconds_div.setAttribute('id', 'seconds');
+        board_game.appendChild(seconds_div);
+        let seconds = 3;
+        let total = seconds
+        let timeinterval = setInterval(() => {
+            total = --total;
+            seconds_div.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                // this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+            }
+        }, 1000);
     }
 
     initKeyEvents = () => {
