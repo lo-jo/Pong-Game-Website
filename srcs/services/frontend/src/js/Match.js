@@ -243,7 +243,7 @@ export class Match extends BaseClass {
         /*Creating board game, parent of ball and paddles*/
         const board_game = document.createElement('div');
         board_game.setAttribute('id', 'board-game');
-        board_game.classList.add('board-game');
+        // board_game.classList.add('board-game');
 
         /*Adding confirmation button*/
         // board_game.appendChild(confirmMatchButton);

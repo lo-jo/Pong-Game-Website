@@ -5,12 +5,13 @@
 }
 
 .app-container {
-  position: relative;
+  /* position: relative; */
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  background-color: #7000ff;
   /* align-items: flex-start; */
 }
 
