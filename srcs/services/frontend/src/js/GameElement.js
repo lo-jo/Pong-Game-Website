@@ -1,23 +1,11 @@
-export const initKeyEvents = () => {
-    document.addEventListener('keydown', (e) => {
-        switch(e.key){
-            case 'w':
-                console.log("`w` pressed");
-                break;
-            case 's':
-                console.log("`w` pressed");
-                break;       
-        }
-    });
-}
-
 export const initGameTwoD = (data) => {
 
-    const { usuario_1 } = data;
+    const { user_paddle_1, user_paddle_2 } = data;
     const { ball_game } = data;
 
     const ball = createBall('ball', ball_game);
-    const paddle_1 = createPaddle('user', usuario_1);
+    const paddle_1 = createPaddle('user', user_paddle_1);
+    const paddle_2 = createPaddle('user', user_paddle_2);
 
 	// gameState = 'start';
 	// // document.getElementById('app').innerHTML = '';
@@ -44,15 +32,16 @@ export const initGameTwoD = (data) => {
     const board_game = document.getElementById('board-game');
 
 
-    const confirm_match_button = document.getElementById('confirm-match');
-    if (confirm_match_button) {
-        board_game.removeChild(confirm_match_button);
+    const seconds_timer = document.getElementById('seconds');
+    if (seconds_timer) {
+        board_game.removeChild(seconds_timer);
     } else {
-        console.error("Element with ID 'confirm-match' not found.");
+        console.error("Element with ID 'seconds' not found.");
     }
 
 	board_game.appendChild(ball);
 	board_game.appendChild(paddle_1);
+    board_game.appendChild(paddle_2);
 }
 
 const createPaddle = ( className, user ) => {
@@ -70,6 +59,8 @@ const createPaddle = ( className, user ) => {
 
     const { top, bottom, left, right } = user;
 
+    console.log("top" +top * 100);
+    console.log("left" +left * 100);
     paddle.style.setProperty("top", `calc(${top * 100}%)`);
     paddle.style.setProperty("left", `calc(${left * 100}%)`);
     return (paddle);

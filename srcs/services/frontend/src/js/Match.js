@@ -1,6 +1,6 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
-import { initGameTwoD, initKeyEvents , drawBall } from './GameElement';
+import { initGameTwoD, drawBall } from './GameElement';
 
 
 export class Match extends BaseClass {
@@ -39,14 +39,10 @@ export class Match extends BaseClass {
                     this.updateGameState(game_state);
                     break;
                 case 'other_user':
-                    console.log("I received other user!");
-                    const { other_user } = data
+                    const { other_user } = data;
+                    console.log(`sending other user!`);
                     console.log(other_user);
-
-                    // console.log('Sending other_user!');
-                    console.log(typeof other_user);
-                    // console.log()
-                    // this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
                     const { timer } = data
@@ -109,16 +105,17 @@ export class Match extends BaseClass {
         const game_state = JSON.parse(game_state_data);
         switch (game_state.event)
         {
-            case 'welcome':
-                const jwtToken = localStorage.getItem('token');
-                this.socket.send(JSON.stringify({'type_message' : 'init_user_data', 'token' : `${jwtToken}`}));
-                break;
             case 'init_pong_game':
                 this.initKeyEvents();
                 initGameTwoD(game_state);
                 break;
             case 'someone_left':
                 console.log('Someone left');
+                break;
+            case 'broadcasted_game_event':
+                console.log('Hay que broadcast el event!')
+                const { broadcasted_game_event } = game_state;
+                console.log(broadcasted_game_event);
                 break;
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
@@ -264,14 +261,14 @@ export class Match extends BaseClass {
         let seconds_div = document.createElement('div');
         seconds_div.setAttribute('id', 'seconds');
         board_game.appendChild(seconds_div);
-        let seconds = 3;
+        let seconds = 5;
         let total = seconds
         let timeinterval = setInterval(() => {
             total = --total;
             seconds_div.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
-                // this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
             }
         }, 1000);
     }

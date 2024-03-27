@@ -26,6 +26,8 @@
 
 #seconds{
   background-color: aqua;
+  font-size: 10rem;
+  text-align: center;
 }
 
 .user-info {
