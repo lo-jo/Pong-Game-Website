@@ -244,7 +244,7 @@ export class Profile extends BaseClass {
         .catch(error => console.error('Error:', error));
     }
 
-    getHtmlForMain() {
+    async getHtmlForMain() {
         this.displayProfile();
         return `
     <div class="container text-center">
@@ -257,7 +257,7 @@ export class Profile extends BaseClass {
                     </span>
                 </div>
                 <div class="row justify-content-center">
-                    <img src="" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+                    <img src="" id="pic" class="avatar img-fluid" alt="Profile Image">
                 </div>
                 <div class="row justify-content-center" id="nb"></div>
                 <div class="row justify-content-center" id="email"></div>
