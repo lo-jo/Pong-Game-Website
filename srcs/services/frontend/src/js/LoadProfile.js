@@ -147,7 +147,7 @@ export class LoadProfile
                     </span>
                 </div>
                 <div class="row justify-content-center">
-                    <img src="${profileData.profile_pic}" id="pic" class="avatar" alt="Profile Image" class="img-fluid">
+                    <img id="pic" class="avatar img-fluid" src="${profileData.profile_pic}" alt="Profile Image">
                 </div>
                 <div class="row justify-content-center" id="nb">${profileData.id}</div>
                 <div class="row justify-content-center" id="email">${profileData.email}</div>

@@ -64,7 +64,7 @@ export const routes = {
         view : LoadProfile,
         dinamic : true,
         auth : true,
-        css : './css/profile.css'
+        css : '../css/profile.css'
     },
     '/logout' : {
         path : '/logout',
@@ -112,7 +112,7 @@ export const connectUser = () => {
 
 // Use the history API to prevent full page reload
 export const navigateTo = (url) => {
-    console.log(`navigateTo called`);
+    console.log(`navigateTo called ${url}`);
     // event.preventDefault();
     history.pushState(null, null, url);
     router();
@@ -140,18 +140,20 @@ function findMatchingRoute(url) {
 let previousView = null;
 let styleCss = null;
 export const router = async () => {
-    // connectUser();
+    const appDiv = document.getElementById('app');
+    // appDiv.innerHTML = '';
+    appDiv.style = 'display: none;';
 
     const path = window.location.pathname;
     console.log(`ROUTER path[${path}]`);
     const matchedRoute = findMatchingRoute(path);
-    
+    // console.log(`matchedRoute: ${matchedRoute}`);
     const viewObject = routes[matchedRoute];
 
     let id = null;
 
     if (previousView && typeof previousView.cleanup === 'function') {
-        console.log("CLEANING UP SHITTY EVENT LISTENERS");
+        // console.log("CLEANING UP SHITTY EVENT LISTENERS");
         previousView.cleanup();
     }
 
@@ -176,9 +178,6 @@ export const router = async () => {
     }
 
     if (viewObject.auth === true && (!token || auth === false)) {
-        // const errorView = new ErrorClass();
-        // document.getElementById('header').innerHTML = errorView.getHtmlForHeader();
-        // document.getElementById('app').innerHTML = errorView.getHtmlForMain();
         navigateTo("/");
         return;
     } else if (viewObject.auth === false && (token && auth === true))
@@ -194,19 +193,28 @@ export const router = async () => {
     
     const view = new viewObject.view(id);
     previousView = view;
-    
+
     if (viewObject.css) {
-        styleCss = document.createElement('link');
-        styleCss.rel = 'stylesheet';
-        styleCss.href = viewObject.css;
-        console.log(viewObject.css)
-        console.log(styleCss.href);
-        document.head.appendChild(styleCss);
+        await loadCss(viewObject.css);
     }
 
-    document.getElementById('app').innerHTML = await view.getHtmlForMain();
+    appDiv.innerHTML = await view.getHtmlForMain();
     (viewObject.path === '/logout') ? navbar.setIsAuthenticated(false) : navbar.setIsAuthenticated(auth);
     navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
+    appDiv.style = 'display: block;';
+}
+
+function loadCss(url) {
+    return new Promise((resolve, reject) => {
+        styleCss = document.createElement('link');
+        styleCss.type = 'text/css';
+        styleCss.rel = 'stylesheet';
+        styleCss.href = url;
+        styleCss.onload = resolve;
+        styleCss.onerror = reject;
+        console.log(`url: ${url}, styleCss.href:${styleCss.href}`);
+        document.head.appendChild(styleCss);
+    });
 }
 
 async function checkAuthentication() {

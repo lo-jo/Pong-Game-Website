@@ -48,7 +48,7 @@ body {
   text-transform: uppercase;
 }
 
-#app {
+/* #app { */
   /********* display: flex;
   justify-content: center;
   align-items: center;
@@ -58,7 +58,7 @@ body {
   /* width: 51vw;
   height: 52.2vh; */
   /****************/
-  position: absolute;
+  /* position: absolute;
   width: 72%;
   min-height: fit-content;
   z-index: 1;
@@ -68,4 +68,29 @@ body {
   top: calc(50%);
   left: calc(50%);
   transform: translate(-50%, -48%);
+} */
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 72%;
+  min-height: fit-content;
+  z-index: 1;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  color: white;
+  border-radius: 10px;
+  top: calc(50%);
+  left: calc(50%);
+  transform: translate(-50%, -48%);
+}
+
+#loader {
+  border: 12px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #444444;
+  width: 70px;
+  height: 70px;
+  animation: spin 1s linear infinite;
 }

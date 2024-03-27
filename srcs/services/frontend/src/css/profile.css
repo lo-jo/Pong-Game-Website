@@ -1,4 +1,4 @@
-.avatar, #pic {
+img#pic.avatar {
     display: block;
     max-width:100px !important;
     max-height:100px !important;
