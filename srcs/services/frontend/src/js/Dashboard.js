@@ -175,6 +175,8 @@ export class Dashboard extends BaseClass {
 
     async getHtmlForMain() {
         return `<div id="dashboard" class="container-fluid">
+                    <div class="row">
+                    <div class="col-8">
                     <div id="game-actions">
                         <div class="game-action">
                             <button id="launch-game-button" type="button">PLAY A MATCH</button>
@@ -186,8 +188,10 @@ export class Dashboard extends BaseClass {
                             <button id="launch-tournament" type="button">CREATE TOURNAMENT</button>
                         </div>
                     </div>
-                    <div id="game-stats">
+                    </div>
+                    <div class="col-3" id="game-stats">
                         <h3>LAST MATCHES</h3>
+                    </div>
                     </div>
                 </div>`;
     };

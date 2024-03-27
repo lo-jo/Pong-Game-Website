@@ -50,7 +50,7 @@ function createWallDiv(wall) {
 
   gridSquares.forEach((_, j) => {
     const cellDiv = document.createElement("div");
-    cellDiv.style.background = "black";
+    cellDiv.style.background = "rgba(0, 0, 0, 0.5)";
     wallDiv.appendChild(cellDiv);
   });
 
@@ -63,7 +63,7 @@ function createTunnel() {
   tunnelDiv.style.flexDirection = "column";
   tunnelDiv.style.justifyContent = "center";
   tunnelDiv.style.maxWidth = "100vw";
-  tunnelDiv.style.backgroundColor = "black";
+  tunnelDiv.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
   tunnelDiv.style.height = "100vh";
 
   const scrollTunnelDiv = document.createElement("div");
@@ -106,7 +106,7 @@ function createTunnel() {
 }
 
 function initializeTunnel() {
-  const rootElement = document.getElementById("body");
+  const rootElement = document.getElementById("grilla");
   rootElement.appendChild(createTunnel());
 }
 

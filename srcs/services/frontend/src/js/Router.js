@@ -166,8 +166,6 @@ export const router = async () => {
     const auth = await checkAuthentication();
     if (auth)
         connectUser();
-    document.getElementById('app').innerHTML = '';
-    document.getElementById('header').innerHTML = '';
 
     if (!viewObject) {
         const errorView = new ErrorClass();
@@ -200,7 +198,8 @@ export const router = async () => {
 
     appDiv.innerHTML = await view.getHtmlForMain();
     (viewObject.path === '/logout') ? navbar.setIsAuthenticated(false) : navbar.setIsAuthenticated(auth);
-    navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
+    document.getElementById('nav-bar').innerHTML = navbar.getHtml();
+    // navbar.getHtml().then(html => document.getElementById('nav-bar').innerHTML = html);
     appDiv.style = 'display: block;';
 }
 
@@ -266,8 +265,8 @@ let navbar = new Navbar();
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM content loaded (Router.js)");
     router();
-    document.getElementById('header').innerHTML = navbar.getHtml();
-    document.getElementById('header').addEventListener('click', (event) => {
+    document.getElementById('nav-bar').innerHTML = navbar.getHtml();
+    document.getElementById('nav-bar').addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.classList.contains('navbar-link')) {
             console.log('LISTENER (Router.js) navbar button clicked: ', event.target);
             event.preventDefault();

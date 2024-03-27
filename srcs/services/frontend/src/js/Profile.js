@@ -194,7 +194,7 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(async data => {
-            // user.friendMap.clear();
+            user.friendMap.clear();
             console.log(data);
             for (const friend of data) {
                 try {
@@ -211,10 +211,10 @@ export class Profile extends BaseClass {
         });
     }
 
-    displayProfile() {
+    async displayProfile() {
         const jwtAccess = localStorage.getItem('token');
-
-        fetch('http://localhost:8000/users/profile/', {
+    
+        return fetch('http://localhost:8000/users/profile/', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -233,55 +233,124 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
-            const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
-            document.getElementById('username').innerText = currentUser.username;
-            document.getElementById("pic").src = currentUser.getProfilePicPath();
-            document.getElementById('email').innerText = currentUser.email;
-            document.getElementById('bio').innerText = currentUser.bio;
-            document.getElementById('nb').innerText = currentUser.id;
-            this.displayStatus(currentUser);
-            this.getFriendList(currentUser);
+            const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio);
+            return currentUser;
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            return null;
+        });
     }
-
+    
     async getHtmlForMain() {
-        this.displayProfile();
-        return `
-    <div class="container text-center">
-        <div class="row align-items-start">
-            <div class="col" id="leftCol">
-                <h1><div class="row justify-content-center" id="username" >
-                </div></h1>
-                <div class="row position-absolute" style="right: 80%;">
-                    <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status">
-                    </span>
-                </div>
-                <div class="row justify-content-center">
-                    <img src="" id="pic" class="avatar img-fluid" alt="Profile Image">
-                </div>
-                <div class="row justify-content-center" id="nb"></div>
-                <div class="row justify-content-center" id="email"></div>
-                <div class="row justify-content-center" id="bio"></div>
-                <div class="row justify-content-center" id="pic"></div>
-                <div class="row justify-content-center" id="friendRequest"></div>    
-            </div>
-            <div class="col">
-            <h1>Stats</h1>
-                    <div class="row">
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                        <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                            Friends
-                        </button>
+        const currentUser = await this.displayProfile();
+        this.displayStatus(currentUser);
+        this.getFriendList(currentUser);
+
+        return `<div class="container text-center">
+                    <div class="row align-items-start">
+                        <div class="col" id="leftCol">
+                            <h1><div class="row justify-content-center">${currentUser.username}</div></h1>
+                            <div class="row position-absolute" style="right: 80%;">
+                                <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status"></span>
+                            </div>
+                            <div class="row justify-content-center">
+                                <img src="${currentUser.getProfilePicPath()}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                            </div>
+                            <div class="row justify-content-center" id="nb">${currentUser.id}</div>
+                            <div class="row justify-content-center" id="email">${currentUser.email}</div>
+                            <div class="row justify-content-center" id="bio">${currentUser.bio}</div>
+                            <div class="row justify-content-center" id="pic">${currentUser.pic}</div>
+                            <div class="row justify-content-center" id="friendRequest">${currentUser.friendRequest}</div>    
+                        </div>
+                        <div class="col">
+                            <h1>Stats</h1>
+                            <div class="row">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                    <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                        Friends
+                                    </button>
+                                </div>
+                                <div class="collapse" id="collapseExample">
+                                    <div class="card card-body" id="friendList">${currentUser.friendList}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                <div class="collapse" id="collapseExample">
-                    <div class="card card-body" id="friendList">
-                </div>
-                </div>
-            </div>
-            </div>
-        </div>
-    </div>
-    `
+                </div>`;
     }
+    
+
+    // async displayProfile() {
+    //     const jwtAccess = localStorage.getItem('token');
+
+    //     fetch('http://localhost:8000/users/profile/', {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': `Bearer ${jwtAccess}`,
+    //             'Content-Type': 'application/json',
+    //         },
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             if (response.status === 401) {
+    //                 console.error('Unauthorized access. Please log in.');
+    //             } else {
+    //                 console.error('Error:', response.status);
+    //             }
+    //             throw new Error('Unauthorized');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         const currentUser = new User(data.username, data.profile_pic, data.id, data.email, data.bio)
+    //         document.getElementById('username').innerText = currentUser.username;
+    //         document.getElementById("pic").src = currentUser.getProfilePicPath();
+    //         document.getElementById('email').innerText = currentUser.email;
+    //         document.getElementById('bio').innerText = currentUser.bio;
+    //         document.getElementById('nb').innerText = currentUser.id;
+    //         this.displayStatus(currentUser);
+    //         this.getFriendList(currentUser);
+    //         return currentUser;
+    //     })
+    //     .catch(error => console.error('Error:', error));
+    // }
+
+    // async getHtmlForMain() {
+    //     await this.displayProfile();
+    //     return `<div class="container text-center">
+    //                 <div class="row align-items-start">
+    //                     <div class="col" id="leftCol">
+    //                         <h1><div class="row justify-content-center" id="username" >
+    //                         </div></h1>
+    //                         <div class="row position-absolute" style="right: 80%;">
+    //                             <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status">
+    //                             </span>
+    //                         </div>
+    //                         <div class="row justify-content-center">
+    //                             <img id="pic" class="avatar img-fluid" alt="Profile Image">
+    //                         </div>
+    //                         <div class="row justify-content-center" id="nb"></div>
+    //                         <div class="row justify-content-center" id="email"></div>
+    //                         <div class="row justify-content-center" id="bio"></div>
+    //                         <div class="row justify-content-center" id="pic"></div>
+    //                         <div class="row justify-content-center" id="friendRequest"></div>    
+    //                     </div>
+    //                     <div class="col">
+    //                     <h1>Stats</h1>
+    //                             <div class="row">
+    //                             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+    //                                 <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    //                                     Friends
+    //                                 </button>
+    //                             </div>
+    //                         <div class="collapse" id="collapseExample">
+    //                             <div class="card card-body" id="friendList">
+    //                         </div>
+    //                         </div>
+    //                     </div>
+    //                     </div>
+    //                 </div>
+    //             </div>`;
+    // }
 }

@@ -171,7 +171,7 @@ export class Chat extends BaseClass {
         const chatInput = document.getElementById('chatInput');
         chatInput.innerHTML = '';
         const inputGroup = document.createElement('div');
-        inputGroup.setAttribute('class', 'input-group');
+        inputGroup.setAttribute('class', 'input-group p-0');
         const chatInputField = document.createElement('input');
         chatInputField.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
         chatInputField.setAttribute('id', 'chat-message-input');
@@ -197,7 +197,7 @@ export class Chat extends BaseClass {
         blockLink.href = "#";
         blockLink.setAttribute('id', `block_${targetId}`);
         // blockLink.innerText = "";
-        blockLink.innerHTML = '<i class="bi bi-slash-circle"">  BLOCK</i>';
+        blockLink.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCK</i>';
         blockLink.addEventListener('click', function(event) {
             event.preventDefault(); 
             this.blockFriendUser(`${targetId}`); 
@@ -208,7 +208,7 @@ export class Chat extends BaseClass {
         const inviteLink = document.createElement('a');
         inviteLink.href = "#";
         inviteLink.setAttribute('id', `invite_${targetId}`);
-        inviteLink.innerHTML = '<i class="bi bi-joystick">  INVITE</i>';
+        inviteLink.innerHTML = '<i class="bi bi-joystick"></i><i>  INVITE</i>';
         inviteLink.addEventListener('click', function(event) {
             event.preventDefault(); 
             this.createMatch(`${targetId}`); 
@@ -362,12 +362,12 @@ export class Chat extends BaseClass {
                 <h1 class="chat-title">Messages</i></h1>
             </div>
 
-            <div class="col-3 mr-10">
+            <div class="col-4 mr-10">
                 <div class="row" id="friendList">
                 </div>
             </div>
 
-            <div class="col-6">
+            <div class="col">
                 <div class="row" id="chatHeader"></div>
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>

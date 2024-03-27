@@ -12,42 +12,38 @@ export default class Navbar {
         this.isAuthenticated = flag;
     }
 
-    async updateNavbar() {
+    updateNavbar() {
         // const isAuthenticated = await this.checkAuthentication();
-        const navbar = document.getElementById('header');
+        const navbar = document.getElementById('nav-bar');
+        console.log("ICIIIII", document.getElementById('nav-bar'));
 
         if (this.isAuthenticated) {
-            navbar.innerHTML = `<nav id="nav-bar">
+            navbar.innerHTML = `<a class="navbar-link" href="/profile">Profile</a>
+                                <a class="navbar-link" href="/settings">Settings</a>
+                                <a class="navbar-link" href="/dashboard">Dashboard</a>
+                                <a class="navbar-link" href="/chat">Chat</a>
+                                <a class="navbar-link" href="/logout">Log out</a>
 
-                                    <a class="navbar-link" href="/profile">Profile</a>
-                                    <a class="navbar-link" href="/settings">Settings</a>
-                                    <a class="navbar-link" href="/dashboard">Dashboard</a>
-                                    <a class="navbar-link" href="/chat">Chat</a>
-                                    <a class="navbar-link" href="/logout">Log out</a>
-
-                                    <div class="btn-group dropstart">
-                                        <button class="btn btn-black btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i id="notification" class="bi bi-bell"></i>
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="count">
-                                            2
-                                            <span class="visually-hidden">unread messages</span>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu" id="alert">
-                                        </ul>
-                                    </div>
-                                </nav>`;
+                                <div class="btn-group dropstart">
+                                    <button class="btn btn-black btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i id="notification" class="bi bi-bell"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="count">
+                                        2
+                                        <span class="visually-hidden">unread messages</span>
+                                        </span>
+                                    </button>
+                                    <ul class="dropdown-menu" id="alert">
+                                    </ul>
+                                </div>`;
         } else {
-            navbar.innerHTML = `<nav id="nav-bar">
-                                    <a class="navbar-link" href="/register">Sign up</a>
-                                    <a class="navbar-link" href="/login">Log in</a>
-                                </nav>`;
+            navbar.innerHTML = `<a class="navbar-link" href="/register">Sign up</a>
+                                <a class="navbar-link" href="/login">Log in</a>`;
         }
     }
 
-    async getHtml() {
-        await this.updateNavbar();
-        const navbar = document.getElementById('header');
+    getHtml() {
+        this.updateNavbar();
+        const navbar = document.getElementById('nav-bar');
         return navbar.innerHTML;
     }
 }
