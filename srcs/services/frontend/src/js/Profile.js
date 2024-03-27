@@ -194,11 +194,12 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(async data => {
-            user.friendMap.clear();
+            // user.friendMap.clear();
+            console.log(data);
             for (const friend of data) {
                 try {
-                    const friendData = await this.getFriendData(friend.recipient_id);
-                    user.friendMap.set(friend.recipient_id, friendData);
+                    const friendData = await this.getFriendData(friend[Object.keys(friend)[1]]);
+                    user.friendMap.set(friend[Object.keys(friend)[1]], friendData);
                 } catch (error) {
                     console.error('Error fetching friend data:', error);
                 }
