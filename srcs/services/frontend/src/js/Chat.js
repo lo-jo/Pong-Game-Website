@@ -99,7 +99,7 @@ export class Chat extends BaseClass {
         <div class="d-flex flex-row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
 
         <div>
-          <p class="small p-2 ms-3 mb-0 rounded-3 custom-text-color" style="background-color: #FFFFFC;">
+          <p class="small p-2 m-2 mb-0 rounded-3 custom-text-color" style="background-color: #FFFFFC;">
           ${message}</p>
           <p class="time ms-3 mb-0 rounded-3 text-muted">${time}</p>
         </div>

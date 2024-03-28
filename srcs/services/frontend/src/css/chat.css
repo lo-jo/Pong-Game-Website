@@ -14,7 +14,7 @@
     border-color: transparent!important;
 }
 
-a{
+a, a > i{
     text-decoration: none;
     color: #FCFF76;
 }
@@ -33,13 +33,13 @@ a{
     color :#a676ff;
 }
 .chatLog {
-    /* overflow-y: auto; */
+    overflow-y: auto;
     height:200px;
     /* width : 90%; */
     /* margin-left : 10px; */
     /* margin-right : 10px */
     /* border:1px solid #FFFFFC; */
-    padding:15px;
+    padding:5px;
     margin-bottom:10px;
     background-color: rgba(255, 255, 252, 0.4);
     overflow-wrap: break-word;
@@ -52,7 +52,7 @@ a{
 }
 
 .time {
-    font-size: 0.7vw;
+    font-size: 0.5vw;
 }
 
 .custom-text-color {

@@ -22,6 +22,7 @@ img#pic.avatar {
     background-color : #7000ff;
     /* height: 120% !important; */
     overflow-y: auto;
+    overflow-x: auto;
 }
 
 .friendvatar {
@@ -37,4 +38,16 @@ img#pic.avatar {
 a{
     text-decoration: none;
     color: #FCFF76;
+}
+
+#match_log .log-content{
+    font-family: monospace;
+    font-size: x-small;
+    text-align: left;
+    overflow-y: auto;
+    /* color:#FCFF76!important; */
+}
+
+.progress-bar-win{
+    background-color: #7000ff;
 }

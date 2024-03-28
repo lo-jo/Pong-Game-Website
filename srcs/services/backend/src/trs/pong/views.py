@@ -247,6 +247,9 @@ class DeleteAllMatches(APIView):
     def post(self, request, format=None):
         Match.objects.all().delete()
         return Response({'message': 'All items have been deleted'}, status=status.HTTP_204_NO_CONTENT)
+from django.db.models import Q  # Import Q object
+from .models import Match
+from .serializers import MatchSerializer
 
 class UserMatchView(RetrieveAPIView):
     queryset = Match.objects.all()
@@ -254,7 +257,7 @@ class UserMatchView(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
-        # Filter matches where user_1 or user_2 is pk and status is 'completed'
-        matches = self.queryset.filter(models.Q(user_1=pk) | models.Q(user_2=pk), status='completed')
+        # Filter matches where either user_1 or user_2 is pk and status is 'completed'
+        matches = self.queryset.filter(Q(user_1=pk, status='completed') | Q(user_2=pk, status='completed'))
         serializer = self.get_serializer(matches, many=True)
         return Response(serializer.data)

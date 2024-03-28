@@ -11,6 +11,7 @@ from .WebSocketClient import WebSocketClient
 class BaseEndpoint:
     def __init__(self, endpoint):
         # Main endpoint
+        self.last_command = None
         self.endpoint = endpoint
         self.ws_client = None
 
@@ -30,8 +31,10 @@ class BaseEndpoint:
             print(f"Endpoint {endpoint_uri} not found in switch_request")
             return False
 
+        # if 
         command = func(endpoint_uri, http_method, token_user, host, http)
-    
+        last_command = command
+
         # print(command)
         try:
             output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
@@ -132,6 +135,7 @@ class PongEndpoint(BaseEndpoint):
         }  
 
         self.switch_request_http = {
+            '/last-request' : '',
             '/pong/matches/': {
                 'GET' : self.request_get_collection,
                 'POST' : self.request_post_collection,

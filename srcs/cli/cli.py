@@ -42,6 +42,7 @@ def main():
         else:
             if protocol == 'HTTPS':
                 endpoint_uri = curses.wrapper(lambda stdscr: prompt(stdscr, list(endpoint_class.switch_request_http.keys()), "Choose the uri endpoint:\n", True))
+                
                 if endpoint_uri == 'GO BACK':
                     continue
                 elif endpoint_uri == 'EXIT':

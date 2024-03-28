@@ -134,30 +134,189 @@ export class LoadProfile
 
     }
 
+    async getFriendData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async displayMatchLog(user) {
+        const jwtAccess = localStorage.getItem('token');
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            const log_content = document.getElementById('log_content');
+    
+            for (const match of data) {
+                try {
+                    const log_div = document.createElement('div');
+                    log_div.setAttribute('class', 'log-content');
+                    const loser = await this.getFriendData(match.loser);
+                    const winner = await this.getFriendData(match.winner);
+                    log_div.innerText = `@${match.created_at}, ${winner.username} won against ${loser.username} (${match.score_user_1} - ${match.score_user_2})`;
+                    log_content.appendChild(log_div);
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
+            }
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+
+    async getMatchData(user) {
+        const jwtAccess = localStorage.getItem('token');
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    getWinsPercent(matchData, winnerId) {
+        const totalMatches = matchData.length;
+        let winsCount = 0;
+    
+        for (const match of matchData) {
+            if (match.winner === winnerId) {
+                winsCount++;
+            }
+        }
+        const winPercentage = (winsCount / totalMatches) * 100;
+        return winPercentage; 
+    }
+
+    getLossPercent(matchData, loserId) {
+        const totalMatches = matchData.length;
+        let lossCount = 0;
+    
+        for (const match of matchData) {
+            if (match.loser === loserId) {
+                lossCount++;
+            }
+        }
+        const lossPercentage = (lossCount / totalMatches) * 100;
+        return lossPercentage;
+    }
+
     async getHtmlForMain() {
         const profileData = await this.getUserData();
         this.displayStatus(profileData);
+        console.log(profileData);
+        this.displayMatchLog(profileData);
+        const matchData = await this.getMatchData(profileData);
+        const wins = this.getWinsPercent(matchData, profileData.id);
+        const losses = this.getLossPercent(matchData, profileData.id);
         return `<div class="container text-center">
         <div class="row align-items-start">
             <div class="col" id="leftCol">
                 <h1><div class="row justify-content-center" id="username" >
                 </div>${profileData.username}</h1>
-                <div class="row position-absolute" style="right: 80%;">
-                    <span class="position-relative top-10 end-0 p-2 bg-success border border-light rounded-circle" id="status">
-                    </span>
-                </div>
-                <div class="row justify-content-center">
-                    <img id="pic" class="avatar img-fluid" src="${profileData.profile_pic}" alt="Profile Image">
-                </div>
+                
+                <div class="btn-group dropstart">
+                                    
+                                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                                    <span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status">
+                                    </span>
+                            </div>
+
                 <div class="row justify-content-center" id="nb">${profileData.id}</div>
                 <div class="row justify-content-center" id="email">${profileData.email}</div>
                 <div class="row justify-content-center" id="bio">${profileData.bio}</div>
                 <div  id="friendRequest"></div> 
             </div>
-            <div class="col">
-            <h1>Stats</h1>
-                    
-            </div>
+            
+
+            <div class="col" id="right-col">
+                            
+                            <div class="row" id="wins_losses">
+                                <div class="col-1 p-3 mb-3 p-title" id="stats_title">
+                                    Stats
+                                </div>
+                                <div class="col p-3"  id="stat_content">
+                                    <h6> Matches </h6>
+                                    
+                                    <div class="progress bg-dark mb-3" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
+                                    </div>
+
+                                    <h6> Tournaments </h6>
+                                    <div class="progress bg-dark" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+
+                            <div class="row align-items-start" id="match_log" >
+                                <div class="col-1 p-3 p-title" id="log_title">
+                                    Match history
+                                </div>
+                                <div class="col p-3 log-content justify-content-start" id="log_content">
+                                </div>
+                            </div>
+
+                        </div>
+
+
             </div>
         </div>
     </div>`
