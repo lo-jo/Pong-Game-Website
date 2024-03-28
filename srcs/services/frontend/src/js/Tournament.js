@@ -191,14 +191,14 @@ export class Tournament extends BaseClass {
             const score = (match.user_1 === currentUser.user_id) ? `${match.score_user_1} vs ${match.score_user_2}` : `${match.score_user_2} vs ${match.score_user_1}`;
             const buttonText = match.status === "completed" ? "Finished" : "Play";
             const buttonDisabled = match.status === "completed" ? "disabled" : "";
-            const matchStatus = match.status;
+            console.log(`match STATUS: ${match.status}`);
 
             return `<div class="card mb-2">
                         <div class="card-body">
                             <h5 class="card-title">${currentUserName} vs ${opponentName}</h5>
                             <div class="row">
                                 <div class="col-6">
-                                    <button class="btn btn-primary" data-match-id="${match.id}" data-match-status="${matchStatus}" ${buttonDisabled}>${buttonText}</button>
+                                    <button class="btn btn-primary" data-match-id="${match.id}" data-match-status="${match.status}" ${buttonDisabled}>${buttonText}</button>
                                 </div>
                                 <div class="col-6 text-center">
                                     <h4>Score:</h4>
@@ -220,11 +220,12 @@ export class Tournament extends BaseClass {
 
         const buttons = document.querySelectorAll('.tournamentMatches .btn-primary');
         buttons.forEach(button => {
-            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id', 'data-match-status')));
+            button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id'), button.getAttribute('data-match-status')));
         });
     }
 
     async startMatch(matchId, matchStatus) {
+        console.log(`match id: ${matchId}, match.status ${matchStatus}`);
         if (matchStatus && matchStatus !== "completed") {
             console.log(`Starting matchId: ${matchId}`);
             history.pushState('', '', `/match/${matchId}`);

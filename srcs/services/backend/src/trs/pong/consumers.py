@@ -1,7 +1,7 @@
 import os, json, jwt
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Match
-from .serializers import MatchSerializer
+from .models import Match, Tournament
+from .serializers import MatchSerializer, TournamentSerializer
 from users.models import User
 from users.serializers import UserSerializer
 from .pong_game import get_game_state
@@ -312,8 +312,19 @@ class PongConsumer(AsyncWebsocketConsumer):
         print("MATCH FINISHHHHH")
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
         match.status = 'completed'
+
         await sync_to_async(match.save)()
 
+        if match.tournament:
+            print("THIS MATCH IS PART OF A TOURNAMENT")
+            tournament = await sync_to_async(Tournament.objects.get)(id=match.tournament)
+
+            tournament.matches_played += 1  
+
+            if tournament.matches_played == 6:
+                tournament.status = 'finished'
+
+            await sync_to_async(tournament.save)()
 
 class MatchConsumer(AsyncWebsocketConsumer):
     # groups = ["broadcast"]
