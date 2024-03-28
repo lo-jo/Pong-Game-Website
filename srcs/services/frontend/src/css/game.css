@@ -85,19 +85,9 @@
 } */
 
 .user-paddle {
-  /* width: calc(5%);
-  height: calc(15%); */
-  /* top : 0;
-  left : 0; */
   position: absolute;
   background-color: #7000ff;
-  /* box-shadow: inset 0 0 18px #fffffc,
-  inset -6px 0 18px #fffffc,
-  inset 6px 0 18px #fffffc,
-  inset -6px 0 30px #fffffc,
-  inset 6px 0 30px #fffffc,
-  0 0 18px #fffffc, 4px 0 18px
-  #fffffc, -4px 0 18px #fffffc; */
+  border-radius: 3%;
 }
 
 
@@ -105,13 +95,6 @@
   position: absolute;
   border-radius: 50%;
 }
-
-/* 
-#ball {
-  background-color: red;
-  width: 5rem;
-
-} */
 
 .ball_effect {
   height: 100%;
@@ -126,6 +109,17 @@
       0 0 18px #fffffc, -4px 0 18px
       #7000ff, 4px 0 18px #fffffc;
 }
+
+@keyframes colorChange {
+  0% { color: black; }
+  50% { color: red; }
+  100% { color: black; }
+}
+
+.color-changing {
+  animation: colorChange 1s infinite;
+}
+
 
 @keyframes spinBall {
   100% {

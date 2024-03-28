@@ -26,8 +26,7 @@ export class Match extends BaseClass {
 
         this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const { type_message } = data
-            // console.log(`TYPE MESSAGE ${type_message}`);
+            const { type_message } = data;
             switch(type_message)
             {
                 case 'ws_handshake':
@@ -36,12 +35,16 @@ export class Match extends BaseClass {
                     break;
                 case 'game_state':
                     const { game_state } = data;
+                    // Must refactorize the send_to_connection in pong consumers
+                    if (game_state === 'match_is_already_finished')
+                    {
+                        this.showMessageAndRedirect('You have tried to join a match already finished.');
+                        break;
+                    }
                     this.updateGameState(game_state);
                     break;
                 case 'other_user':
                     const { other_user } = data;
-                    // console.log(`sending other user!`);
-                    // console.log(other_user);
                     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
@@ -49,13 +52,8 @@ export class Match extends BaseClass {
                     this.updateTimer(timer);
                     break;
                 case 'game_element':
-                    // console.log(data);
                     const { game_element } = data;
-                    // console.log(game_element);
                     this.updateGameElement(game_element);
-                    break;
-                case 'debug':
-                    console.log("One message from debug!");
                     break;
             }
         };
@@ -113,17 +111,10 @@ export class Match extends BaseClass {
                 console.log('Someone left');
                 break;
             case 'broadcasted_game_event':
-                console.log('Hay que broadcast el event!')
                 const { broadcasted_game_event } = game_state;
-                console.log(broadcasted_game_event);
                 this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
                 break;
             case 'game_elements':
-                // const { user_paddle_1, user_paddle_2 } = game_state;
-                // const { ball_game } = game_state;
-                // console.log(user_paddle_1);
-                // console.log(user_paddle_2);
-                // console.log(ball_game);
                 drawGameElements(game_state);
                 break;
             default:
@@ -146,22 +137,6 @@ export class Match extends BaseClass {
         }
     }
 
-    /*Functions to send data*/
-    getScreenParams()
-    {
-        const appDiv = document.getElementById('app');
-        const screenParams = {
-            offsetWidth: appDiv.offsetWidth,
-            offsetHeight: appDiv.offsetHeight,
-            clientWidth: appDiv.clientWidth,
-            clientHeight: appDiv.clientHeight
-        };
-        return screenParams;
-    }
-    
-
-    /*Functions to update html*/
-    
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
         return ``;
@@ -184,14 +159,27 @@ export class Match extends BaseClass {
     }
 
     
-    updateTimer(seconds_string) {
-        const seconds = parseInt(seconds_string, 10);
+    updateTimer(timer_data) {
+        const timer = JSON.parse(timer_data);
+        const { time_remaininig, type } = timer;
+
+        const timerDiv = document.getElementById('timer');
+        if (type == 'normal')
+        {
+            timerDiv.classList.remove('.color-changing');
+        }
+        else
+        {
+            timerDiv.classList.add('.color-changing');
+        }
+
+        const seconds = parseInt(time_remaininig, 10);
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
 
         const formattedMinutes = String(minutes).padStart(2, '0');
         const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-        document.getElementById('timer').innerText = `${formattedMinutes}:${formattedSeconds}`;
+        timerDiv.innerText = `${formattedMinutes}:${formattedSeconds}`;
     }
     
     initGame(user_1_info, user_2_info)
@@ -203,7 +191,6 @@ export class Match extends BaseClass {
 
     initBoard(user_1_info, user_2_info)
     {
-        // console.log(`Drawing initial board`)
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -216,46 +203,43 @@ export class Match extends BaseClass {
         
         /*Creating user names div*/
         const user1Div = document.createElement('div');
-        user1Div.classList.add('user-info', 'top-left');
+        user1Div.classList.add('user-info');
         user1Div.innerHTML = `
-            <span>${user_1_info.username}</span>
-        `;
+            <span>${user_1_info.username}</span>`;
 
         const user2Div = document.createElement('div');
-        user2Div.classList.add('user-info', 'top-right');
-        user2Div.innerHTML = `
-            <span>${user_2_info.username}</span>
-        `;
+        user2Div.classList.add('user-info');
+        user2Div.innerHTML = `<span>${user_2_info.username}</span>`;
 
         /*Creating timer*/
         const timerElement = document.createElement('div');
         timerElement.id = 'timer';
         timerElement.classList.add('timer');
-        timerElement.textContent = '2:00';
+        timerElement.textContent = '00:00';
+
+        const score_1 = document.createElement('div');
+        score_1.setAttribute('id', 'score-1');
+        score_1.className = `score`;
+        score_1.innerHTML = `0`;
+
+        const score_2 = document.createElement('div');
+        score_2.setAttribute('id', 'score-2');
+        score_2.className = `score`;
+        score_2.innerHTML = `0`;
+
 
         // Adding childs of game header
         game_header.appendChild(user1Div);
+        game_header.appendChild(score_1);
         game_header.appendChild(timerElement);
+        game_header.appendChild(score_2);
         game_header.appendChild(user2Div);
-
+        /*Addind header to appContainer */
         appContainer.appendChild(game_header);
-
-        // // Confirmation button 
-        // const confirmMatchButton = document.createElement('button');
-        // confirmMatchButton.setAttribute('id', 'confirm-match');
-        // confirmMatchButton.classList.add('btn', 'btn-light', 'center');
-        // confirmMatchButton.textContent = 'Ready';
-        // confirmMatchButton.addEventListener('click', () => {
-        //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-        // });
 
         /*Creating board game, parent of ball and paddles*/
         const board_game = document.createElement('div');
         board_game.setAttribute('id', 'board-game');
-        // board_game.classList.add('board-game');
-
-        /*Adding confirmation button*/
-        // board_game.appendChild(confirmMatchButton);
 
         /*Adding board game to app div */
         appContainer.appendChild(board_game);
