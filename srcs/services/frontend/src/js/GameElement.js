@@ -47,6 +47,7 @@ export const initGameTwoD = (data) => {
 const createPaddle = ( className, user ) => {
     console.log('createPaddle call()');
     const paddle = document.createElement('div');
+    paddle.setAttribute('id', `paddle-${user.id}`);
     /*Setting element class name*/
     paddle.className = `${className}-paddle`;
     /*Getting size for data user*/
@@ -56,34 +57,10 @@ const createPaddle = ( className, user ) => {
     /*Setting size with calc()*/
     paddle.style.setProperty("width", `calc(${width}%)`);
     paddle.style.setProperty("height", `calc(${height}%)`);
-
     const { top, bottom, left, right } = user;
-
-    console.log("top" +top * 100);
-    console.log("left" +left * 100);
     paddle.style.setProperty("top", `calc(${top * 100}%)`);
     paddle.style.setProperty("left", `calc(${left * 100}%)`);
     return (paddle);
-};
-
-const createBoard = (className) => {
-    const boardContainer = document.createElement('div');
-    boardContainer.className = `${className}`;
-    
-
-    const dottedLine = document.createElement('div');
-    dottedLine.className = 'dotted-line';
-
-    const ball = createBall('ball');
-    // paddle_1 = createPaddle('paddle_1');
-    // paddle_2 = createPaddle('paddle_2');
-	
-    boardContainer.appendChild(ball);
-    // boardContainer.appendChild(paddle_1);
-    // boardContainer.appendChild(paddle_2);
-	// boardContainer.appendChild(dottedLine);
-
-    return (boardContainer);
 };
 
 const createBall = ( id, ball_data ) => {
@@ -100,8 +77,6 @@ const createBall = ( id, ball_data ) => {
     const { top, bottom, left, right }  = ball_data;
     ball.style.setProperty("top", `calc(${top * 100}%)`);
     ball.style.setProperty("left", `calc(${left * 100}%)`);
-    // ball.style.setProperty("bottom", `calc(${bottom * 100}%)`);
-    // ball.style.setProperty("right", `calc(${right * 100}%)`);
     /*Adding ball effect*/
     const ballEffect = document.createElement('div');
     ballEffect.className = 'ball_effect';
@@ -109,31 +84,40 @@ const createBall = ( id, ball_data ) => {
     return (ball);
 };
 
+export const drawGameElements = (game_state_info) => {
+    const { user_paddle_1, user_paddle_2 } = game_state_info;
+    const { ball_game } = game_state_info;
+    drawBall(ball_game);
+    drawUserPaddle(user_paddle_1);
+    drawUserPaddle(user_paddle_2);
+}
 
 export const drawBall = (ball_info) => {
-    console.log(`Drawing ball!`);
+    // console.log(`Drawing ball!`);
     const ball = document.getElementById('ball');
     const top = 100 * ball_info.top;
     const left = 100 * ball_info.left
-    // ball.style.setProperty('background-color', `blue`);
-    // console.log(`Top ${top}`);
-    // console.log(`Left ${left}`);
     ball.style.setProperty("top", `calc(${top}%)`);
     ball.style.setProperty("left", `calc(${left}%)`);
 }
 
+export const drawUserPaddle = (paddle_user_info) => {
+    console.log(paddle_user_info);
+    const paddle = document.getElementById(`paddle-${paddle_user_info.id}`);
+    const top = 100 * paddle_user_info.top;
+    if (paddle_user_info.id == 1)
+        paddle.style.backgroundColor = 'red';
+    else
+        paddle.style.backgroundColor = 'yellow';
+    console.log(`Drawing paddle ${paddle_user_info.id} with this top ${top}`)
+    paddle.style.setProperty("top", `calc(${top}%)`);
+}
+
 export const drawUser = (user_info) => {
-    console.log(`Drawing user!`);
-
     const user = document.createElement('div');
-    // ball.className = className;
     user.className = 'game_user';
-
     const top = 100 * user_info.top;
     const left = 100 * user_info.left
-    // ball.style.setProperty('background-color', `blue`);
-    console.log(`Top ${top}`);
-    console.log(`Left ${left}`);
     user.style.setProperty("top", `calc(${top}%)`);
     user.style.setProperty("left", `calc(${left}%)`);
 }

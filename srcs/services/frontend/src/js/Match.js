@@ -1,6 +1,6 @@
 import { BaseClass } from './BaseClass'
 import { router } from './Router'
-import { initGameTwoD, drawBall } from './GameElement';
+import { initGameTwoD, drawGameElements } from './GameElement';
 
 
 export class Match extends BaseClass {
@@ -40,8 +40,8 @@ export class Match extends BaseClass {
                     break;
                 case 'other_user':
                     const { other_user } = data;
-                    console.log(`sending other user!`);
-                    console.log(other_user);
+                    // console.log(`sending other user!`);
+                    // console.log(other_user);
                     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
                     break;
                 case 'timer':
@@ -106,8 +106,8 @@ export class Match extends BaseClass {
         switch (game_state.event)
         {
             case 'init_pong_game':
-                this.initKeyEvents();
                 initGameTwoD(game_state);
+                this.initKeyEvents();
                 break;
             case 'someone_left':
                 console.log('Someone left');
@@ -116,6 +116,15 @@ export class Match extends BaseClass {
                 console.log('Hay que broadcast el event!')
                 const { broadcasted_game_event } = game_state;
                 console.log(broadcasted_game_event);
+                this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
+                break;
+            case 'game_elements':
+                // const { user_paddle_1, user_paddle_2 } = game_state;
+                // const { ball_game } = game_state;
+                // console.log(user_paddle_1);
+                // console.log(user_paddle_2);
+                // console.log(ball_game);
+                drawGameElements(game_state);
                 break;
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
@@ -187,14 +196,14 @@ export class Match extends BaseClass {
     
     initGame(user_1_info, user_2_info)
     {
-        console.log(`initGame call()`);
+        // console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
         this.showTimerBeforeMatch();
     }
 
     initBoard(user_1_info, user_2_info)
     {
-        console.log(`Drawing initial board`)
+        // console.log(`Drawing initial board`)
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -256,12 +265,12 @@ export class Match extends BaseClass {
     }
 
     showTimerBeforeMatch(){
-        console.log(`showTimerBeforeMatch call()`);
+        // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
         seconds_div.setAttribute('id', 'seconds');
         board_game.appendChild(seconds_div);
-        let seconds = 5;
+        let seconds = 3;
         let total = seconds
         let timeinterval = setInterval(() => {
             total = --total;
