@@ -96,6 +96,9 @@ export const connectUser = () => {
             const message = data.message;
             const alertElement = document.getElementById('alert');
             alertElement.innerHTML += `<li>${message}</li><li><hr class="dropdown-divider"></li>`;
+            const count = document.getElementById('bellCount');
+            document.getElementById('bellCount').innerText = 'NEW!';
+            document.getElementById('bellCount').style.backgroundColor = 'red';
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');

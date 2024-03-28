@@ -32,6 +32,14 @@ body {
   height: 50vh;
 }
 
+.notif-div{
+    position: relative;
+    top : 0.4rem;
+    right: 0;
+    z-index: 999999;
+    color: white;
+    width: 100px;
+}
 /* #header{
   margin-top: 2rem;
 } */

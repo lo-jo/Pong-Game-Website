@@ -171,22 +171,21 @@ export class Chat extends BaseClass {
         const chatInput = document.getElementById('chatInput');
         chatInput.innerHTML = '';
         const inputGroup = document.createElement('div');
-        inputGroup.setAttribute('class', 'input-group p-0');
+        inputGroup.setAttribute('class', 'input-group p-2');
+        inputGroup.style.backgroundColor = 'rgba(148, 103, 150, 0.336)';
         const chatInputField = document.createElement('input');
-        chatInputField.setAttribute('class', 'form-control'); // Add Bootstrap form-control class
+        chatInputField.setAttribute('class', 'form-control p-0'); // Add Bootstrap form-control class
         chatInputField.setAttribute('id', 'chat-message-input');
         chatInputField.setAttribute('type', 'text');
-        chatInputField.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
-        chatInputField.style.borderRadius = '0px';
-        chatInputField.style.border = '0px';
         chatInputField.setAttribute('placeholder', `Send message to ${targetUsername}`);
         const inputGroupAppend = document.createElement('div');
         inputGroupAppend.setAttribute('class', 'input-group-append');
         inputGroupAppend.style.borderRadius = '0px';
-        const iconSpan = document.createElement('span');
-        iconSpan.setAttribute('class', 'input-group-text');
-        iconSpan.innerHTML = '<i class="bi bi-arrow-right-circle""></i>';
-        inputGroupAppend.appendChild(iconSpan);
+        // const iconSpan = document.createElement('span');
+        // iconSpan.setAttribute('class', 'input-group-text');
+        // iconSpan.innerHTML = 'WHAT';
+        
+        // inputGroupAppend.appendChild(iconSpan);
         inputGroup.appendChild(chatInputField);
         inputGroup.appendChild(inputGroupAppend);
         chatInput.appendChild(inputGroup);

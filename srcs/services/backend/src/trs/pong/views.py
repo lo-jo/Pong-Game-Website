@@ -261,3 +261,14 @@ class UserMatchView(RetrieveAPIView):
         matches = self.queryset.filter(Q(user_1=pk, status='completed') | Q(user_2=pk, status='completed'))
         serializer = self.get_serializer(matches, many=True)
         return Response(serializer.data)
+
+class PendingMatchView(RetrieveAPIView):
+    queryset = Match.objects.all()
+    serializer_class = MatchSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        # Filter matches where either user_1 or user_2 is pk and status is 'completed'
+        matches = self.queryset.filter(Q(user_1=pk, status='pending') | Q(user_2=pk, status='pending'))
+        serializer = self.get_serializer(matches, many=True)
+        return Response(serializer.data)

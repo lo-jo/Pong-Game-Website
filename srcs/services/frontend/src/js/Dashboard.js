@@ -173,7 +173,107 @@ export class Dashboard extends BaseClass {
                 </div>`;
     };
 
+    async getUserData() {
+        const jwtAccess = localStorage.getItem('token');
+    
+        return fetch('http://localhost:8000/users/profile/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            return response.json();
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            return null;
+        });
+    }
+
+    async getFriendData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async displayUpcomingMatches(user) {
+        const jwtAccess = localStorage.getItem('token');
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/pending_matches/${user.id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            const log_content = document.getElementById('upcoming');
+            
+    
+            for (const match of data) {
+                try {
+                    const log_div = document.createElement('div');
+                    log_div.setAttribute('class', 'log-content');
+                    const user_1 = await this.getFriendData(match.user_1);
+                    const user_2 = await this.getFriendData(match.user_2);
+                    log_div.innerText = `${user_1.username} vs. ${user_2.username} *play*`;
+                    log_content.appendChild(log_div);
+                } catch (error) {
+                    console.error('Error fetching upcoming matches:', error);
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
     async getHtmlForMain() {
+        const userData = await this.getUserData();
+        this.displayUpcomingMatches(userData);
         return `<div id="dashboard" class="container-fluid">
                     <div class="row">
                     <div class="col-8">
@@ -190,7 +290,8 @@ export class Dashboard extends BaseClass {
                     </div>
                     </div>
                     <div class="col-3" id="game-stats">
-                        <h3>LAST MATCHES</h3>
+                        <h3>Upcoming Matches</h3>
+                        <div class="row" id="upcoming"></div>
                     </div>
                     </div>
                 </div>`;

@@ -267,7 +267,6 @@ export class Profile extends BaseClass {
                     console.error('Error fetching user data:', error);
                 }
             }
-            return data;
         } catch (error) {
             console.error('Error:', error);
         }

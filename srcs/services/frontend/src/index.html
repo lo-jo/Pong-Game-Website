@@ -11,7 +11,21 @@
   <body id="body">
     <div class="container-fluid text-center m-0 p-0">
         <div class="row p-0 m-0">
-            <nav class="navbar fixed-top p-2" id="nav-bar"></nav>
+            <div class="col-11">
+            <nav class="navbar fixed-top p-2" id="nav-bar"></nav></div>
+            <div class="col-1">
+                <!-- <span class="notif-div">toto</span> -->
+                <div class="btn-group dropstart notif-div fixed-top">
+                    <button class="btn btn-black btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i id="notification" class="bi bi-bell"></i>
+                    <span class="position-absolute top-0 start-80 translate-middle badge rounded-pill bg-danger" id="bellCount">
+                        <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu" id="alert">
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="row m-0 p-0 justify-content-center align-items-center bg-dark" id="background">
             <div id="app" class="col-7 bg-black p-3"></div>
