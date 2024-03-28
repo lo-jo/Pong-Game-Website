@@ -59,6 +59,7 @@ function createWallDiv(wall) {
 
 function createTunnel() {
   const tunnelDiv = document.createElement("div");
+  tunnelDiv.id = "tunnel-container";
   tunnelDiv.style.display = "flex";
   tunnelDiv.style.flexDirection = "column";
   tunnelDiv.style.justifyContent = "center";
@@ -106,7 +107,7 @@ function createTunnel() {
 }
 
 function initializeTunnel() {
-  const rootElement = document.getElementById("grilla");
+  const rootElement = document.getElementById("background");
   rootElement.appendChild(createTunnel());
 }
 
