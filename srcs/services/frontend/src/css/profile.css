@@ -20,6 +20,7 @@ img#pic.avatar {
 .friend-body {
     opacity : .6;
     background-color : #7000ff;
+    color: #FFFFFC;
     /* height: 120% !important; */
     overflow-y: auto;
     overflow-x: auto;

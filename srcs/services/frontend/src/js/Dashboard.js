@@ -252,6 +252,11 @@ export class Dashboard extends BaseClass {
             }
             const data = await response.json();
             const log_content = document.getElementById('upcoming');
+            if (data.length == 0){
+                log_content.innerText = "No upcoming matches";
+                return;
+            }
+            
             
     
             for (const match of data) {

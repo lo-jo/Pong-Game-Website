@@ -64,3 +64,8 @@ a, a > i{
 .custom-text-color {
     color: #383434; /* Specify your desired text color */
 }
+
+.chatFooter, .blockUser{
+    /* background-color: #e884f1; */
+    text-align: right;
+}

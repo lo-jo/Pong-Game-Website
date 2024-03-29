@@ -195,6 +195,7 @@ export class Chat extends BaseClass {
         const blockLink = document.createElement('a');
         blockLink.href = "#";
         blockLink.setAttribute('id', `block_${targetId}`);
+        blockLink.setAttribute('class', 'chatFooter');
         // blockLink.innerText = "";
         blockLink.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCK</i>';
         blockLink.addEventListener('click', function(event) {
@@ -310,7 +311,12 @@ export class Chat extends BaseClass {
             return response.json();
         })
         .then(data => {
-            this.generateFriendElements(data);
+            if (data.length == 0){
+                document.getElementById('chatWindow').innerHTML = `No friends yet :( <br>Add some friends to start chatting.`;
+                return ;
+            }
+            else
+                this.generateFriendElements(data);
         })
         .catch(error => {
             console.error('Error fetching friendlist : ', error);
@@ -344,14 +350,6 @@ export class Chat extends BaseClass {
         }
     }
 
-    getHtmlForHeader() {
-        return `<nav id="nav-bar">
-                    PROFILE
-                    <a href="/">HOME</a>
-                    <a href="/settings">SETTINGS</a>
-                </nav>`;
-    }
-
     async getHtmlForMain() {
         await this.getUserData();
         this.displayFriendList();
@@ -371,7 +369,7 @@ export class Chat extends BaseClass {
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>
                 <div class="row" id="chatFooter">
-                    <div class="col justify-content-start" id="blockUser"></div>
+                    <div class="col" id="blockUser"></div>
                     <div class="col" id="invitePong"></div>
             </div>
         </div>

@@ -262,8 +262,12 @@ export class LoadProfile
         console.log(profileData);
         this.displayMatchLog(profileData);
         const matchData = await this.getMatchData(profileData);
-        const wins = this.getWinsPercent(matchData, profileData.id);
-        const losses = this.getLossPercent(matchData, profileData.id);
+        let wins = this.getWinsPercent(matchData, profileData.id);
+        if (!wins)
+            wins = 0;
+        let losses = this.getLossPercent(matchData, profileData.id);
+        if (!losses)
+            losses = 0;
         return `<div class="container text-center">
         <div class="row align-items-start">
             <div class="col" id="leftCol">

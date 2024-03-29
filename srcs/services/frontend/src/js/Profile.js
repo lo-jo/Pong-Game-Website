@@ -57,65 +57,10 @@ export class Profile extends BaseClass {
         .catch(error => console.error('Error fetching status:', error));
     }
 
-    // displayFriendProfile(friendId) {
-    //     const jwtAccess = localStorage.getItem('token');
-
-    //     fetch(`http://localhost:8000/users/${friendId}/profile/`, {
-    //         method: 'GET',
-    //         headers: {
-    //             'Authorization': `Bearer ${jwtAccess}`,
-    //             'Content-Type': 'application/json',
-    //         },
-    //     })
-    //     .then(response => {
-    //         if (!response.ok) {
-    //             if (response.status === 401) {
-    //                 console.error('Unauthorized access. Please log in.');
-    //             } else {
-    //                 console.error('Error:', response.status);
-    //             }
-    //             throw new Error('Unauthorized');
-    //         }
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         document.getElementById('username').innerText = data.username;
-    //         history.pushState('','', `/profile`);
-    //     })
-    //     .catch(error => console.error('Error:', error));
-        
-    // }
-
-    // async getFriendData(id) {
-    //     const jwtAccess = localStorage.getItem('token');
-    //     try {
-    //         const response = await fetch(`http://localhost:8000/users/${id}/`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Authorization': `Bearer ${jwtAccess}`,
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-
-    //         if (!response.ok) {
-    //             if (response.status === 401) {
-    //                 console.error('Unauthorized access. Please log in.');
-    //             } else {
-    //                 console.error('Error:', response.status);
-    //             }
-    //             throw new Error('Unauthorized');
-    //         }
-    //         const data = await response.json();
-    //         return data;
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //         throw error;
-    //     }
-    // }
 
     async generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
-        friendListContainer.innerHTML = '';
+        // friendListContainer.innerHTML = '';
     
         for (const friend of friends) {
             const friendId = friend[Object.keys(friend)[1]];
@@ -193,7 +138,10 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(async data => {
-            this.generateFriendElements(data);
+            if (data.length == 0)
+                document.getElementById('friendList').innerText = "You dont have any friends yet.";
+            else
+                this.generateFriendElements(data);
         })
         .catch(error => {
             console.error('Error fetching friendlist : ', error);
@@ -327,20 +275,17 @@ export class Profile extends BaseClass {
 
     async getHtmlForMain() {
         const currentUser = await this.displayProfile();
-        this.displayStatus(currentUser);
-        this.getFriendList(currentUser);
+        await this.displayStatus(currentUser);
+        
         const matchData = await this.getMatchData(currentUser);
-        this.displayMatchLog(currentUser);
+        await this.displayMatchLog(currentUser);
         let wins = this.getWinsPercent(matchData, currentUser.id);
-        console.log(wins);
         if (!wins)
             wins = 0;
         let losses = this.getLossPercent(matchData, currentUser.id);
         if (!losses)
             losses = 0;
-
-        console.log(" PERCENT OF WINS", wins);
-
+        await this.getFriendList(currentUser);
         return `<div class="container text-center">
                     <div class="row align-items-start">
                         <div class="col-4" id="leftCol">
@@ -353,7 +298,7 @@ export class Profile extends BaseClass {
                             <div class="btn-group dropstart">
                                     
                                     <img src="${currentUser.getProfilePicPath()}" id="pic" class="avatar img-fluid" alt="Profile Image">
-                                    <span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status">
+                                    <span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status">
                                     </span>
                             </div>
                             
