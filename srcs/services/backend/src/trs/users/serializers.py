@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny
 import os
 
 # A user serializer will translate python data to JSON data and vice versa
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

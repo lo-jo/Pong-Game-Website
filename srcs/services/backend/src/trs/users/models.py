@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 
+#custom user model creation
 class UserProfileManager(UserManager):
     def create_user(self, email, username, password=None, profile_pic="users/profile_pic/default.png", otp_enabled=False, otp_verified=False):
         email = self.normalize_email(email)

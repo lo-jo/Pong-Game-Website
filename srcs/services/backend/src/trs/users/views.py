@@ -1,25 +1,19 @@
 from .models import User, Friendship
-from django.shortcuts import get_object_or_404
 from users.serializers import UserSerializer, UpdateUserSerializer, FriendSerializer, FriendUsernameSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.shortcuts import get_object_or_404
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 import pyotp
 import qrcode
-
 from io import BytesIO
-from django.core.files.base import ContentFile
-#TEST CHECK_AUTHENTICATION
-from rest_framework_simplejwt.authentication import JWTAuthentication
-import pyotp
-from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 class AllUsersView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -49,7 +43,6 @@ class RegisterUserView(APIView):
             return Response({'error': 'Username already registered'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             serializer = UserSerializer(data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -138,7 +131,6 @@ class CheckAuthentication(APIView):
     def get(self, request):
         return Response({'authenticated': True})
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -207,22 +199,6 @@ class OtpUserView(APIView):
             buffer.seek(0)
             user.qr_code.save('qr_code.png', ContentFile(buffer.getvalue()))
             return Response({"message": "2FA enabled successfully"}, status=status.HTTP_200_OK)
-    # def post(self, request, *args, **kwargs):
-    #     user = request.user
-    #     user.otp_enabled = True
-    #     secret_key = pyotp.random_base32()
-    #     totp = pyotp.TOTP(secret_key)
-    #     provisioning_uri = totp.provisioning_uri(user.email, issuer_name="PONG")
-    #     qr = qrcode.make(provisioning_uri)
-    #     user.otp_key = secret_key
-
-    #     buffer = BytesIO()
-    #     qr.save(buffer, format='PNG')
-    #     qr_img.save(buffer, format='PNG')
-    #     buffer.seek(0)
-    #     user.qr_code.save('qr_code.png', ContentFile(buffer.getvalue()))
-        
-    #     return Response({"message": "2FA enabled successfully"}, status=status.HTTP_200_OK)
 
 class VerifyOtpView(APIView):
     permission_classes = (IsAuthenticated,)
