@@ -33,12 +33,17 @@ body {
 }
 
 .notif-div{
-    position: relative;
+    /* position: relative; */
+    position : fixed;
     top : 0.4rem;
-    right: 0;
+    /* right: 100!important; */
     z-index: 999999;
-    color: white;
+    color: rgb(177, 13, 13);
     width: 100px;
+}
+
+#dropdown-menu{
+    background-color: aquamarine;
 }
 /* #header{
   margin-top: 2rem;
@@ -125,3 +130,10 @@ body {
   height: 70px;
   animation: spin 1s linear infinite;
 } */
+
+#alert{
+    opacity : .8;
+    padding: 3px;
+    background-color : #7000ff;
+    color:#ffffff;
+}

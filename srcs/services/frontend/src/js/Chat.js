@@ -371,7 +371,7 @@ export class Chat extends BaseClass {
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>
                 <div class="row" id="chatFooter">
-                    <div class="col" id="blockUser"></div>
+                    <div class="col justify-content-start" id="blockUser"></div>
                     <div class="col" id="invitePong"></div>
             </div>
         </div>

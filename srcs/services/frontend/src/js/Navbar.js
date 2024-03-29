@@ -15,15 +15,19 @@ export default class Navbar {
     updateNavbar() {
         // const isAuthenticated = await this.checkAuthentication();
         const navbar = document.getElementById('nav-bar');
+        const alert = document.getElementById('bellButton');
         console.log("ICIIIII", document.getElementById('nav-bar'));
 
         if (this.isAuthenticated) {
+            alert.style.display = 'block';
             navbar.innerHTML = `<a class="navbar-link" href="/profile">Profile</a>
                                 <a class="navbar-link" href="/settings">Settings</a>
                                 <a class="navbar-link" href="/dashboard">Dashboard</a>
                                 <a class="navbar-link" href="/chat">Chat</a>
                                 <a class="navbar-link" href="/logout">Log out</a>`;
         } else {
+            
+            alert.style.display = 'none';
             navbar.innerHTML = `<a class="navbar-link" href="/register">Sign up</a>
                                 <a class="navbar-link" href="/login">Log in</a>`;
         }

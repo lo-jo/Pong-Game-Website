@@ -77,7 +77,6 @@ export let onlineSocket = null;
 
 export const connectUser = () => {
     const token = localStorage.getItem('token');
-    // console.log("connect user func");
 
     if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN) {
         console.log('WebSocket connection already open.');
@@ -95,10 +94,11 @@ export const connectUser = () => {
             const data = JSON.parse(e.data);
             const message = data.message;
             const alertElement = document.getElementById('alert');
-            alertElement.innerHTML += `<li>${message}</li><li><hr class="dropdown-divider"></li>`;
+            const bellButton = document.getElementById('bellButton');
+            alertElement.innerHTML += `<li">${message}</li><li><hr class="dropdown-divider"></li>`;
             const count = document.getElementById('bellCount');
-            document.getElementById('bellCount').innerText = 'NEW!';
-            document.getElementById('bellCount').style.backgroundColor = 'red';
+            count.innerText = 'NEW!';
+            // document.getElementById('bellCount').style.backgroundColor = 'red';
         };
         onlineSocket.onclose = function (e) {
             console.log('Socket closed unexpectedly');
@@ -276,4 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo(event.target);
         }
     });
+});
+
+
+// clearing alert button when clicking on it
+document.getElementById("bellButton").addEventListener("click", function() {
+    var bellCountSpan = document.getElementById("bellCount");
+    bellCountSpan.textContent = "";
 });

@@ -154,7 +154,10 @@ export class Settings extends BaseClass {
         if (this.formerState == true)
             switchValue = "checked";
         
-        return `<h1>Edit profile</h1>
+        return `<div class="container">
+            <div class="row">
+            <h1>Edit profile</h1>
+            </div>
         <div class="form-group">
         <form id="editprofile" enctype="multipart/form-data">
             <label for="username">Username:</label>
@@ -179,6 +182,7 @@ export class Settings extends BaseClass {
             <div id="redWarning" class="alert alert-danger" role="alert" style="display :none;"></div>
             
         </form>
+        </div>
         </div>`
     }
 }

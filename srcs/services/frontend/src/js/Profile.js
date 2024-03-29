@@ -331,13 +331,19 @@ export class Profile extends BaseClass {
         this.getFriendList(currentUser);
         const matchData = await this.getMatchData(currentUser);
         this.displayMatchLog(currentUser);
-        const wins = this.getWinsPercent(matchData, currentUser.id);
-        const losses = this.getLossPercent(matchData, currentUser.id);
+        let wins = this.getWinsPercent(matchData, currentUser.id);
+        console.log(wins);
+        if (!wins)
+            wins = 0;
+        let losses = this.getLossPercent(matchData, currentUser.id);
+        if (!losses)
+            losses = 0;
+
         console.log(" PERCENT OF WINS", wins);
 
         return `<div class="container text-center">
                     <div class="row align-items-start">
-                        <div class="col" id="leftCol">
+                        <div class="col-4" id="leftCol">
                             <h1><div class="row justify-content-center">${currentUser.username}</div></h1>
 
                             <div class="row justify-content-center">
@@ -357,16 +363,7 @@ export class Profile extends BaseClass {
                             <div class="row justify-content-center" id="bio">${currentUser.bio}</div>
                         
                         
-                            <div class="row">
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                    <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                        Friends
-                                    </button>
-                                </div>
-                                <div class="collapse" id="collapseExample">
-                                    <div class="card friend-body" id="friendList"></div>
-                                </div>
-                            </div>
+                            
                         </div>
 
                         <div class="col" id="right-col">
@@ -399,6 +396,19 @@ export class Profile extends BaseClass {
                                 </div>
                             </div>
 
+                        </div>
+
+                        <div class="col-3 p-4">
+                        <div class="row">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                    <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                        Friends
+                                    </button>
+                                </div>
+                                <div class="collapse" id="collapseExample">
+                                    <div class="card friend-body" id="friendList"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>`;

@@ -27,9 +27,9 @@ img#pic.avatar {
 
 .friendvatar {
     display: block!important;
-    max-width:50px !important;
-    max-height:50px !important;
-    margin-right : 6px;
+    max-width:40px !important;
+    max-height:40px !important;
+    margin-right : 7px;
     width: auto;
     height: auto;
 	  border-radius: 50%;
