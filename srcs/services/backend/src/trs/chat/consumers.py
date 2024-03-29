@@ -5,9 +5,8 @@ from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from urllib.parse import parse_qs
 from users.models import User
-from chat.models import Message
+from chat.models import Message, BlackList
 from chat.serializers import CustomSerializer
-from chat.models import BlackList
 from rest_framework import status
 from rest_framework.response import Response
 from django.utils import timezone

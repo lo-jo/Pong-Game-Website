@@ -39,7 +39,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path("SPA/", include("SPA.urls")),
+    # path("SPA/", include("SPA.urls")),
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),
     path("notify/", include("notification.urls")),
