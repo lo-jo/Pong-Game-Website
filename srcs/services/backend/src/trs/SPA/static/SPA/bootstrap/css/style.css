@@ -1,0 +1,39 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: #888;
+    line-height: 30px;
+    text-align: center;
+}
+ 
+strong { font-weight: 600; }
+ 
+a, a:hover, a:focus {
+    color: #83c926;
+    text-decoration: none;
+    transition: all .3s;
+}
+ 
+h1, h2 {
+    margin-top: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px;
+    font-weight: 10;
+    color: #6c1818;
+    line-height: 50px;
+}
+
+/***** Top menu *****/
+ 
+.navbar {
+    background: #ed732c;
+    -o-transition: all .6s;
+    -moz-transition: all .6s;
+    -webkit-transition: all .6s;
+    -ms-transition: all .6s;
+    transition: all .6s;
+    backface-visibility: hidden;
+}
+ 
+ 
