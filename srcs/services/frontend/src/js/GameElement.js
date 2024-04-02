@@ -22,7 +22,7 @@ export const initGameTwoD = (data) => {
 }
 
 const createPaddle = ( className, user ) => {
-    console.log('createPaddle call()');
+    // console.log('createPaddle call()');
     const paddle = document.createElement('div');
     paddle.setAttribute('id', `paddle-${user.id}`);
     /*Setting element class name*/
@@ -41,7 +41,7 @@ const createPaddle = ( className, user ) => {
 };
 
 const createBall = ( id, ball_data ) => {
-    console.log('createBall call()');
+    // console.log('createBall call()');
     /*Setting id for ball */
 	const ball = document.createElement('div');
     ball.setAttribute('id', id);

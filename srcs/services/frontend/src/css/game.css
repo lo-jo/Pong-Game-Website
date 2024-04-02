@@ -44,7 +44,11 @@
   /* background-color: coral; */
   margin: 5px;
   padding: 5px;
-  /* max-width: 200px; */
+}
+
+.timer-prolongation {
+  border: 2px solid #7000ff;
+  border-radius: 0.5rem;
 }
 
 #board-game {
@@ -111,13 +115,13 @@
 }
 
 @keyframes colorChange {
-  0% { color: black; }
+  0% { color: #7000ff; }
   50% { color: red; }
-  100% { color: black; }
+  100% { color: #7000ff; }
 }
 
 .color-changing {
-  animation: colorChange 1s infinite;
+  animation: colorChange 0.5s infinite;
 }
 
 
