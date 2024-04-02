@@ -79,6 +79,12 @@ export class LoadProfile
         });
     }
 
+    async delayedDisplayStatus(user) {
+        setTimeout(() => {
+            this.displayStatus(user);
+        }, 100); // Delayed by 1 second (1000 milliseconds)
+    }
+
     displayStatus = (user) => {
         const jwtAccess = localStorage.getItem('token');
         fetch(`http://localhost:8000/notify/${user.username}/`, {
@@ -96,12 +102,14 @@ export class LoadProfile
             return response.json();
         })
         .then(data => {
+            var statusGroup = document.getElementById('statusgroup');
             if (data.hasOwnProperty('error')) {
-                document.getElementById('status').classList.remove('bg-success');
-                document.getElementById('status').classList.add('bg-danger');
-            } else {
-                // document.getElementById('status').innerText = 'ON';
+                var spanHTML = '<span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-danger border border-light" id="status"></span>';
             }
+            else {
+                var spanHTML = '<span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status"></span>';
+            }
+            statusGroup.insertAdjacentHTML('afterbegin', spanHTML);
             this.getFriendshipStatus(user);
         })
         .catch(error => console.error('Error fetching status:', error));
@@ -159,6 +167,14 @@ export class LoadProfile
             console.error('Error:', error);
             throw error;
         }
+    }
+
+    async displayMatchLogDelayed(user) {
+        console.log("DISPLAYPLAY");
+        setTimeout(async () => {
+            await this.displayMatchLog(user);
+        }, 100); // Delayed by 1 second (1000 milliseconds)
+        console.log("HASBEEN DELAYED DISPLAYPLAY");
     }
 
     async displayMatchLog(user) {
@@ -258,9 +274,9 @@ export class LoadProfile
 
     async getHtmlForMain() {
         const profileData = await this.getUserData();
-        this.displayStatus(profileData);
+        await this.delayedDisplayStatus(profileData);
         console.log(profileData);
-        this.displayMatchLog(profileData);
+        await this.displayMatchLogDelayed(profileData);
         const matchData = await this.getMatchData(profileData);
         let wins = this.getWinsPercent(matchData, profileData.id);
         if (!wins)
@@ -274,12 +290,9 @@ export class LoadProfile
                 <h1><div class="row justify-content-center" id="username" >
                 </div>${profileData.username}</h1>
                 
-                <div class="btn-group dropstart">
-                                    
-                                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
-                                    <span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status">
-                                    </span>
-                            </div>
+                <div class="btn-group dropstart" id="statusgroup">
+                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                </div>
 
                 <div class="row justify-content-center" id="nb">${profileData.id}</div>
                 <div class="row justify-content-center" id="email">${profileData.email}</div>

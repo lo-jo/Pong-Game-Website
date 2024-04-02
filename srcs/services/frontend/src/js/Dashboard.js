@@ -296,7 +296,7 @@ export class Dashboard extends BaseClass {
                     </div>
                     <div class="col-3" id="game-stats">
                         <h3>Upcoming Matches</h3>
-                        <div class="row" id="upcoming"></div>
+                        <div class="row text-start" id="upcoming"></div>
                     </div>
                     </div>
                 </div>`;

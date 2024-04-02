@@ -76,6 +76,7 @@ export const routes = {
 export let onlineSocket = null;
 
 export const connectUser = () => {
+    console.log('CONNECT USERRRRRRRRRR');
     const token = localStorage.getItem('token');
 
     if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN ) {
@@ -85,26 +86,27 @@ export const connectUser = () => {
 
     if (token){
         onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
-        if (onlineSocket.readyState == WebSocket.OPEN){
-            onlineSocket.onopen = function (e) {
+        // if (onlineSocket.readyState == WebSocket.OPEN){
+            onlineSocket.onopen = async function (e) {
                 console.log('WebSocket connection established.');
                 onlineSocket.send(JSON.stringify({ type: 'send_notification', token: token }));
             };
             onlineSocket.onmessage = function (e) {
                 const data = JSON.parse(e.data);
+                console.log("RECEIVING NOTIFICATION", data);
                 const message = data.message;
                 const alertElement = document.getElementById('alert');
                 const bellButton = document.getElementById('bellButton');
                 alertElement.innerHTML += `<li">${message}</li><li><hr class="dropdown-divider"></li>`;
                 const count = document.getElementById('bellCount');
                 count.innerText = 'NEW!';
-                // document.getElementById('bellCount').style.backgroundColor = 'red';
+                document.getElementById('bellCount').style.backgroundColor = 'red';
             };
             onlineSocket.onclose = function (e) {
                 console.log('Socket closed unexpectedly');
                 setTimeout(connectUser(), 1000)
             }; 
-        }
+        // }
 
     }
 }
@@ -270,6 +272,10 @@ let navbar = new Navbar();
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM content loaded (Router.js)");
     router();
+    document.getElementById("bellButton").addEventListener("click", function() {
+    var bellCountSpan = document.getElementById("bellCount");
+    bellCountSpan.textContent = "";
+    });
     document.getElementById('nav-bar').innerHTML = navbar.getHtml();
     document.getElementById('nav-bar').addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.classList.contains('navbar-link')) {
@@ -278,11 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo(event.target);
         }
     });
+    
 });
 
-
-// clearing alert button when clicking on it
-document.getElementById("bellButton").addEventListener("click", function() {
-    var bellCountSpan = document.getElementById("bellCount");
-    bellCountSpan.textContent = "";
-});

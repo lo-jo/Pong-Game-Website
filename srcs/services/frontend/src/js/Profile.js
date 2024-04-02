@@ -278,7 +278,7 @@ export class Profile extends BaseClass {
         await this.displayStatus(currentUser);
         
         const matchData = await this.getMatchData(currentUser);
-        await this.displayMatchLog(currentUser);
+        this.displayMatchLog(currentUser);
         let wins = this.getWinsPercent(matchData, currentUser.id);
         if (!wins)
             wins = 0;

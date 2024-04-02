@@ -137,8 +137,6 @@ export class Settings extends BaseClass {
             const data = await response.json();
             console.log(data);
             document.getElementById('app').innerHTML = "Profile successfully updated";
-            this.removeEventListeners();
-    
             if (this.isChecked === true && this.isChecked !== this.formerState && this.userData.otp_enabled === false) {
                 await this.enableTwoFa();
             }
@@ -174,9 +172,9 @@ export class Settings extends BaseClass {
                 <input class="form-control" type="file" id="newavatar">
               </div>
 
-            <div class="form-check form-switch" id="twoFA">
+            <div class="form-check form-switch text-start" id="twoFA">
                 <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
-                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA   <i class="bi bi-question-circle"></i></p></label>
+                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA <i class="bi bi-question-circle"></i></p></label>
             </div>
             <button type="submit" id="editButton" class="btn btn-dark btn-sm">Submit</button>
             <div id="redWarning" class="alert alert-danger" role="alert" style="display :none;"></div>

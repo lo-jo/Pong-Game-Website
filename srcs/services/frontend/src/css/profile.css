@@ -12,6 +12,7 @@ img#pic.avatar {
     transform: rotate(180deg); /* Additional rotation to make it display bottom to top */
     float: right; /* Center the text horizontally */
     /* white-space: nowrap; Prevent line breaks */
+    cursor:cell;
     color : #FFFFFC;
     /* font-style: italic; Make the text italic */
     /* font-size: 3rem; Adjust the font size as needed */
@@ -51,4 +52,12 @@ a{
 
 .progress-bar-win{
     background-color: #7000ff;
+}
+
+
+
+#email{
+    opacity : .6;
+    color:#FFFFFC;
+
 }

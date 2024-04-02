@@ -96,12 +96,12 @@ export class Chat extends BaseClass {
 
     generateChatBubble(sender, message, time){
         return `
-        <div class="d-flex flex-row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
+        <div class="d-flex flex-row text-start ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
 
         <div>
           <p class="small p-2 m-2 mb-0 rounded-3 custom-text-color" style="background-color: #FFFFFC;">
           ${message}</p>
-          <p class="time ms-3 mb-0 rounded-3 text-muted">${time}</p>
+          <p class="time ms-3 mb-0 rounded-3 text-muted ${(this.profileData.username == sender) ? `text-end` : `text-start`}">${time}</p>
         </div>
       </div>
             `;
@@ -114,8 +114,6 @@ export class Chat extends BaseClass {
 
     async startConvo(targetId) {
         if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
-            // this.chatSocket.close();
-            console.log("CLOSEEEEEE here");
             this.chatSocket.close();
             this.chatSocket = null;
         }
@@ -129,8 +127,6 @@ export class Chat extends BaseClass {
         }
         this.chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
-            console.log(e.data);
-            // document.querySelector('#chatLog').innerText += (data.senderUsername + ": " + data.message + '\n');
             document.querySelector('#chatLog').innerHTML += this.generateChatBubble(data.senderUsername, data.message, data.time)
             this.auto_scroll_down();
         }.bind(this);
@@ -165,7 +161,7 @@ export class Chat extends BaseClass {
         // Create a div for chat log
         const chatLog = document.createElement('div');
         chatLog.setAttribute('id', 'chatLog');
-        chatLog.setAttribute('class', 'chatLog'); // Add Bootstrap form-control class
+        chatLog.setAttribute('class', 'chatLog');
         chatWindow.appendChild(chatLog);
     
         const chatInput = document.getElementById('chatInput');
@@ -174,7 +170,7 @@ export class Chat extends BaseClass {
         inputGroup.setAttribute('class', 'input-group p-2');
         inputGroup.style.backgroundColor = 'rgba(148, 103, 150, 0.336)';
         const chatInputField = document.createElement('input');
-        chatInputField.setAttribute('class', 'form-control p-0'); // Add Bootstrap form-control class
+        chatInputField.setAttribute('class', 'form-control p-0');
         chatInputField.setAttribute('id', 'chat-message-input');
         chatInputField.setAttribute('type', 'text');
         chatInputField.setAttribute('placeholder', `Send message to ${targetUsername}`);
@@ -369,8 +365,8 @@ export class Chat extends BaseClass {
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>
                 <div class="row" id="chatFooter">
-                    <div class="col" id="blockUser"></div>
-                    <div class="col" id="invitePong"></div>
+                    <div class="col text-start" id="blockUser"></div>
+                    <div class="col text-end" id="invitePong"></div>
             </div>
         </div>
             `;
