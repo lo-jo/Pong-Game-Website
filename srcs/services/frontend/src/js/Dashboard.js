@@ -1,4 +1,4 @@
-import { router } from './Router'
+import { navigateTo, router } from './Router'
 import { BaseClass } from './BaseClass'
 import { Tournament } from './Tournament';
 
@@ -251,21 +251,34 @@ export class Dashboard extends BaseClass {
                 throw new Error('Unauthorized');
             }
             const data = await response.json();
+            console.log("MATCH DATA", data);
             const log_content = document.getElementById('upcoming');
             if (data.length == 0){
                 log_content.innerText = "No upcoming matches";
                 return;
             }
-            
-            
-    
             for (const match of data) {
                 try {
+                    if (!match.user_1 || !match.user_2){
+                        // CHECK THIS WITH DANIEL
+                        continue;
+                    }
                     const log_div = document.createElement('div');
-                    log_div.setAttribute('class', 'log-content');
+                    log_div.setAttribute('class', 'p-1 log-content');
                     const user_1 = await this.getFriendData(match.user_1);
                     const user_2 = await this.getFriendData(match.user_2);
-                    log_div.innerText = `${user_1.username} vs. ${user_2.username} *play*`;
+                    log_div.innerText = `${user_1.username} vs. ${user_2.username} `;
+                    const playButt = document.createElement('button');
+                    playButt.setAttribute('class', "btn btn-danger btn-sm");
+                    playButt.setAttribute('id', `${match.id}`);
+                    playButt.innerText = 'PLAY';
+                    playButt.addEventListener('click', (event) => {
+                        if (event.target.id == `${match.id}`){
+                            event.preventDefault();
+                            navigateTo(`http://localhost:5173/match/${match.id}`);
+                        }
+                    });
+                    log_div.appendChild(playButt);
                     log_content.appendChild(log_div);
                 } catch (error) {
                     console.error('Error fetching upcoming matches:', error);
@@ -294,9 +307,9 @@ export class Dashboard extends BaseClass {
                         </div>
                     </div>
                     </div>
-                    <div class="col-3" id="game-stats">
+                    <div class="col-4" id="game-stats">
                         <h3>Upcoming Matches</h3>
-                        <div class="row text-start" id="upcoming"></div>
+                        <div class="row text-start"><div class="text-start" id="upcoming"></div></div>
                     </div>
                     </div>
                 </div>`;

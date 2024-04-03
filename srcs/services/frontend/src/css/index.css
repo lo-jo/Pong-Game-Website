@@ -13,6 +13,8 @@ body {
 
 #background {
     height: 100vh;
+    /* display: flex!important; */
+    /* flex-wrap: wrap; */
     /* position: relative; */
 }
 
@@ -29,8 +31,25 @@ body {
     color :#ffffff;
   /* min-height: 50vh; */
   z-index: 1;
-  height: 50vh;
+  /* height: 50vh; */
+  /* display: flex!important; */
+  /* flex-direction: column; */
+  animation: popAnimation 0.9s ease forwards;
+  transform-origin: center;
+
 }
+
+  @keyframes popAnimation {
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 
 .notif-div{
     /* position: relative; */
