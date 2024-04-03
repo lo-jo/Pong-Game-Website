@@ -7,6 +7,10 @@ export class Logout extends BaseClass{
         this.clearToken();
     }
     clearToken() {
+        const alert = document.getElementById('alert');
+        alert.innerHTML = '';
+        const bellCount = document.getElementById('bellCount');
+        bellCount.innerText = '';
         if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN)
             onlineSocket.close();
         const token = localStorage.getItem('jwt_token');

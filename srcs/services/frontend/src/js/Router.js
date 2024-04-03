@@ -86,10 +86,13 @@ export const connectUser = () => {
 
     if (token){
         onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
-        // if (onlineSocket.readyState == WebSocket.OPEN){
-            onlineSocket.onopen = async function (e) {
-                console.log('WebSocket connection established.');
-                onlineSocket.send(JSON.stringify({ type: 'send_notification', token: token }));
+
+            onlineSocket.onopen = function (e) {
+                // console.log('WebSocket connection established.');
+                if (onlineSocket.readyState == WebSocket.OPEN){
+                    onlineSocket.send(JSON.stringify({ type: 'send_notification', token: token }));
+                }
+                
             };
             onlineSocket.onmessage = function (e) {
                 const data = JSON.parse(e.data);
@@ -104,7 +107,7 @@ export const connectUser = () => {
             };
             onlineSocket.onclose = function (e) {
                 console.log('Socket closed unexpectedly');
-                setTimeout(connectUser(), 1000)
+                // setTimeout(connectUser(), 1000)
             }; 
         // }
 
