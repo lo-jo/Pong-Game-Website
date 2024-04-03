@@ -50,7 +50,7 @@ function createWallDiv(wall) {
 
   gridSquares.forEach((_, j) => {
     const cellDiv = document.createElement("div");
-    cellDiv.style.background = "rgba(0, 0, 0, 0.5)";
+    cellDiv.style.background = "rgba(0, 0, 0)";
     wallDiv.appendChild(cellDiv);
   });
 
