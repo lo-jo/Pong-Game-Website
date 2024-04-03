@@ -28,7 +28,7 @@ export class Login extends BaseClass {
             else {
                 console.log(res.message);
                 localStorage.setItem('token', this.token);
-                connectUser();
+                await connectUser();
                 history.pushState({}, '', '/dashboard');
                 router();
             }
@@ -123,7 +123,7 @@ export class Login extends BaseClass {
                         document.getElementById('app').innerHTML = await this.getVerifyTwoFaHtml();
                     } else {
                         localStorage.setItem('token', data.access);
-                        connectUser();
+                        await connectUser();
                         history.pushState({}, '', '/dashboard');
                         router();
                     }

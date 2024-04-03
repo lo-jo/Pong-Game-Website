@@ -75,11 +75,11 @@ export const routes = {
 
 export let onlineSocket = null;
 
-export const connectUser = () => {
+export const connectUser = async () => {
     console.log('CONNECT USERRRRRRRRRR');
     const token = localStorage.getItem('token');
 
-    if (onlineSocket && onlineSocket.readyState === WebSocket.OPEN ) {
+    if (onlineSocket) {
         console.log('WebSocket connection already open.');
         return;
     }
@@ -175,7 +175,7 @@ export const router = async () => {
     const token = localStorage.getItem('token');
     const auth = await checkAuthentication();
     if (auth)
-        connectUser();
+        await connectUser();
 
     if (!viewObject) {
         const errorView = new ErrorClass();
@@ -275,18 +275,21 @@ let navbar = new Navbar();
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM content loaded (Router.js)");
     router();
+    // document.getElementById('nav-bar').innerHTML = navbar.getHtml();
     document.getElementById("bellButton").addEventListener("click", function() {
-    var bellCountSpan = document.getElementById("bellCount");
-    bellCountSpan.textContent = "";
+        var bellCountSpan = document.getElementById("bellCount");
+        bellCountSpan.textContent = "";
     });
-    document.getElementById('nav-bar').innerHTML = navbar.getHtml();
     document.getElementById('nav-bar').addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.classList.contains('navbar-link')) {
             console.log('LISTENER (Router.js) navbar button clicked: ', event.target);
             event.preventDefault();
             navigateTo(event.target);
         }
-    });
-    
+    });    
 });
 
+// document.getElementById("bellButton").addEventListener("click", function() {
+// var bellCountSpan = document.getElementById("bellCount");
+// bellCountSpan.textContent = "";
+// });
