@@ -68,6 +68,34 @@ export class Tournament extends BaseClass {
         return data;
     }
 
+    async fetchTournamentLeaderboard(tournamentId) {
+        const httpProtocol = window.location.protocol;
+        const jwtAccess = localStorage.getItem('token');
+    
+        const options = {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        };
+    
+        try {
+            const response = await fetch(`${httpProtocol}//localhost:8000/pong/tournaments/${tournamentId}/leaderboard/`, options);
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error fetching tournament leaderboard:', errorData.error);
+            } else {
+                const tournamentData = await response.json();
+                console.log('Successfully fetched tournament leaderboard:', tournamentData);
+                return tournamentData;
+            }
+        } catch (error) {
+            console.error('Error fetching tournament leaderboard:', error);
+        }
+    }
+
     async fetchTournamentData(tournamentId) {
         const httpProtocol = window.location.protocol;
         const jwtAccess = localStorage.getItem('token');
@@ -94,6 +122,46 @@ export class Tournament extends BaseClass {
         } catch (error) {
             console.error('Error fetching tournament data:', error);
         }
+    }
+
+    async leaderboardTournament(tournamentId) {
+        const tournamentLeaderboard = await this.fetchTournamentLeaderboard(tournamentId);
+        const leaderboardData = tournamentLeaderboard.leaderboard;
+    
+        let leaderboardHTML = `<div class="container">
+                                    <div class="row justify-content-center">
+                                        <h2 class="text-center">Tournament: ${tournamentLeaderboard.tournament_name}</h2>
+                                        <h3 class="text-center">Winner: ${tournamentLeaderboard.winner}</h3>
+                                        <div class="col-lg-8 col-md-10 col-sm-12">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Rank</th>
+                                                        <th>User</th>
+                                                        <th>Points</th>
+                                                        <th>Points against</th>
+                                                        <th>Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>`;
+    
+        leaderboardData.forEach(entry => {
+            leaderboardHTML += `<tr>
+                                    <td>${entry.rank}</td>
+                                    <td>${entry.username}</td>
+                                    <td>${entry.points}</td>
+                                    <td>${entry.total_points_against}</td>
+                                    <td>${entry.total_duration}</td>
+                                </tr>`;
+        });
+    
+        leaderboardHTML += `</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
+    
+        document.getElementById('app').innerHTML = leaderboardHTML;
     }
 
     async joinTournament(tournamentId) {
@@ -282,7 +350,7 @@ export class Tournament extends BaseClass {
         const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
         const isTournamentFull = tournament.status == "full";
     
-        if (userAlreadyJoined) {
+        if (userAlreadyJoined && tournament.status != "finished") {
             if (isTournamentFull) {
                 joinButton.setAttribute('class', 'btn btn-outline-success');
                 joinButton.textContent = 'Play';
@@ -296,6 +364,10 @@ export class Tournament extends BaseClass {
             joinButton.setAttribute('class', 'btn btn-outline-primary');
             joinButton.disabled = true;
             joinButton.textContent = 'Complete';
+        } else if (tournament.status == "finished") {
+            joinButton.setAttribute('class', 'btn btn-outline-warning');
+            joinButton.textContent = 'Leaderboard';
+            joinButton.addEventListener('click', () => this.leaderboardTournament(tournament.id));
         } else {
             joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
             joinButton.appendChild(spinner);
