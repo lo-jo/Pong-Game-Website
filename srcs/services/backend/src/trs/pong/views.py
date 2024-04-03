@@ -243,6 +243,35 @@ class JoinTournamentView(APIView):
                     tournament=tournament
                 )
 
+class TournamentLeaderboardView(APIView):
+    def get(self, request, tournament_id):
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            if tournament.status != 'finished':
+                return Response({'error': 'Tournament is not finished yet'}, status=status.HTTP_400_BAD_REQUEST)
+            leaderboard_data = {
+                'tournament_name': tournament.name,
+                'winner': tournament.winner.username if tournament.winner else None,
+                'leaderboard': tournament.leaderboard,
+            }
+            return Response(leaderboard_data)
+        except Tournament.DoesNotExist:
+            return Response({'error': 'Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class TournamentWinnerView(APIView):
+    def get(self, request, tournament_id):
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+            if tournament.status != 'finished':
+                return Response({'error': 'Tournament is not finished yet'}, status=status.HTTP_400_BAD_REQUEST)
+            winner_data = {
+                'tournament_name': tournament.name,
+                'winner': tournament.winner.username if tournament.winner else None,
+            }
+            return Response(winner_data)
+        except Tournament.DoesNotExist:
+            return Response({'error': 'Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
+
 class DeleteAllMatches(APIView):
     def post(self, request, format=None):
         Match.objects.all().delete()

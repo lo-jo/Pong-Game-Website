@@ -1,7 +1,7 @@
 import os, json, jwt
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Match
-from .serializers import MatchSerializer
+from .models import Match, Tournament
+from .serializers import MatchSerializer, TournamentSerializer
 from users.models import User
 from users.serializers import UserSerializer
 from .pong_game import get_game_state
@@ -283,38 +283,57 @@ class PongConsumer(AsyncWebsocketConsumer):
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
 
-        init_pong_game_data = {
-            'event' : 'init_pong_game',
-            'ball_game' : self.ball,
-            'user_paddle_1' : self.game_user_1["paddle"],
-            'user_paddle_2' : self.game_user_2["paddle"]
-        }
+        # init_pong_game_data = {
+        #     'event' : 'init_pong_game',
+        #     'ball_game' : self.ball,
+        #     'user_paddle_1' : self.game_user_1["paddle"],
+        #     'user_paddle_2' : self.game_user_2["paddle"]
+        # }
 
-        await self.send_to_group('game_state', json.dumps(init_pong_game_data))
+        # await self.send_to_group('game_state', json.dumps(init_pong_game_data))
         
-        while self.game_finish == False:
-            # if self.ball['top'] <= 0.03 or self.ball['top'] >= 0.95:
-            #     self.ball['speed_y'] *= -1
+        # while self.game_finish == False:
+        #     # if self.ball['top'] <= 0.03 or self.ball['top'] >= 0.95:
+        #     #     self.ball['speed_y'] *= -1
             
-            if self.ball['left'] <= 0.015 or (self.ball['left'] + self.ball['size_x']) >= 0.985:
-                self.ball['speed_x'] *= -1
+        #     if self.ball['left'] <= 0.015 or (self.ball['left'] + self.ball['size_x']) >= 0.985:
+        #         self.ball['speed_x'] *= -1
 
-            # if self.ball['left'] <= 0.1:
-            #     if check_hit(self.ball['top'], self.ball['size_y'], self.usuario_1['top'], self.usuario_1['size_y']):
-            #         self.ball['speed_x'] *= -1
+        #     # if self.ball['left'] <= 0.1:
+        #     #     if check_hit(self.ball['top'], self.ball['size_y'], self.usuario_1['top'], self.usuario_1['size_y']):
+        #     #         self.ball['speed_x'] *= -1
 
-            self.ball['left'] += self.ball['speed_x']
+        #     self.ball['left'] += self.ball['speed_x']
             
-            # Sending ball info
-            await self.send_to_group('game_element', json.dumps(self.ball))
-            # Sleeping one miliseconds for thread 
-            await asyncio.sleep(0.1)
+        #     # Sending ball info
+        #     await self.send_to_group('game_element', json.dumps(self.ball))
+        #     # Sleeping one miliseconds for thread 
+        #     await asyncio.sleep(0.1)
 
         print("MATCH FINISHHHHH")
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
         match.status = 'completed'
+        ##### TESTS - CHELO #####
+        match.winner = match.user_1
+        match.loser = match.user_2
+        match.score_user_1 = 5
+        match.score_user_2 = 2
+        #########################
+
         await sync_to_async(match.save)()
 
+        if match.tournament:
+            print("THIS MATCH IS PART OF A TOURNAMENT")
+            tournament_id = match.tournament_id
+            tournament = await sync_to_async(Tournament.objects.get)(id=tournament_id)
+
+            tournament.matches_played += 1
+
+            if tournament.matches_played == 6:
+                tournament.status = 'finished'
+                tournament.calculate_winner_and_leaderboard()
+
+            await sync_to_async(tournament.save)()
 
 class MatchConsumer(AsyncWebsocketConsumer):
     # groups = ["broadcast"]

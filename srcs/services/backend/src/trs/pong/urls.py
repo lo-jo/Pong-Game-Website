@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PongDashboardView, AllMatchesView, MatchDetailView, JoinMatchView, DeleteAllMatches, CreateTournamentView, OpenTournamentsView, TournamentView, JoinTournamentView, UserMatchView, PendingMatchView
+from .views import PongDashboardView, AllMatchesView, MatchDetailView, JoinMatchView, DeleteAllMatches, CreateTournamentView, OpenTournamentsView, TournamentView, JoinTournamentView, UserMatchView, PendingMatchView, TournamentLeaderboardView, TournamentWinnerView
 
 urlpatterns = [
     path('', PongDashboardView.as_view()),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('tournaments/<int:tournament_id>/', TournamentView.as_view(), name='tournament-detail'),
     path('join_tournament/<int:tournament_id>/', JoinTournamentView.as_view()),
     path('user_matches/<int:pk>/', UserMatchView.as_view(), name='user-matches'),
-    path('pending_matches/<int:pk>/', PendingMatchView.as_view(), name='pending-matches')
-
+    path('pending_matches/<int:pk>/', PendingMatchView.as_view(), name='pending-matches'),
+    path('tournaments/<int:tournament_id>/leaderboard/', TournamentLeaderboardView.as_view(), name='tournament_leaderboard'),
+    path('tournaments/<int:tournament_id>/winner/', TournamentWinnerView.as_view(), name='tournament_winner'),
 ]
