@@ -309,7 +309,7 @@ export class Dashboard extends BaseClass {
         const userData = await this.getUserData();
         this.displayUpcomingMatches(userData);
         return `<div id="dashboard" class="container">
-                    <div class="row align-items-center justify-content-center">
+                    <div class="row justify-content-center">
                         <div class="col-4 col-sm-5">
                             <div id="game-actions" class="row justify-content-center">
                                 <div class="game-action col">
@@ -328,8 +328,10 @@ export class Dashboard extends BaseClass {
                             </div>
                         </div>
                         <div class="col-8 col-sm-7" id="game-stats">
-                            <h3>Upcoming Matches</h3>
-                            <div class="row text-start" id="upcoming"></div>
+                            <div class="row">
+                                <h3>Upcoming Matches</h3>
+                            </div>
+                            <div class="row text-center" id="upcoming"></div>
                         </div>
                     </div>
                 </div>`;
