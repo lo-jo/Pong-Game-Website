@@ -348,7 +348,7 @@ export class Profile extends BaseClass {
         console.log(twins);
         await this.getFriendList(currentUser);
         return `<div class="container text-center">
-                    <div class="row align-items-start">
+                    <div class="row align-items-center">
                         <div class="col-4" id="leftCol">
                             <h1><div class="row justify-content-center">${currentUser.username}</div></h1>
 
