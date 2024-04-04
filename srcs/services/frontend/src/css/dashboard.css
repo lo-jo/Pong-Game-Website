@@ -1,9 +1,6 @@
 /* Dashboard styles */
 
-/* LIST TOURNAMENTS */
-
-
-/* FORMS */
+/* Tournament form, list of tournaments and pagination */
 @keyframes fadeOut {
     0% { opacity: 1; }
     100% { opacity: 0; }
@@ -16,7 +13,7 @@
 
 .tournamentMatches .card, #game-stats .list-group-item, .page-link {
     background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    color: #FFFFFC;
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -26,66 +23,47 @@
 }
 
 .active > .page-link, .disabled > .page-link{
-    background-color: #ffffff;
+    background-color: #FFFFFC;
     color: #FF003D;
 }
 
 .tournamentMatches button:hover, .page-link:hover {
-    background-color: #ffffff;
+    background-color: #FFFFFC;
     color: #FF003D;
 }
 
 .list-group-item button:hover {
-    color: #ffffff;
+    color: #FFFFFC;
 }
 
 .tournamentMatches button:disabled {
     background-color: #7a7070;
-    color: #ffffff;
+    color: #FFFFFC;
 }
 
-/* GAME */
-/* #game-actions {
-    width: 55%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-.game-action{
-    padding: 10%;
-    text-align: center;
-} */
-
+/* Dashboard left side buttons */
 .game-action button{
     width: 80%;
-    padding: 2%;
     background-color: inherit;
-    border : 2px solid white;
-    color: white;
+    border : 2px solid rgba(255, 255, 255, 0.5);
+    color: #FFFFFC;
 }
 
 .game-action button:hover{
-    background-color: #ffffff;
+    background-color: #FFFFFC;
     border-color :#615f5f;
     color: #000000;
 }
 
-/* #game-stats{
-    width: 45%;
-} */
-/* 
-#dashboard {
-    width: 100%;
-    height: 100%;
-    display: flex;
-} */
-/* 
-#form-tournament{
-    width: 100%;
-    height: 100%;
-} */
+#game-stats .card{
+    background-color: rgba(42, 40, 66, 0.8)!important;
+    border: 2px solid rgba(156, 153, 153, 0.5)!important;
+}
 
+#game-stats .card-title {
+    color: #FFFFFC;
+    font-weight: bold;
+}
 
 #loader {
     border: 12px solid #f3f3f3;

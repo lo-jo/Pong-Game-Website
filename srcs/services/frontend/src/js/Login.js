@@ -127,45 +127,59 @@ export class Login extends BaseClass {
                         history.pushState({}, '', '/dashboard');
                         router();
                     }
-                    // call a fetch get on users/profile/
-                    // if current_user.otp_enabled is true
-                    // >>>>> and if otp_verified is false 
-                    // >>>>>>> GENERATE NEW PAGE FOR QR CODE ( pour GET le qr code fron previous get call et display it) 
-                    // >>>>>>> +front side: FORM TO SUBMIT
-                    // >>>>>>>>>>> fetch POST URL/users/otp/
-                    // >>>>>>>>>>>>>>>> verifier la reponse (estce que la key correspond)
-                    // >>>>>>>>>>>>>>>> si reponse ok=
-                    // >>>>>>>>>>>>>>>> localStorage.setItem('token', data.access);
-                    // >>>>>>>>>>>>>>>> connectUser()
-                    // >>>>>>>>>>>>>>>> history.pushState({}, '', '/dashboard');
-                    // >>>>>>>>>>>>>>>> router();
-                    // >>>>>>>>>>>>>>>> si reponse pas OK > fuck off 
-                    // else
                 } else {
                     console.log("Invalid Credentials");
+                    this.displayMessage("Invalid Credentials", false);
                     // Handle invalid credentials
                 }
             } else {
                 console.error('Error:', response.statusText);
+                this.displayMessage("Invalid Credentials", false);
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    async getHtmlForMain() {
-        return `<h1>Login</h1>
-                <form id="loginForm">
-                    <label for="username">Username:</label>
-                    <input class="form-control form-control-sm" type="text" id="username" name="username" required autocomplete="username"><br>
-                    <label for="password">Password:</label>
-                    <input class="form-control form-control-sm" type="password" id="password" name="password" required autocomplete="current-password"><br>
-                    <button type="submit" id="loginButton" class="btn btn-dark btn-sm">Sign-in</button>
-                </form>`
+    hideMessage(id) {
+        const alertElement = document.getElementById("redWarning");
+        alertElement.textContent = '';
+        alertElement.style.display = 'none';
     }
 
-    // cleanup() {
-    //     super.cleanup();
-    //     // document.getElementById('app').removeEventListener('click', this.handleDocumentClickBound);
-    // }
+    displayMessage(message, flag) {
+        const id = (flag) ? ".alert-success" : ".alert-danger";
+        const alertElement = document.getElementById("redWarning");
+        alertElement.textContent = message;
+        alertElement.style.display = 'block';
+        setTimeout(() => {
+            this.hideMessage(id);
+        }, 1500);
+    }
+
+    async getHtmlForMain() {
+        return `<h1 class="mb-3">Login</h1>
+                <div class="form-group">
+                    <form id="loginForm" class="text-start">
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="username">Username:</label>
+                                <input class="form-control form-control-sm" type="text" id="username" name="username" required autocomplete="username">
+                            </div>        
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="password">Password:</label>
+                                <input class="form-control form-control-sm" type="password" id="password" name="password" required autocomplete="current-password">
+                            </div>        
+                        </div>
+                        <div class="row m-3 text-center justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <button type="submit" id="loginButton" class="p-1 btn btn-dark">Sign-in</button>
+                                <div id="redWarning" class="my-2 alert alert-danger" role="alert" style="display :none;"></div>
+                            </div>        
+                        </div>            
+                    </form>
+                </div>`;
+    }
 }

@@ -6,29 +6,28 @@
 
 body {
   width: 100%;
-  height: 100%;
-  /* background-color: rgb(0, 248, 54) !important; */
+  height: 100vh;
+  background-color: rgba(0, 0, 0)!important;
   /* overflow: hidden; */
 }
 
 #background {
-    height: 100vh;
-    /* display: flex!important; */
-    /* flex-wrap: wrap; */
-    /* position: relative; */
+  height: 100vh!important;
+  width: 100%!important;
+  /* position: relative; */
 }
 
 #tunnel-container {
   position: absolute;
   z-index: 0;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh!important;
 }
 
 #app {
-    color :#ffffff;
+  color :#FFFFFC;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.5);
   /* min-height: 50vh; */
   z-index: 1;
   /* height: 50vh; */
@@ -52,21 +51,18 @@ body {
   }
 
 .notif-div{
-    /* position: relative; */
-    position : fixed;
-    top : 0.4rem;
-    /* right: 100!important; */
-    z-index: 999999;
-    color: rgb(177, 13, 13);
-    width: 100px;
+  /* position: relative; */
+  position : fixed;
+  top : 0.4rem;
+  /* right: 100!important; */
+  z-index: 999999;
+  color: rgb(177, 13, 13);
+  width: 100px;
 }
 
 #dropdown-menu{
-    background-color: aquamarine;
+  background-color: aquamarine;
 }
-/* #header{
-  margin-top: 2rem;
-} */
 
 /******* #nav-bar{
   width: 80%;
@@ -103,58 +99,11 @@ body {
   text-transform: uppercase;
 }
 
-/* #app {
-  /********* display: flex;
-  justify-content: center;
-  align-items: center;
-  transform-style: preserve-3d;
-  position: absolute; */
-  /* height: 50%; */
-  /* width: 51vw;
-  height: 52.2vh; */
-  /****************/
-  /* position: absolute;
-  width: 72%;
-  min-height: fit-content;
-  z-index: 1;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 10px;
-  top: calc(50%);
-  left: calc(50%);
-  transform: translate(-50%, -48%);
-} */ 
-
-/* #app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  width: 72%;
-  min-height: fit-content;
-  z-index: 1; 
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 10px;
-  top: calc(50%);
-  left: calc(50%);
-  transform: translate(-50%, -48%);
-} */
-
-/* #loader {
-  border: 12px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 8px solid #444444;
-  width: 70px;
-  height: 70px;
-  animation: spin 1s linear infinite;
-} */
-
 #alert{
-    opacity : .8;
-    padding: 3px;
-    background-color : #7000ff;
-    color:#ffffff;
+  opacity : .8;
+  padding: 3px;
+  background-color : #7000ff;
+  color:#ffffff;
 }
 
 ::-webkit-scrollbar {

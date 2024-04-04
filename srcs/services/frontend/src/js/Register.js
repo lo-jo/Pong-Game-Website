@@ -74,24 +74,36 @@ export class Register extends BaseClass
             console.error('ERROR : ', error);
         }
     }
-    
 
     async getHtmlForMain() {
-        return `<h1>Sign-up </h1><div class="form-group">
-        <form id="loginForm">
-            <label for="username">Username:</label>
-            <input class="form-control form-control-sm" type="text" id="username" name="username" required placeholder="Enter username" autocomplete="username">
-            <br>
-            <label for="email">E-mail:</label>
-            <input class="form-control form-control-sm" type="email" id="email" name="email" required placeholder="Enter e-mail">
-            <br>
-            <label for="password">Password:</label>
-            <input class="form-control form-control-sm" type="password" id="password" name="password" required placeholder="Password" autocomplete="current-password">
-            <br>
-            <button type="submit" id="register" class="btn btn-dark btn-sm">Sign-up</button>
-            <div id="redWarning" class="alert alert-danger" role="alert" style="display :none;"></div>
-        </form>
-        </div>`
+        return `<h1 class="mb-3">Sign-up</h1>
+                <div class="form-group">
+                    <form id="loginForm" class="text-start">
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="username">Username:</label>
+                                <input class="form-control form-control-sm" type="text" id="username" name="username" required placeholder="Enter username" autocomplete="username">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="email">E-mail:</label>
+                                <input class="form-control form-control-sm" type="email" id="email" name="email" required placeholder="Enter e-mail">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="password">Password:</label>
+                                <input class="form-control form-control-sm" type="password" id="password" name="password" required placeholder="Password" autocomplete="current-password">
+                            </div>
+                        </div>
+                        <div class="row m-2 text-center justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <button type="submit" id="register" class="p-1 btn btn-dark">Sign-up</button>
+                                <div id="redWarning" class="my-2 alert alert-danger" role="alert" style="display :none;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>`;
     }
-
 }

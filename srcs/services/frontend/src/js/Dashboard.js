@@ -30,18 +30,24 @@ export class Dashboard extends BaseClass {
         } else if (event.target.id === 'launch-tournament') {
             history.pushState({}, '', '/dashboard');
             document.getElementById('app').innerHTML = await this.getHtmlFormTournament();
+        } else if (event.target.id === 'goBack' || event.target.id === 'goBackBtn') {
+            event.preventDefault();
+            document.getElementById('app').innerHTML = await this.getHtmlForMain();
         } else if (event.target.id === 'createTournament') {
             event.preventDefault();
             let tournamentNameInput = document.getElementById("tournamentName");
             let createTournamentButton = document.getElementById("createTournament");
+            let goBackBtn = document.getElementById("goBackBtn");
             tournamentNameInput.disabled = true;
             createTournamentButton.disabled = true;
+            goBackBtn.disabled = true;
             let tournamentName = tournamentNameInput.value.trim();
             if (!tournamentName) {
                 this.displayMessage("Tournament name cannot be empty.", false);
                 setTimeout(async () => {
                     tournamentNameInput.disabled = false;
                     createTournamentButton.disabled = false;
+                    goBackBtn.disabled = false;
                 }, 1500);
                 return;
             }
@@ -154,22 +160,32 @@ export class Dashboard extends BaseClass {
     }
 
     async getHtmlFormTournament() {
-        return `<div id="form-tournament container">
-                    <div class="row justify-content-center">
-                        <h1 class="text-center">Create tournament</h1>
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="form-group">
-                                <form id="tournamentForm">
-                                    <label for="tournamentName">Tournament name:</label>
-                                    <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Pong masters">
-                                    <br>
-                                    <div id="redWarning" class="alert alert-danger" role="alert"></div>
-                                    <div id="greenNotif" class="alert alert-success" role="alert"></div>
-                                    <button type="submit" id="createTournament" class="btn btn-dark btn-sm">Create</button>
-                                </form>
-                            </div>
+        return `<div class="row justify-content-center">
+                    <div class="col-xl-4 col-lg-6 col-md-8">
+                        <div class="d-flex align-items-center my-3">
+                            <button type="button" id="goBackBtn" class="p-1 btn btn-dark me-3">
+                                <i id="goBack" class="bi bi-arrow-left-circle m-2"></i>
+                            </button>
+                            <h3 class="mb-0">Create tournament</h3>
                         </div>
                     </div>
+                </div>
+                <div class="form-group">
+                    <form id="tournamentForm" class="text-start">
+                        <div class="row my-3 justify-content-center align-items-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="tournamentName">Tournament name:</label>
+                                <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Pong masters">
+                            </div>
+                        </div>
+                        <div class="row m-2 text-center justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <div id="redWarning" class="alert alert-danger" role="alert"></div>
+                                <div id="greenNotif" class="alert alert-success" role="alert"></div>
+                                <button type="submit" id="createTournament" class="my-3 p-1 btn btn-dark btn-sm">Create</button>
+                            </div>        
+                        </div>            
+                    </form>
                 </div>`;
     };
 
@@ -292,25 +308,29 @@ export class Dashboard extends BaseClass {
     async getHtmlForMain() {
         const userData = await this.getUserData();
         this.displayUpcomingMatches(userData);
-        return `<div id="dashboard" class="container-fluid">
-                    <div class="row">
-                    <div class="col-8">
-                    <div id="game-actions">
-                        <div class="game-action">
-                            <button id="launch-game-button" type="button">PLAY A MATCH</button>
+        return `<div id="dashboard" class="container">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-4 col-sm-5">
+                            <div id="game-actions" class="row justify-content-center">
+                                <div class="game-action col">
+                                    <button id="launch-game-button" class="btn my-3 py-2" type="button">PLAY A MATCH</button>
+                                </div>
+                            </div>
+                            <div id="game-actions" class="row">
+                                <div class="game-action col">
+                                    <button id="join-tournament" class="btn my-3 py-2" type="button">JOIN TOURNAMENT</button>
+                                </div>
+                            </div>
+                            <div id="game-actions" class="row">
+                                <div class="game-action col">
+                                    <button id="launch-tournament" class="btn my-3 py-2" type="button">CREATE TOURNAMENT</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="game-action">
-                            <button id="join-tournament" type="button">JOIN TOURNAMENT</button>
+                        <div class="col-8 col-sm-7" id="game-stats">
+                            <h3>Upcoming Matches</h3>
+                            <div class="row text-start" id="upcoming"></div>
                         </div>
-                        <div class="game-action">
-                            <button id="launch-tournament" type="button">CREATE TOURNAMENT</button>
-                        </div>
-                    </div>
-                    </div>
-                    <div class="col-4" id="game-stats">
-                        <h3>Upcoming Matches</h3>
-                        <div class="row text-start"><div class="text-start" id="upcoming"></div></div>
-                    </div>
                     </div>
                 </div>`;
     };
