@@ -305,23 +305,27 @@ export class Tournament extends BaseClass {
 
     async createTournamentCard(tournament, currentUserId) {
         const card = document.createElement('div');
-        card.setAttribute('class', 'card mb-3');
+        card.setAttribute('class', 'card mb-2 p-1');
     
         const cardBody = document.createElement('div');
         cardBody.setAttribute('class', 'card-body');
     
-        const cardTitle = document.createElement('h5');
+        const cardTitle = document.createElement('h6');
         cardTitle.setAttribute('class', 'card-title');
         cardTitle.textContent = tournament.name;
     
         const cardText = document.createElement('p');
+        cardText.setAttribute('class', 'card-text my-3');
         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
 
         players.forEach((player, index) => {
             let playerLink;
-            if (currentUserId.user_id == player.id)
-                playerLink = document.createElement('p');
-            else {
+            if (currentUserId.user_id == player.id) {
+                cardText.textContent += player.username;
+                if (index < players.length - 1) {
+                    cardText.textContent += ", ";
+                }
+            } else {
                 playerLink = document.createElement('a');
                 playerLink.setAttribute('href', `/test/${player.id}`);
                 playerLink.addEventListener('click', (event) => {
@@ -329,17 +333,17 @@ export class Tournament extends BaseClass {
                     console.log(`clicking to id: ${player.id}`);
                     navigateTo(event.target.href);
                 });
-            }
-            playerLink.textContent = player.username;
-            cardText.appendChild(playerLink);
-            if (index < players.length - 1) {
-                playerLink.textContent += ", ";
+                playerLink.textContent = player.username;
+                cardText.appendChild(playerLink);
+                if (index < players.length - 1) {
+                    playerLink.textContent += ", ";
+                }
             }
         });
     
         const joinButton = document.createElement('button');
         joinButton.id = `join-button-${tournament.id}`;
-        joinButton.setAttribute('class', 'btn btn-outline-info');
+        joinButton.setAttribute('class', 'px-3 py-1 btn btn-outline-info');
         joinButton.textContent = 'Join';
     
         const spinner = document.createElement('span');
@@ -352,11 +356,11 @@ export class Tournament extends BaseClass {
     
         if (userAlreadyJoined && tournament.status != "finished") {
             if (isTournamentFull) {
-                joinButton.setAttribute('class', 'btn btn-outline-success');
+                joinButton.setAttribute('class', 'px-3 py-1 btn btn-outline-success');
                 joinButton.textContent = 'Play';
                 joinButton.addEventListener('click', () => this.playTournament(tournament.id));
             } else {
-                joinButton.setAttribute('class', 'btn btn-outline-secondary');
+                joinButton.setAttribute('class', 'px-3 py-1 btn btn-outline-secondary');
                 joinButton.disabled = true;
                 joinButton.textContent = 'Joined';
             }
@@ -386,10 +390,23 @@ export class Tournament extends BaseClass {
         const openTournaments = await this.fetchOpenTournaments();
         const gameStatsDiv = document.getElementById('game-stats');
 
-        gameStatsDiv.innerHTML = '<h2 class="text-center">Tournaments:</h2>';
+        gameStatsDiv.innerHTML = `<div class="row mb-2 align-items-center justify-content-center">
+                                        <div class="col-2">
+                                            <button type="button" id="goBackBtn" class="px-2 py-1 btn btn-dark">
+                                                <i id="goBack" class="bi bi-arrow-left-circle"></i>
+                                            </button>
+                                        </div>
+                                        <div class="col-10 text-start">
+                                            <h3>Tournaments:</h3>
+                                        </div>
+                                    </div>`;
     
         if (openTournaments.length === 0) {
-            gameStatsDiv.innerHTML = '<div class="container"><h2 class="col text-center">No open tournaments available 🧐</h2></div>';
+            gameStatsDiv.innerHTML += `<div class="row">
+                                            <div class="col-10">
+                                                <h4 class="mt-5">No tournaments available 🧐</h4>
+                                            </div>
+                                        </div>`;
             return;
         }
     
@@ -398,11 +415,11 @@ export class Tournament extends BaseClass {
         const paginatedTournaments = openTournaments.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
     
         const tournamentContainer = document.createElement('div');
-        tournamentContainer.setAttribute('class', 'row');
+        tournamentContainer.setAttribute('class', 'row justify-content-center');
     
         await Promise.all(paginatedTournaments.map(async tournament => {
             const col = document.createElement('div');
-            col.setAttribute('class', 'row');
+            col.setAttribute('class', 'col-8');
     
             const card = await this.createTournamentCard(tournament, currentUserId);
             col.appendChild(card);
@@ -429,89 +446,6 @@ export class Tournament extends BaseClass {
 
         gameStatsDiv.appendChild(pagination);
     }
-
-    // async displayOpenTournaments(pageNumber = 1, pageSize = 3) {
-    //     const openTournaments = await this.fetchOpenTournaments();
-    //     const gameStatsDiv = document.getElementById('game-stats');
-
-    //     gameStatsDiv.innerHTML = '<h2 class="text-center">Tournaments:</h2>';
-
-    //     if (openTournaments.length === 0) {
-    //         gameStatsDiv.innerHTML = '<div class="container"><h2 class="col text-center">No open tournaments available 🧐</h2></div>';
-    //         return;
-    //     }
-
-    //     const paginatedTournaments = openTournaments.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-
-    //     const tournamentList = document.createElement('ul');
-    //     tournamentList.setAttribute('class', 'list-group');
-
-    //     const currentUserId = jwt_decode(localStorage.getItem('token'));
-
-    //     await Promise.all(paginatedTournaments.map(async tournament => {
-    //         const listItem = document.createElement('li');
-    //         listItem.setAttribute('class', 'list-group-item mt-3');
-
-    //         const joinButton = document.createElement('button');
-    //         joinButton.setAttribute('class', 'btn btn-outline-info');
-    //         joinButton.textContent = 'Join';
-
-    //         joinButton.id = `join-button-${tournament.id}`;
-    //         const spinner = document.createElement('span');
-    //         spinner.id = `spinner-${tournament.id}`;
-    //         spinner.className = 'spinner-border spinner-border-sm text-light';
-    //         spinner.style.display = 'none';
-
-    //         const userAlreadyJoined = tournament.participants.some(participant => participant.user_id === currentUserId.user_id);
-    //         const isTournamentFull = tournament.status == "full";
-
-    //         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
-    //         const usernames = players.map(player => player.username);
-    //         listItem.textContent = `${tournament.name} Players: ${usernames.join(', ')}`;
-
-    //         if (userAlreadyJoined) {
-    //             if (isTournamentFull) {
-    //                 joinButton.setAttribute('class', 'btn btn-outline-success');
-    //                 joinButton.textContent = 'Play';
-    //                 joinButton.addEventListener('click', () => this.playTournament(tournament.id));
-    //             } else {
-    //                 joinButton.setAttribute('class', 'btn btn-outline-secondary');
-    //                 joinButton.disabled = true;
-    //                 joinButton.textContent = 'Joined';
-    //             }
-    //         } else if (isTournamentFull) {
-    //             joinButton.setAttribute('class', 'btn btn-outline-primary');
-    //             joinButton.disabled = true;
-    //             joinButton.textContent = 'Complete';
-    //         } else {
-    //             joinButton.addEventListener('click', () => this.joinTournament(tournament.id));
-    //             joinButton.appendChild(spinner);
-    //         }
-
-    //         listItem.appendChild(joinButton);
-    //         tournamentList.appendChild(listItem);
-    //     }));
-
-    //     gameStatsDiv.appendChild(tournamentList);
-
-    //     const totalPages = Math.ceil(openTournaments.length / pageSize);
-    //     const pagination = document.createElement('ul');
-    //     pagination.setAttribute('class', 'pagination justify-content-center mt-3');
-
-    //     this.createPaginationItem('<<', (pageNumber > 1), () => this.displayOpenTournaments(pageNumber - 1, pageSize), pagination, false);
-
-    //     const maxVisiblePages = 3;
-    //     const startPage = Math.max(1, pageNumber - Math.floor(maxVisiblePages / 2));
-    //     const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    //     for (let i = startPage; i <= endPage; i++) {
-    //         this.createPaginationItem(i, i === pageNumber, () => this.displayOpenTournaments(i, pageSize), pagination, true);
-    //     }
-
-    //     this.createPaginationItem('>>', (pageNumber < totalPages), () => this.displayOpenTournaments(pageNumber + 1, pageSize), pagination, false);
-
-    //     gameStatsDiv.appendChild(pagination);
-    // }
 
     createPaginationItem(content, enabled, onClick, parentElement, pageItem) {
         const item = document.createElement('li');
