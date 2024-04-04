@@ -298,3 +298,14 @@ class PendingMatchView(RetrieveAPIView):
         matches = self.queryset.filter(Q(user_1=pk, status='pending') | Q(user_2=pk, status='pending'))
         serializer = self.get_serializer(matches, many=True)
         return Response(serializer.data)
+
+
+class UserTournamentView(RetrieveAPIView):
+    queryset = Tournament.objects.all()
+    serializer_class = TournamentSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        winner = self.queryset.filter(Q(winner=pk, status='finished'))
+        serializer = self.get_serializer(winner, many=True)
+        return Response(serializer.data)
