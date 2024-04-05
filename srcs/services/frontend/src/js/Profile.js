@@ -328,12 +328,25 @@ export class Profile extends BaseClass {
         return currentWeekWinsCount;
       }
 
+    async displayMatchLogDelayed(user) {
+        console.log("DISPLAYPLAY");
+        setTimeout(async () => {
+            await this.displayMatchLog(user);
+        }, 100); // Delayed by 1 second (1000 milliseconds)
+    }
+
+    async delayedDisplayStatus(user) {
+        setTimeout(() => {
+            this.displayStatus(user);
+        }, 100); // Delayed by 1 second (1000 milliseconds)
+    }
+
     async getHtmlForMain() {
         const currentUser = await this.displayProfile();
-        await this.displayStatus(currentUser);
+        await this.delayedDisplayStatus(currentUser);
         
         const matchData = await this.getMatchData(currentUser);
-        this.displayMatchLog(currentUser);
+        await this.displayMatchLogDelayed(currentUser);
         let wins = this.getWinsPercent(matchData, currentUser.id);
         if (!wins)
             wins = 0;
@@ -350,12 +363,7 @@ export class Profile extends BaseClass {
         return `<div class="container text-center">
                     <div class="row align-items-center">
                         <div class="col-4" id="leftCol">
-                            <h1><div class="row justify-content-center">${currentUser.username}</div></h1>
-
-                            <div class="row justify-content-center">
-                            
-                
-                            </div>
+                            <div class="row justify-content-center" id="username"><h1>${currentUser.username}</h1></div>
                             <div class="btn-group dropstart">
                                     
                                     <img src="${currentUser.getProfilePicPath()}" id="pic" class="avatar img-fluid" alt="Profile Image">

@@ -119,3 +119,13 @@ a{
     align-items: center;
     alignment-baseline: central;
 }
+
+#username{
+    max-width: 100%; /* Ensure text doesn't overflow container */
+    font-size: 1.5rem; /* Set a default font size */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden;    /* Hide overflowed text */
+    text-overflow: ellipsis; /* Display ellipsis (...) when text overflows */
+
+
+}

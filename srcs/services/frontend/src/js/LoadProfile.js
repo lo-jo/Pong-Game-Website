@@ -102,12 +102,12 @@ export class LoadProfile
             return response.json();
         })
         .then(data => {
-            var statusGroup = document.getElementById('statusgroup');
+            var statusGroup = document.getElementById('status');
             if (data.hasOwnProperty('error')) {
-                var spanHTML = '<span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-danger border border-light" id="status"></span>';
+                var spanHTML = '<span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-danger border border-light" id="status"></span>';
             }
             else {
-                var spanHTML = '<span class="position-absolute top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status"></span>';
+                var spanHTML = '<span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status"></span>';
             }
             statusGroup.insertAdjacentHTML('afterbegin', spanHTML);
             this.getFriendshipStatus(user);
@@ -174,7 +174,6 @@ export class LoadProfile
         setTimeout(async () => {
             await this.displayMatchLog(user);
         }, 100); // Delayed by 1 second (1000 milliseconds)
-        console.log("HASBEEN DELAYED DISPLAYPLAY");
     }
 
     async displayMatchLog(user) {
@@ -246,6 +245,33 @@ export class LoadProfile
         }
     }
 
+    async getTournData(user) {
+        const jwtAccess = localStorage.getItem('token');
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/tournaments/wins/${user.id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
     getWinsPercent(matchData, winnerId) {
         const totalMatches = matchData.length;
         let winsCount = 0;
@@ -272,6 +298,34 @@ export class LoadProfile
         return lossPercentage;
     }
 
+    isInCurrentWeek(dateString) {
+        const date = new Date(dateString);
+        const currentDate = new Date();
+        const startOfWeek = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - currentDate.getDay()
+        );
+        const endOfWeek = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + (6 - currentDate.getDay())
+        );
+        return date >= startOfWeek && date <= endOfWeek;
+      }
+      
+    getCurrentWeekWins(tournData) {
+        let currentWeekWinsCount = 0;
+      
+        for (const tourn of tournData) {
+          if (tourn.created_at && this.isInCurrentWeek(tourn.created_at)) {
+            currentWeekWinsCount++;
+          }
+        }
+      
+        return currentWeekWinsCount;
+    }
+
     async getHtmlForMain() {
         const profileData = await this.getUserData();
         await this.delayedDisplayStatus(profileData);
@@ -284,14 +338,21 @@ export class LoadProfile
         let losses = this.getLossPercent(matchData, profileData.id);
         if (!losses)
             losses = 0;
+        const tournData = await this.getTournData(profileData);
+        let twins = this.getCurrentWeekWins(tournData);
         return `<div class="container text-center">
-        <div class="row align-items-start">
+        <div class="row align-items-center">
             <div class="col" id="leftCol">
                 <h1><div class="row justify-content-center" id="username" >
                 </div>${profileData.username}</h1>
                 
-                <div class="btn-group dropstart" id="statusgroup">
+
+
+                <div class="btn-group dropstart">
+                                    
                     <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                    <span class="" id="status">
+                    </span>
                 </div>
 
                 <div class="row justify-content-center" id="nb">${profileData.id}</div>
@@ -315,8 +376,21 @@ export class LoadProfile
                                     </div>
 
                                     <h6> Tournaments </h6>
-                                    <div class="progress bg-dark" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
+                                    <div class="row justify-content-center p-2">
+
+                                            <svg width="50" height="50" viewBox="0 0 250 250" class="circular-progress">
+                                                <!-- Background Circle -->
+                                                <circle cx="125" cy="125" r="100" class="bg"></circle>
+                                                
+                                                <!-- Foreground Circle -->
+                                                <circle cx="125" cy="125" r="100" class="fg"></circle>
+                                                
+                                                <!-- Text Element -->
+                                                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" id="progress-text" style="font-size: 100px; fill:white;">${twins}</text>
+                                            </svg>
+
+                                            <p id="winwin">won this week</p>
+
                                     </div>
                                 </div>
                                 
