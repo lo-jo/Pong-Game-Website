@@ -277,7 +277,12 @@ class PongConsumer(AsyncWebsocketConsumer):
             return user_json.data
         except User.DoesNotExist:
             return None
-    
+
+    async def request_ping(self):
+        while self.game_finish == False:
+            await self.send_to_connection()
+            await asyncio.sleep(0.1)
+
     # Senders
     async def send_initial_data(self):
         self.db_user_1 = await self.user_in_db(self.match_info["user_1"])

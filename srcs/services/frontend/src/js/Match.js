@@ -12,6 +12,8 @@ export class Match extends BaseClass {
         this.css = './css/game.css';
         /*Socket*/
         this.socket = null;
+        /*URL of match*/
+        this.url = window.location.href;
 
         /*Getting token*/
         this.token = localStorage.getItem('token');
@@ -41,6 +43,8 @@ export class Match extends BaseClass {
                     const { ws_handshake } = data;
                     this.ws_handshake(ws_handshake, data);
                     break;
+                case 'ping':
+                    console.log('The server wants that I do ping')
                 case 'game_state':
                     const { game_state } = data;
                     this.updateGameState(game_state);
@@ -80,7 +84,7 @@ export class Match extends BaseClass {
     }
 
     /*Methods for match handshake*/
-    ws_handshake(ws_handshake_message, data)
+    async ws_handshake(ws_handshake_message, data)
     {
         switch(ws_handshake_message)
         {
@@ -103,7 +107,7 @@ export class Match extends BaseClass {
         }
     }
 
-    
+    /*Methods to update the game state*/
     updateGameState(game_state_data)
     {
         const game_state = JSON.parse(game_state_data);
@@ -131,6 +135,7 @@ export class Match extends BaseClass {
         }
     }
 
+    /*Update the game elements */
     updateGameElement(game_element_data)
     {
         const game_element = JSON.parse(game_element_data);

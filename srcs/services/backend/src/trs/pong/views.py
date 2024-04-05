@@ -85,9 +85,8 @@ class JoinMatchView(APIView):
     def post(self, request):
         try:
             # Getting latest match posted
+            print("////////////////In POST////////////////////")
             latest_match = Match.objects.latest('created_at')
-
-            
             if latest_match.user_1 != request.user:
                 # print("You are going to join the last match created")
                 latest_match.user_2 = request.user
@@ -96,8 +95,6 @@ class JoinMatchView(APIView):
                 self.join_user_to_match_lobby('join_play', latest_match.id)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                print("Maybe this will be a match to more")
-                # return Response({}, status=status.HTTP_200_OK)
                 print("Created new match because you are the other user")
                 new_match = Match.objects.create(status='pending')
                 new_match.user_1 = request.user
@@ -115,11 +112,10 @@ class JoinMatchView(APIView):
                 )
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Match.DoesNotExist:
-            print("Created new match!")
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user
             new_match.save()
-            
+
             serializer = MatchSerializer(new_match)
             # Sends a message via WebSocket when a new match is created.
             channel_layer = get_channel_layer()
