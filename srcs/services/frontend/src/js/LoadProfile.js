@@ -197,7 +197,8 @@ export class LoadProfile
             }
             const data = await response.json();
             const log_content = document.getElementById('log_content');
-    
+            if (data.length == 0)
+                log_content.innerHTML = 'No matches played yet.'
             for (const match of data) {
                 try {
                     const log_div = document.createElement('div');
@@ -328,7 +329,6 @@ export class LoadProfile
     async getHtmlForMain() {
         const profileData = await this.getUserData();
         await this.delayedDisplayStatus(profileData);
-        console.log(profileData);
         await this.displayMatchLogDelayed(profileData);
         const matchData = await this.getMatchData(profileData);
         let wins = this.getWinsPercent(matchData, profileData.id);

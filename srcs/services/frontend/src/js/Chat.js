@@ -16,8 +16,6 @@ export class Chat extends BaseClass {
         {
             const link = document.querySelector(`[id*="profile_${target.id}"]`);
             event.preventDefault();
-            console.log('clicked send message', target.id);
-            // console.log("inner text sibling", target.nextSibling.innerText);
             this.initChatWindow(target.id, link.innerText, event);
         }
     }
@@ -69,7 +67,6 @@ export class Chat extends BaseClass {
             }));
             await this.notifyGame(targetId);
         } catch (error) {
-            // Handle error here
             console.error('Error creating match:', error);
         }
     }
@@ -138,7 +135,6 @@ export class Chat extends BaseClass {
         // document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function (e) {
             if (e.keyCode == 13){
-                console.log('enter');
                 const messageInputDom = document.querySelector('#chat-message-input');
                 const message = messageInputDom.value;
                 this.chatSocket.send(JSON.stringify({
@@ -177,11 +173,6 @@ export class Chat extends BaseClass {
         const inputGroupAppend = document.createElement('div');
         inputGroupAppend.setAttribute('class', 'input-group-append');
         inputGroupAppend.style.borderRadius = '0px';
-        // const iconSpan = document.createElement('span');
-        // iconSpan.setAttribute('class', 'input-group-text');
-        // iconSpan.innerHTML = 'WHAT';
-        
-        // inputGroupAppend.appendChild(iconSpan);
         inputGroup.appendChild(chatInputField);
         inputGroup.appendChild(inputGroupAppend);
         chatInput.appendChild(inputGroup);
@@ -192,7 +183,6 @@ export class Chat extends BaseClass {
         blockLink.href = "#";
         blockLink.setAttribute('id', `block_${targetId}`);
         blockLink.setAttribute('class', 'chatFooter');
-        // blockLink.innerText = "";
         blockLink.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCK</i>';
         blockLink.addEventListener('click', function(event) {
             event.preventDefault(); 
@@ -211,7 +201,6 @@ export class Chat extends BaseClass {
         }.bind(this));
         blockDiv.appendChild(blockLink);
         inviteDiv.appendChild(inviteLink);
-    
         await this.startConvo(targetId);
     }
 
@@ -373,7 +362,6 @@ export class Chat extends BaseClass {
     }
 
     cleanup() {
-        console.log("Chat cleanup");
         this.removeDocumentClickListener();
         if (this.chatSocket != null && this.chatSocket.readyState === WebSocket.OPEN) {
             this.chatSocket.close();

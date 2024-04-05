@@ -267,7 +267,6 @@ export class Dashboard extends BaseClass {
                 throw new Error('Unauthorized');
             }
             const data = await response.json();
-            console.log("MATCH DATA", data);
             const log_content = document.getElementById('upcoming');
             if (data.length == 0){
                 log_content.innerText = "No upcoming matches";

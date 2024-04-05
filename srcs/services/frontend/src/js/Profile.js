@@ -202,7 +202,8 @@ export class Profile extends BaseClass {
             }
             const data = await response.json();
             const log_content = document.getElementById('log_content');
-    
+            if (data.length == 0)
+                log_content.innerHTML = 'No matches played yet.'
             for (const match of data) {
                 try {
                     const log_div = document.createElement('div');
@@ -329,10 +330,9 @@ export class Profile extends BaseClass {
       }
 
     async displayMatchLogDelayed(user) {
-        console.log("DISPLAYPLAY");
         setTimeout(async () => {
             await this.displayMatchLog(user);
-        }, 100); // Delayed by 1 second (1000 milliseconds)
+        }, 80); // Delayed by 1 second (1000 milliseconds)
     }
 
     async delayedDisplayStatus(user) {
@@ -344,7 +344,6 @@ export class Profile extends BaseClass {
     async getHtmlForMain() {
         const currentUser = await this.displayProfile();
         await this.delayedDisplayStatus(currentUser);
-        
         const matchData = await this.getMatchData(currentUser);
         await this.displayMatchLogDelayed(currentUser);
         let wins = this.getWinsPercent(matchData, currentUser.id);
@@ -353,12 +352,8 @@ export class Profile extends BaseClass {
         let losses = this.getLossPercent(matchData, currentUser.id);
         if (!losses)
             losses = 0;
-
-
         const tournData = await this.getTournData(currentUser);
-        console.log(tournData);
         let twins = this.getCurrentWeekWins(tournData);
-        console.log(twins);
         await this.getFriendList(currentUser);
         return `<div class="container text-center">
                     <div class="row align-items-center">
