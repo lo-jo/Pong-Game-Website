@@ -87,8 +87,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Requesting ws handshaking to client
         await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
 
-        # await self.init_ws_handshake(token)
-
         # Adding a the current connection to the group
         await self.channel_layer.group_add(
             self.group_name,
@@ -147,6 +145,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_2'}))
                     elif game_event == 'move_down':
                         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_2'}))
+            
             # Broadcasting an event
             case 'broadcasted_game_event':
                 broadcast_game_event = data.get('broadcasted_game_event')
@@ -368,7 +367,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def game_timer(self):
         timer_type = 'normal'
-        while self.time_remaining >= 0:
+        while self.time_remaining >= 0 and self.game_finish == False:
             await self.send_to_group('timer', json.dumps({'time_remaininig' : f'{self.time_remaining}', 'type' : f'{timer_type}'}))
             await asyncio.sleep(1)
             if (self.time_remaining - 3) == 0:
@@ -465,7 +464,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         # May be completed in case of client deconnection
         if match.status == 'completed':
             return
-        # await self.send_to_group('game_state', json.dumps({'event' : 'match_finished'}))
         # Setting score
         match.score_user_1 = self.game_user_1["paddle"]["score"]
         match.score_user_2 = self.game_user_2["paddle"]["score"]
