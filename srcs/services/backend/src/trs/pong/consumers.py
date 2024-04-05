@@ -158,7 +158,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                 self.request_ping_message = False
             case 'match_aborted':
                 match = await sync_to_async(Match.objects.get)(id=self.match_id)
-                if match.user_1 == self.who_i_am_id:
+
+                if self.match_info["user_1"] == self.who_i_am_id:
                     match.score_user_1 = 3
                     match.score_user_2 = 0
                     match.winner = match.user_1
@@ -178,7 +179,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
                 # Redirect
                 redirect_info = {
-                    'event' : 'deconnection',
+                    'event' : 'disconnection',
                     'winner' : match.winner.username,
                     'loser' : match.loser.username
                 }

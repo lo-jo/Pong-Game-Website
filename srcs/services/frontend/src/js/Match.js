@@ -45,7 +45,6 @@ export class Match extends BaseClass {
                     break;
                 case 'request_ping':
                     this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
-                    console.log('Sending ping!');
                     break;
                 case 'game_state':
                     const { game_state } = data;
@@ -121,7 +120,7 @@ export class Match extends BaseClass {
                 break;
             case 'someone_left':
                 const { how } = game_state;
-                console.log(`Someone left by this reason ${how}`);
+                // console.log(`Someone left by this reason ${how}`);
                 this.socket.send(JSON.stringify({'type_message' : 'match_aborted'}));
                 break;
             case 'broadcasted_game_event':
@@ -132,11 +131,10 @@ export class Match extends BaseClass {
                 drawGameElements(game_state);
                 break;
             case 'match_completed':
-                console.log('Sending match_finished to server!');
                 this.socket.send(JSON.stringify({'type_message' : 'match_completed'}));  
                 this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
-            case 'deconnection':
+            case 'disconnection':
                 this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;            
             default:
