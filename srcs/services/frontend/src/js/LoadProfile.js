@@ -275,7 +275,7 @@ export class LoadProfile
     async getHtmlForMain() {
         const profileData = await this.getUserData();
         await this.delayedDisplayStatus(profileData);
-        console.log(profileData);
+        // console.log(profileData);
         await this.displayMatchLogDelayed(profileData);
         const matchData = await this.getMatchData(profileData);
         let wins = this.getWinsPercent(matchData, profileData.id);
