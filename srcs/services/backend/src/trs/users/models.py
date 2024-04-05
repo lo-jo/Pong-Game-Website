@@ -18,7 +18,7 @@ class UserProfileManager(UserManager):
 
 # adding extra database fields to user 
 class User(AbstractUser):
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=100, unique=True)
     bio = models.TextField(max_length=100, blank=True)
     email = models.EmailField(unique=True, blank=False, null=False)
     otp_enabled = models.BooleanField(default=False, null=True)

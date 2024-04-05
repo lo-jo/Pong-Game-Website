@@ -10,6 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password', 'email', 'id', 'bio', 'profile_pic', 'otp_enabled', 'otp_verified', 'qr_code')
         extra_kwargs = {'password': {'write_only': True}}
     # method to create a new row in the database
+    def validate_username(self, value):
+        """
+        Validate username to ensure it meets specified criteria.
+        """
+        if len(value) > 100:
+            raise serializers.ValidationError("Username must be less than 100 characters.")
+        if not all(c in '-_.0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in value):
+            raise serializers.ValidationError("Username must contain only ASCII alphanumerics, hyphens, underscores, or periods.")
+        return value
+
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
@@ -26,10 +36,16 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'bio', 'profile_pic', 'otp_enabled')
 
     def validate_username(self, value):
-        print("value:", value)
+        """
+        Validate username to ensure it's unique and meets specified criteria.
+        """
         user = self.context['request'].user
+        if len(value) > 100:
+            raise serializers.ValidationError("Username must be less than 100 characters.")
+        if not all(c in '-_.0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in value):
+            raise serializers.ValidationError("Username must contain only ASCII alphanumerics, hyphens, underscores, or periods.")
         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
-            raise serializers.ValidationError({"This username is already in use."})
+            raise serializers.ValidationError("This username is already in use.")
         return value
 
     def validate_email(self, value):
