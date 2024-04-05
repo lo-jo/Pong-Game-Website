@@ -10,29 +10,25 @@ import asyncio
 import random
 from urllib.parse import parse_qs
 
-class LocalPongConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        print('CONNECTIN')
-
 class PongConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        query_params = parse_qs(self.scope['query_string'].decode())
-        token = query_params.get('token', [None])[0]
-        print(token)
-        # Getting id from url (ws)
-        self.match_id = self.scope['url_route']['kwargs']['id']
-        # Setting group (channels) for sending data to ws
-        self.group_name = f'match_{self.match_id}'
+        # query_params = parse_qs(self.scope['query_string'].decode())
+        # token = query_params.get('token', [None])[0]
+        # print(token)
+        # # Getting id from url (ws)
+        # self.match_id = self.scope['url_route']['kwargs']['id']
+        # # Setting group (channels) for sending data to ws
+        # self.group_name = f'match_{self.match_id}'
         # Database match data
         self.match_info = None
         # Database user data
-        self.db_user_1 = None
-        self.db_user_2 = None
+        # self.db_user_1 = None
+        # self.db_user_2 = None
 
         self.game_user_1 = {}
         self.game_user_2 = {}
 
-        self.who_i_am_id = None
+        # self.who_i_am_id = None
 
         self.ball = {
             'elem' : 'ball',
@@ -85,9 +81,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Saving match info in consumer
         self.match_info = match_info
         # Requesting ws handshaking to client
-        await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
+        # await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
 
-        print("init ws handshake call()")
+        # print("init ws handshake call()")
         # await self.init_ws_handshake(token)
 
         # Adding a the current connection to the group
@@ -337,9 +333,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.game_finish = True
 
     async def game_loop(self):
-        while not self.game_user_1 or not self.game_user_2:
-            print("Waiting for the info...")
-            await asyncio.sleep(1)
+        # while not self.game_user_1 or not self.game_user_2:
+        #     print("Waiting for the info...")
+        #     await asyncio.sleep(1)
 
         print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
@@ -353,8 +349,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         }
 
         await self.send_to_group('game_state', json.dumps(init_pong_game_data))
+        // REPLACE WITH SEND TO CONNECTION
         # Start timer
-        asyncio.create_task(self.game_timer())
+        asyncio.create_task(self.game_timer()) // GARDER LE THREAD
 
         while self.game_finish == False:
             # Bouncing the ball in Y Axis
@@ -408,6 +405,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # Sending elements info
             await self.send_to_group('game_state', json.dumps(game_elements))
+            #  // send to connection!!
             # Sleeping one miliseconds for thread 
             await asyncio.sleep(0.1)
         # Finishing and saving the match

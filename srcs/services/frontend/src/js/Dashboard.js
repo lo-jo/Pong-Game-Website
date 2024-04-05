@@ -1,4 +1,4 @@
-import { router } from './Router'
+import { navigateTo, router } from './Router'
 import { BaseClass } from './BaseClass'
 import { Tournament } from './Tournament';
 
@@ -27,7 +27,18 @@ export class Dashboard extends BaseClass {
             }
             // history.pushState({}, '', '/match_lobby');
             // router();
-        } else if (event.target.id === 'launch-tournament') {
+        
+        }
+        else if (event.target.id == 'launch-local-game'){
+            event.preventDefault();
+            try{
+                console.log('CLICKED');
+                await this.postLocalMatch();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        } 
+        else if (event.target.id === 'launch-tournament') {
             history.pushState({}, '', '/dashboard');
             document.getElementById('app').innerHTML = await this.getHtmlFormTournament();
         } else if (event.target.id === 'createTournament') {
@@ -58,6 +69,129 @@ export class Dashboard extends BaseClass {
             await this.tournament.displayOpenTournaments();
         }
     }
+
+    async getUserData() {
+        const jwtAccess = localStorage.getItem('token');
+    
+        return fetch('http://localhost:8000/users/profile/', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            return response.json();
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            return null;
+        });
+    }
+
+    async getFriendData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async createMatch(targetId){
+        const jwtAccess = localStorage.getItem('token');
+        const requestBody = {
+            user_1: this.getUserData().id,
+            user_2: targetId
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/matches/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const match = JSON.parse(await response.text());
+            history.pushState({}, '', `/localmatch/${match.id}`);
+            router();
+        } catch (error) {
+            // Handle error here
+            console.error('Error creating match:', error);
+        }
+    }
+
+    async postLocalMatch() {
+        console.log("Posting that local match");
+        const username = "friend";
+        const password = "fakepw";
+        const email = "friend@amigo.org";
+        
+        try {
+            const response = await fetch('http://localhost:8000/users/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
+            });
+    
+            if (!response.ok) {
+                let responseData = await response.text(); // Get response text
+                const errorData = JSON.parse(responseData);
+                let formattedErrorMsg = '';
+                for (const [key, value] of Object.entries(errorData)) {
+                    if (Array.isArray(value)) {
+                        formattedErrorMsg += `${key}: ${value.join(', ')}\n`;
+                    } else {
+                        formattedErrorMsg += `${key}: ${value}\n`;
+                    }
+                }
+                
+                this.displayMessage(formattedErrorMsg, false);
+                throw new Error('Invalid credentials');
+            }
+            // console.log(await response.text());
+            const user2 = await response.text();
+            await this.createMatch(user2.id);
+          
+        } catch (error) {
+            console.error('ERROR : ', error);
+        }
+    }
+
 
     async postMatch() {
         const httpProtocol = window.location.protocol;
@@ -179,6 +313,7 @@ export class Dashboard extends BaseClass {
                     <div class="col-8">
                     <div id="game-actions">
                         <div class="game-action">
+                            <button id="launch-local-game" type="button">PLAY LOCAL MATCH</button>
                             <button id="launch-game-button" type="button">PLAY A MATCH</button>
                         </div>
                         <div class="game-action">
