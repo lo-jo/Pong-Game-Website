@@ -82,7 +82,7 @@ export class LoadProfile
     async delayedDisplayStatus(user) {
         setTimeout(() => {
             this.displayStatus(user);
-        }, 100); // Delayed by 1 second (1000 milliseconds)
+        }, 80);
     }
 
     displayStatus = (user) => {
@@ -170,10 +170,9 @@ export class LoadProfile
     }
 
     async displayMatchLogDelayed(user) {
-        console.log("DISPLAYPLAY");
         setTimeout(async () => {
             await this.displayMatchLog(user);
-        }, 100); // Delayed by 1 second (1000 milliseconds)
+        }, 80);
     }
 
     async displayMatchLog(user) {
