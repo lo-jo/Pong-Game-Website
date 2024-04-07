@@ -1,0 +1,120 @@
+Exception inside application: 'paddle'
+backend   | Traceback (most recent call last):
+backend   |   File "/usr/local/lib/python3.10/site-packages/django/contrib/staticfiles/handlers.py", line 101, in __call__
+backend   |     return await self.application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/routing.py", line 62, in __call__
+backend   |     return await application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/security/websocket.py", line 37, in __call__
+backend   |     return await self.application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 47, in __call__
+backend   |     return await self.inner(dict(scope, cookies=cookies), receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 263, in __call__
+backend   |     return await self.inner(wrapper.scope, receive, wrapper.send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/auth.py", line 185, in __call__
+backend   |     return await super().__call__(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/middleware.py", line 24, in __call__
+backend   |     return await self.inner(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/routing.py", line 116, in __call__
+backend   |     return await application(
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 94, in app
+backend   |     return await consumer(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 58, in __call__
+backend   |     await await_many_dispatch(
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/utils.py", line 50, in await_many_dispatch
+backend   |     await dispatch(result)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 73, in dispatch
+backend   |     await handler(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/generic/websocket.py", line 194, in websocket_receive
+backend   |     await self.receive(text_data=message["text"])
+backend   |   File "/code/src/trs/pong/consumers.py", line 152, in receive
+backend   |     await self.receive_broadcast_event(broadcast_game_event)
+backend   |   File "/code/src/trs/pong/consumers.py", line 299, in receive_broadcast_event
+backend   |     self.game_user_2["paddle"]["top"] += 0.1
+backend   | KeyError: 'paddle'
+backend   | Task exception was never retrieved
+backend   | future: <Task finished name='Task-22856' coro=<PongConsumer.request_ping() done, defined at /code/src/trs/pong/consumers.py:322> exception=Disconnected('Attempt to send on a closed protocol')>
+backend   | Traceback (most recent call last):
+backend   |   File "/code/src/trs/pong/consumers.py", line 332, in request_ping
+backend   |     await self.send_to_connection({'type_message' : 'request_ping'})
+backend   |   File "/code/src/trs/pong/consumers.py", line 364, in send_to_connection
+backend   |     await self.send(text_data=json.dumps(event))
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/generic/websocket.py", line 209, in send
+backend   |     await super().send({"type": "websocket.send", "text": text_data})
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 81, in send
+backend   |     await self.base_send(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 226, in send
+backend   |     return await self.real_send(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/server.py", line 241, in handle_reply
+backend   |     protocol.handle_reply(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/ws_protocol.py", line 207, in handle_reply
+backend   |     self.serverSend(message["text"], False)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/ws_protocol.py", line 261, in serverSend
+backend   |     self.sendMessage(content.encode("utf8"), binary)
+backend   |   File "/usr/local/lib/python3.10/site-packages/autobahn/websocket/protocol.py", line 2275, in sendMessage
+backend   |     raise Disconnected("Attempt to send on a closed protocol")
+backend   | autobahn.exception.Disconnected: Attempt to send on a closed protocol
+
+
+
+
+ebSocket CONNECT /ws/pong/match/25/ [172.18.0.1:40514]
+backend   | Application instance <Task pending name='Task-10144' coro=<ASGIStaticFilesHandler.__call__() running at /usr/local/lib/python3.10/site-packages/django/contrib/staticfiles/handlers.py:101> wait_for=<Future pending cb=[Task.task_wakeup()]>> for connection <WebSocketProtocol client=['172.18.0.1', 45246] path=b'/ws/pong/match/21/'> took too long to shut down and was killed.
+backend   | Application instance <Task pending name='Task-22278' coro=<ASGIStaticFilesHandler.__call__() running at /usr/local/lib/python3.10/site-packages/django/contrib/staticfiles/handlers.py:101> wait_for=<Future pending cb=[Task.task_wakeup()]>> for connection <WebSocketProtocol client=['172.18.0.1', 53562] path=b'/ws/pong/match/23/'> took too long to shut down and was killed.
+backend   | Application instance <Task pending name='Task-30377' coro=<ASGIStaticFilesHandler.__call__() running at /usr/local/lib/python3.10/site-packages/django/contrib/staticfiles/handlers.py:101> wait_for=<Future pending cb=[Task.task_wakeup()]>> for connection <WebSocketProtocol client=['172.18.0.1', 52680] path=b'/ws/pong/match/24/'> took too long to shut down and was killed.
+backend   | Exception inside application: 'paddle'
+backend   | Traceback (most recent call last):
+backend   |   File "/usr/local/lib/python3.10/site-packages/django/contrib/staticfiles/handlers.py", line 101, in __call__
+backend   |     return await self.application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/routing.py", line 62, in __call__
+backend   |     return await application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/security/websocket.py", line 37, in __call__
+backend   |     return await self.application(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 47, in __call__
+backend   |     return await self.inner(dict(scope, cookies=cookies), receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 263, in __call__
+backend   |     return await self.inner(wrapper.scope, receive, wrapper.send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/auth.py", line 185, in __call__
+backend   |     return await super().__call__(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/middleware.py", line 24, in __call__
+backend   |     return await self.inner(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/routing.py", line 116, in __call__
+backend   |     return await application(
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 94, in app
+backend   |     return await consumer(scope, receive, send)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 58, in __call__
+backend   |     await await_many_dispatch(
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/utils.py", line 50, in await_many_dispatch
+backend   |     await dispatch(result)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 73, in dispatch
+backend   |     await handler(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/generic/websocket.py", line 194, in websocket_receive
+backend   |     await self.receive(text_data=message["text"])
+backend   |   File "/code/src/trs/pong/consumers.py", line 152, in receive
+backend   |     await self.receive_broadcast_event(broadcast_game_event)
+backend   |   File "/code/src/trs/pong/consumers.py", line 289, in receive_broadcast_event
+backend   |     self.game_user_2["paddle"]["top"] -= 0.1
+backend   | KeyError: 'paddle'
+backend   | Task exception was never retrieved
+backend   | future: <Task finished name='Task-30459' coro=<PongConsumer.request_ping() done, defined at /code/src/trs/pong/consumers.py:322> exception=Disconnected('Attempt to send on a closed protocol')>
+backend   | Traceback (most recent call last):
+backend   |   File "/code/src/trs/pong/consumers.py", line 332, in request_ping
+backend   |     await self.send_to_connection({'type_message' : 'request_ping'})
+backend   |   File "/code/src/trs/pong/consumers.py", line 364, in send_to_connection
+backend   |     await self.send(text_data=json.dumps(event))
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/generic/websocket.py", line 209, in send
+backend   |     await super().send({"type": "websocket.send", "text": text_data})
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/consumer.py", line 81, in send
+backend   |     await self.base_send(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/channels/sessions.py", line 226, in send
+backend   |     return await self.real_send(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/server.py", line 241, in handle_reply
+backend   |     protocol.handle_reply(message)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/ws_protocol.py", line 207, in handle_reply
+backend   |     self.serverSend(message["text"], False)
+backend   |   File "/usr/local/lib/python3.10/site-packages/daphne/ws_protocol.py", line 261, in serverSend
+backend   |     self.sendMessage(content.encode("utf8"), binary)
+backend   |   File "/usr/local/lib/python3.10/site-packages/autobahn/websocket/protocol.py", line 2275, in sendMessage
+backend   |     raise Disconnected("Attempt to send on a closed protocol")
+backend   | autobahn.exception.Disconnected: Attempt to send on a closed protocol
+backend   | WebSocket DISCONNECT /ws/pong/match/25/ [172.18.0.1:40514]
+backend   | WebSocket DISCONNECT /ws/pong/match/25/ [172.18.0.1:40498]
