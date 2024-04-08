@@ -50,38 +50,12 @@ body {
     }
   }
 
-.notif-div{
-  /* position: relative; */
-  position : fixed;
-  top : 0.4rem;
-  /* right: 100!important; */
-  z-index: 999999;
-  color: rgb(177, 13, 13);
-  width: 100px;
-}
-
 #dropdown-menu{
   background-color: aquamarine;
 }
 
-/******* #nav-bar{
-  width: 80%;
-  margin-left: 10%;
-  padding: 0.8rem;
-  display: flex;
-  justify-content: space-around;
-} *******/
-
 #nav-bar{
-  /* width: 100%; */
-  /* padding: 2rem 1rem; */
-  /* display: flex; */
   justify-content: space-around;
-  /* min-height: 5vh; */
-  /* position: absolute; */
-  /* top: 0; */
-  /* left: 0; */
-  /* z-index: 1; */
   background-color: black;
 }
 
