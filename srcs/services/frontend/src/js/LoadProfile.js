@@ -59,8 +59,11 @@ export class LoadProfile
                 friendRequestLink.innerText = `You and ${user.username} are friends :)`;
                 document.getElementById('friendRequest').appendChild(friendRequestLink);
             }
-                
-            else{
+            else if (this.id == decoded_token.user_id) {
+                const friendRequestLink = document.createElement('text');
+                friendRequestLink.innerText = ``;
+                document.getElementById('friendRequest').appendChild(friendRequestLink);
+            } else{
                 const friendRequestLink = document.createElement('button');
                 friendRequestLink.setAttribute('class', 'btn btn-dark');
                 friendRequestLink.setAttribute('id', 'addButton');
