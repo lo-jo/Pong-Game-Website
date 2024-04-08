@@ -125,10 +125,11 @@ class UserProfileView(RetrieveAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         
 class CheckAuthentication(APIView):
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+
         return Response({'authenticated': True})
 
 class CustomTokenObtainPairView(TokenObtainPairView):
