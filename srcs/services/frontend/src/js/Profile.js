@@ -45,14 +45,14 @@ export class Profile extends BaseClass {
             return response.json();
         })
         .then(data => {
-            const statusElement = document.getElementById('status');
+            var statusGroup = document.getElementById('status');
             if (data.hasOwnProperty('error')) {
-                // document.getElementById('status').innerText = 'Offline';
-                statusElement.parentElement.querySelector('.bg-danger').classList.remove('bg-success');
-                statusElement.parentElement.querySelector('.rounded-circle').classList.add('bg-danger')
-            } else {
-                // document.getElementById('status').innerText = 'Online';
+                var spanHTML = '<span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-danger border border-light" id="status"></span>';
             }
+            else {
+                var spanHTML = '<span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status"></span>';
+            }
+            statusGroup.insertAdjacentHTML('afterbegin', spanHTML);
         })
         .catch(error => console.error('Error fetching status:', error));
     }
@@ -362,7 +362,7 @@ export class Profile extends BaseClass {
                             <div class="btn-group dropstart">
                                     
                                     <img src="${currentUser.getProfilePicPath()}" id="pic" class="avatar img-fluid" alt="Profile Image">
-                                    <span class="position-absolute mt-2 top-15 start-0 p-2 translate-middle rounded-circle bg-success border border-light" id="status">
+                                    <span class="" id="status">
                                     </span>
                             </div>
                             
