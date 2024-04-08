@@ -19,17 +19,16 @@ export class LoadProfile
             });
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    console.error('Unauthorized access. Please log in.');
-                } else {
-                    console.error('Error:', response.status);
-                }
-                throw new Error('Unauthorized');
+                throw response.status
             }
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error('Error:', error);
+            if (error === 401)
+                throw `Unauthorized access. Please log in.`;
+            else if (error === 404)
+                throw `Not found`;
+            // console.error('Error:', error);
             throw error;
         }
     }
@@ -273,69 +272,63 @@ export class LoadProfile
     }
 
     async getHtmlForMain() {
-        const profileData = await this.getUserData();
-        await this.delayedDisplayStatus(profileData);
-        // console.log(profileData);
-        await this.displayMatchLogDelayed(profileData);
-        const matchData = await this.getMatchData(profileData);
-        let wins = this.getWinsPercent(matchData, profileData.id);
-        if (!wins)
-            wins = 0;
-        let losses = this.getLossPercent(matchData, profileData.id);
-        if (!losses)
-            losses = 0;
-        return `<div class="container text-center">
-        <div class="row align-items-start">
-            <div class="col" id="leftCol">
-                <h1><div class="row justify-content-center" id="username" >
-                </div>${profileData.username}</h1>
-                
-                <div class="btn-group dropstart" id="statusgroup">
-                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
-                </div>
-
-                <div class="row justify-content-center" id="nb">${profileData.id}</div>
-                <div class="row justify-content-center" id="email">${profileData.email}</div>
-                <div class="row justify-content-center" id="bio">${profileData.bio}</div>
-                <div  id="friendRequest"></div> 
-            </div>
-            
-
-            <div class="col" id="right-col">
-                            
-                            <div class="row" id="wins_losses">
-                                <div class="col-1 p-3 mb-3 p-title" id="stats_title">
-                                    Stats
-                                </div>
-                                <div class="col p-3"  id="stat_content">
-                                    <h6> Matches </h6>
-                                    
-                                    <div class="progress bg-dark mb-3" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
-                                    </div>
-
-                                    <h6> Tournaments </h6>
-                                    <div class="progress bg-dark" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
-                                    </div>
-                                </div>
+        try {
+            const profileData = await this.getUserData();
+            await this.delayedDisplayStatus(profileData);
+            // console.log(profileData);
+            await this.displayMatchLogDelayed(profileData);
+            const matchData = await this.getMatchData(profileData);
+            let wins = this.getWinsPercent(matchData, profileData.id);
+            if (!wins)
+                wins = 0;
+            let losses = this.getLossPercent(matchData, profileData.id);
+            if (!losses)
+                losses = 0;
+            return `<div class="container text-center">
+                        <div class="row align-items-start">
+                            <div class="col" id="leftCol">
+                                <h1><div class="row justify-content-center" id="username" >
+                                </div>${profileData.username}</h1>
                                 
+                                <div class="btn-group dropstart" id="statusgroup">
+                                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                                </div>
+
+                                <div class="row justify-content-center" id="nb">${profileData.id}</div>
+                                <div class="row justify-content-center" id="email">${profileData.email}</div>
+                                <div class="row justify-content-center" id="bio">${profileData.bio}</div>
+                                <div  id="friendRequest"></div> 
                             </div>
 
-
-                            <div class="row align-items-start" id="match_log" >
-                                <div class="col-1 p-3 p-title" id="log_title">
-                                    Match history
-                                </div>
-                                <div class="col p-3 log-content justify-content-start" id="log_content">
+                            <div class="col" id="right-col">
+                                <div class="row" id="wins_losses">
+                                    <div class="col-1 p-3 mb-3 p-title" id="stats_title">
+                                        Stats
+                                    </div>
+                                    <div class="col p-3"  id="stat_content">
+                                        <h6> Matches </h6>
+                                            <div class="progress bg-dark mb-3" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
+                                            </div>
+                                            <h6> Tournaments </h6>
+                                            <div class="progress bg-dark" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
+                                            </div>
+                                    </div> 
+                                    </div>
+                                    <div class="row align-items-start" id="match_log" >
+                                        <div class="col-1 p-3 p-title" id="log_title">
+                                            Match history
+                                        </div>
+                                        <div class="col p-3 log-content justify-content-start" id="log_content">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-
-
-            </div>
-        </div>
-    </div>`
-    };
+                    </div>`;
+        } catch (error) {
+            return `<h1>${error}</h1>`;
+        };
+    }
 }
