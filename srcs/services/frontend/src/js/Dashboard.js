@@ -129,11 +129,11 @@ export class Dashboard extends BaseClass {
 
     async createMatch(targetId){
         const jwtAccess = localStorage.getItem('token');
+        const selfData = await this.getUserData();
         const requestBody = {
-            user_1: this.getUserData().id,
-            user_2: targetId
+            user_1: selfData.id,
+            user_2: targetId,
         };
-    
         try {
             const response = await fetch(`http://localhost:8000/pong/matches/`, {
                 method: 'POST',
@@ -153,11 +153,26 @@ export class Dashboard extends BaseClass {
         }
     }
 
+
+    generateRandomName() {
+        const syllables = ['ba', 'be', 'bi', 'bo', 'bu', 'da', 'de', 'di', 'do', 'du', 'la', 'le', 'li', 'lo', 'lu', 'ma', 'me', 'mi', 'mo', 'mu', 'na', 'ne', 'ni', 'no', 'nu', 'pa', 'pe', 'pi', 'po', 'pu', 'ra', 're', 'ri', 'ro', 'ru', 'sa', 'se', 'si', 'so', 'su', 'ta', 'te', 'ti', 'to', 'tu', 'va', 've', 'vi', 'vo', 'vu'];
+    
+        // Randomly select syllables to generate a name
+        const nameLength = Math.floor(Math.random() * 3) + 2; // Minimum length 2 syllables, maximum 4 syllables
+        let name = '';
+        for (let i = 0; i < nameLength; i++) {
+            const randomIndex = Math.floor(Math.random() * syllables.length);
+            name += syllables[randomIndex];
+        }
+    
+        return name.charAt(0).toUpperCase() + name.slice(1); // Capitalize the first letter
+    }
+
     async postLocalMatch() {
         console.log("Posting that local match");
-        const username = "friend";
+        const username = this.generateRandomName();
         const password = "fakepw";
-        const email = "friend@amigo.org";
+        const email = `${username}@amigo.org`;
         
         try {
             const response = await fetch('http://localhost:8000/users/register/', {
@@ -184,7 +199,7 @@ export class Dashboard extends BaseClass {
                 throw new Error('Invalid credentials');
             }
             // console.log(await response.text());
-            const user2 = await response.text();
+            const user2 = await response.json();
             await this.createMatch(user2.id);
           
         } catch (error) {

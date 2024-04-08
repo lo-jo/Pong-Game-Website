@@ -26,7 +26,7 @@ export class LocalMatch extends BaseClass {
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/localmatch/`;
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/localmatch/${this.id}/`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -34,36 +34,38 @@ export class LocalMatch extends BaseClass {
             console.log('WebSocket(match gameeee) connection established.');
         };
 
-        // this.socket.onmessage = (event) => {
-        //     const data = JSON.parse(event.data);
-        //     const { type_message } = data;
-        //     switch(type_message)
-        //     {
-        //         // case 'ws_handshake':
-        //         //     const { ws_handshake } = data;
-        //         //     this.ws_handshake(ws_handshake, data);
-        //         //     break;
-        //         // case 'ping':
-        //         //     console.log('The server wants that I do ping')
-        //         case 'game_state':
-        //             const { game_state } = data;
-        //             this.updateGameState(game_state);
-        //             break;
-        //         // case 'other_user':
-        //         //     const { other_user } = data;
-        //         //     console.log('sending other user!')
-        //         //     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
-        //         //     break;
-        //         case 'timer':
-        //             const { timer } = data
-        //             this.updateTimer(timer);
-        //             break;
-        //         case 'game_element':
-        //             const { game_element } = data;
-        //             this.updateGameElement(game_element);
-        //             break;
-        //     }
-        // };
+        this.socket.onmessage = (event) => {
+            
+            const data = JSON.parse(event.data);
+            console.log(data);
+            const { type_message } = data;
+            switch(type_message)
+            {
+                case 'ws_handshake':
+                    const { ws_handshake } = data;
+                    this.ws_handshake(ws_handshake, data);
+                    break;
+                // case 'ping':
+                //     console.log('The server wants that I do ping')
+                case 'game_state':
+                    const { game_state } = data;
+                    this.updateGameState(game_state);
+                    break;
+                // case 'other_user':
+                //     const { other_user } = data;
+                //     console.log('sending other user!')
+                //     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                //     break;
+                case 'timer':
+                    const { timer } = data
+                    this.updateTimer(timer);
+                    break;
+                case 'game_element':
+                    const { game_element } = data;
+                    this.updateGameElement(game_element);
+                    break;
+            }
+        };
 
         this.socket.onerror = function(error) {
             console.error('WebSocket error:', error);
@@ -94,10 +96,10 @@ export class LocalMatch extends BaseClass {
             // case 'match_already_completed':
             //     this.showMessageAndRedirect('You have tried to join a match already completed.');
             //     break;
-            // case 'tell_me_who_you_are':
-            //     const jwtToken = localStorage.getItem('token');
-            //     this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
-            //     break;
+            case 'tell_me_who_you_are':
+                const jwtToken = localStorage.getItem('token');
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
+                break;
             // case 'failed_authorization':
             //     this.showMessageAndRedirect(`You don't have authorization to this match.`);
             //     break;
@@ -199,7 +201,7 @@ export class LocalMatch extends BaseClass {
     
     initGame(user_1_info, user_2_info)
     {
-        // console.log(`initGame call()`);
+        console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
         this.showTimerBeforeMatch();
     }
