@@ -170,7 +170,9 @@ export class Dashboard extends BaseClass {
 
     async postLocalMatch() {
         console.log("Posting that local match");
-        const username = this.generateRandomName();
+        const userData = await this.getUserData();
+        const username = `#`+this.generateRandomName();
+        console.log(username);
         const password = "fakepw";
         const email = `${username}@amigo.org`;
         
