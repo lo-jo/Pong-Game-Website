@@ -224,11 +224,11 @@ export class LocalMatch extends BaseClass {
         const user1Div = document.createElement('div');
         user1Div.classList.add('user-info');
         user1Div.innerHTML = `
-            <span>${user_1_info.username}</span>`;
+            <span>${user_1_info.username} <span class="controls-info">W</span><span class="controls-info">S</span></span>`;
 
         const user2Div = document.createElement('div');
         user2Div.classList.add('user-info');
-        user2Div.innerHTML = `<span>${user_2_info.username}</span>`;
+        user2Div.innerHTML = `<span><span class="controls-info">↑</span><span class="controls-info">↓</span></span> ${user_2_info.username} `;
 
         /*Creating timer*/
         const timerElement = document.createElement('div');

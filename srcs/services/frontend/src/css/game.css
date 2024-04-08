@@ -181,3 +181,11 @@
   color: #fffffc;
   font-weight: 500;
 }
+
+.controls-info {
+
+    padding: 2px 3px!important;
+    font-size:small;
+    border: solid 1px;
+    border-radius: 20%;
+}
