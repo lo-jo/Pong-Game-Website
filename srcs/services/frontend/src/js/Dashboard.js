@@ -155,25 +155,28 @@ export class Dashboard extends BaseClass {
 
 
     generateRandomName() {
-        const syllables = ['ba', 'be', 'bi', 'bo', 'bu', 'da', 'de', 'di', 'do', 'du', 'la', 'le', 'li', 'lo', 'lu', 'ma', 'me', 'mi', 'mo', 'mu', 'na', 'ne', 'ni', 'no', 'nu', 'pa', 'pe', 'pi', 'po', 'pu', 'ra', 're', 'ri', 'ro', 'ru', 'sa', 'se', 'si', 'so', 'su', 'ta', 'te', 'ti', 'to', 'tu', 'va', 've', 'vi', 'vo', 'vu'];
-    
-        // Randomly select syllables to generate a name
-        const nameLength = Math.floor(Math.random() * 3) + 2; // Minimum length 2 syllables, maximum 4 syllables
-        let name = '';
-        for (let i = 0; i < nameLength; i++) {
-            const randomIndex = Math.floor(Math.random() * syllables.length);
-            name += syllables[randomIndex];
-        }
-    
-        return name.charAt(0).toUpperCase() + name.slice(1); // Capitalize the first letter
+        const randomNumber = Math.floor(Math.random() * 1000); // Generate a random number between 0 and 999
+        return `USER${randomNumber}`;
     }
+
+    generateRandomPassword(length) {
+        const passwordLength = length || 8; // Default length is 8 characters
+        let password = '';
+        for (let i = 0; i < passwordLength; i++) {
+            const digit = Math.floor(Math.random() * 10); // Generate a random digit (0-9)
+            password += digit;
+        }
+        return password;
+    }
+    
+
 
     async postLocalMatch() {
         console.log("Posting that local match");
         const userData = await this.getUserData();
-        const username = `#`+this.generateRandomName();
+        const username = this.generateRandomName();
         console.log(username);
-        const password = "fakepw";
+        const password = this.generateRandomPassword();
         const email = `${username}@amigo.org`;
         
         try {

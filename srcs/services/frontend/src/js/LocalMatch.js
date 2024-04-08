@@ -21,6 +21,8 @@ export class LocalMatch extends BaseClass {
         this.addDocumentClickListener();
         this.insertCssLink();
         this.initWebSocket();
+        this.user_1_info = null;
+        this.user_2_info = null;
     }
 
     initWebSocket() {
@@ -90,12 +92,6 @@ export class LocalMatch extends BaseClass {
     {
         switch(ws_handshake_message)
         {
-            // case 'match_do_not_exist':
-            //     this.showMessageAndRedirect('You have tried to join a non-existent match, try with a valid ID');
-            //     break;
-            // case 'match_already_completed':
-            //     this.showMessageAndRedirect('You have tried to join a match already completed.');
-            //     break;
             case 'tell_me_who_you_are':
                 const jwtToken = localStorage.getItem('token');
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
@@ -106,6 +102,9 @@ export class LocalMatch extends BaseClass {
             
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
+                this.user_1_info = user_1_info;
+                this.user_2_info = user_2_info;
+                console.log("INITIAL DATA", user_2_info.id);
                 this.initGame(user_1_info, user_2_info);
         }
     }
@@ -113,6 +112,7 @@ export class LocalMatch extends BaseClass {
     /*Methods to update the game state*/
     updateGameState(game_state_data)
     {
+        console.log('GAME EVEMT');
         const game_state = JSON.parse(game_state_data);
         switch (game_state.event)
         {
@@ -124,6 +124,7 @@ export class LocalMatch extends BaseClass {
                 console.log('Someone left');
                 break;
             case 'broadcasted_game_event':
+                console.log("44444Supposed to b getting a broadcasted gane element");
                 const { broadcasted_game_event } = game_state;
                 this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
                 break;
@@ -203,11 +204,12 @@ export class LocalMatch extends BaseClass {
     {
         console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
-        this.showTimerBeforeMatch();
+        this.showTimerBeforeMatch(user_1_info, user_2_info);
     }
 
     initBoard(user_1_info, user_2_info)
     {
+        console.log("init game board");
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -265,7 +267,7 @@ export class LocalMatch extends BaseClass {
         app.appendChild(appContainer);
     }
 
-    showTimerBeforeMatch(){
+    showTimerBeforeMatch(user_1_info, user_2_info){
         // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
@@ -278,7 +280,9 @@ export class LocalMatch extends BaseClass {
             seconds_div.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'user2' , 'user2' : `${user_2_info.id}`}));
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+
                 console.log('sending confirmation');
             }
         }, 1000);
@@ -290,11 +294,19 @@ export class LocalMatch extends BaseClass {
             switch(e.key){
                 case 'w':
                     // console.log("`w` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_1_info.id}`}));
                     break;
                 case 's':
                     // console.log("`s` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_1_info.id}`}));
+                    break;
+                case 'ArrowUp':
+                    // console.log("`w` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_2_info.id}`}));
+                    break;
+                case 'ArrowDown':
+                    // console.log("`s` pressed");
+                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_2_info.id}`}));
                     break;       
             }
         });

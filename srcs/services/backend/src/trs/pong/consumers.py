@@ -16,7 +16,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         self.match_id = self.scope['url_route']['kwargs']['id']
         # # Setting group (channels) for sending data to ws
         self.group_name = f'match_{self.match_id}'
-        print("self.mathc_id", self.match_id)
+
         # Database match data
         self.match_info = None
         # Database user data
@@ -128,14 +128,23 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                     self.game_user_1 = other_user_data
 
             case 'game_event':
+                print('GAME VEVENT', data)
                 game_event = data.get('game_event')
-                user_id = get_user_id_by_jwt_token(data, 'token')
-                if user_id == self.game_user_1["user_id"]:
+                user_id = data.get('id')
+                user_id = int(user_id) if user_id is not None else None
+                print("THIS IS MY USER 2", self.game_user_2)
+                print('****GETTING THAT CURRENT USER ID ', user_id, "koko", self.game_user_1['user_id'], self.game_user_2['user_id'])
+
+                
+                if user_id == self.game_user_1['user_id']:
+                    print("///why are you not going inside here")
                     if game_event == 'move_up':
+                        print("why are you not going inside here")
                         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_1'}))
                     elif game_event == 'move_down':
                         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_1'}))
-                elif user_id == self.game_user_2["user_id"]:
+                elif user_id == int(self.game_user_2["user_id"]):
+                    print('USER 2 IS PUSHING KEYS')
                     if game_event == 'move_up':
                         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_2'}))
                     elif game_event == 'move_down':
@@ -205,7 +214,11 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                     self.who_i_am_id = self.game_user_1["user_id"]
                     game_user_1_str = json.dumps(self.game_user_1)
                     await self.send_to_group('other_user', game_user_1_str)
-
+    
+        elif ws_handshake_message == 'user2':
+            print("IS THE ACTUAL DATA THAT IM GETTING", data)
+            self.game_user_2['user_id'] = data['user2']
+            self.game_user_2['paddle'] = self.game_user_2_paddle
 
         elif ws_handshake_message == 'confirmation':
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
