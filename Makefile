@@ -1,7 +1,6 @@
 SRCS_PATH = ./srcs/
 CLI_PATH = cli/cli.py
-YML_FILE = docker-compose.yml
-COMPOSE_FILE = $(addprefix $(SRCS_PATH), $(YML_FILE))
+COMPOSE_FILE = docker-compose.yml
 CLI = $(addprefix $(SRCS_PATH), $(CLI_PATH))
 CERTS = ./srcs/services/backend/selfsigned.crt ./srcs/services/backend/selfsigned.key \
 		./srcs/services/frontend/selfsigned.crt ./srcs/services/frontend/selfsigned.key

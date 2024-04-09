@@ -128,27 +128,35 @@ export class Tournament extends BaseClass {
         const tournamentLeaderboard = await this.fetchTournamentLeaderboard(tournamentId);
         const leaderboardData = tournamentLeaderboard.leaderboard;
     
-        let leaderboardHTML = `<div class="container">
-                                    <div class="row justify-content-center">
+        let leaderboardHTML = `<div class="row mb-2 align-items-center justify-content-center">
+                                    <div class="col-2">
+                                        <button type="button" id="goBackBtn" class="px-2 py-1 btn btn-dark">
+                                            <i id="goBack" class="bi bi-arrow-left-circle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-10 text-start">
                                         <h2 class="text-center">Tournament: ${tournamentLeaderboard.tournament_name}</h2>
-                                        <h3 class="text-center">Winner: ${tournamentLeaderboard.winner}</h3>
-                                        <div class="col-lg-8 col-md-10 col-sm-12">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Rank</th>
-                                                        <th>User</th>
-                                                        <th>Points</th>
-                                                        <th>Points against</th>
-                                                        <th>Time</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>`;
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <h3 class="text-center mb-1 title-winner">Winner: ${tournamentLeaderboard.winner}</h3>
+                                    <div class="col-lg-8 col-md-10 col-sm-12">
+                                        <table class="table table-dark table-hover my-3">
+                                            <thead>
+                                                <tr>
+                                                    <th>Rank</th>
+                                                    <th>User</th>
+                                                    <th>Points</th>
+                                                    <th>Points against</th>
+                                                    <th>Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">`;
     
         leaderboardData.forEach(entry => {
             leaderboardHTML += `<tr>
                                     <td>${entry.rank}</td>
-                                    <td>${entry.username}</td>
+                                    <td><a href="/test/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
                                     <td>${entry.total_duration}</td>
@@ -158,8 +166,7 @@ export class Tournament extends BaseClass {
         leaderboardHTML += `</tbody>
                         </table>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
     
         document.getElementById('app').innerHTML = leaderboardHTML;
     }

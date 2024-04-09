@@ -250,6 +250,8 @@ class TournamentLeaderboardView(APIView):
             tournament = Tournament.objects.get(id=tournament_id)
             if tournament.status != 'finished':
                 return Response({'error': 'Tournament is not finished yet'}, status=status.HTTP_400_BAD_REQUEST)
+            tournament.calculate_winner_and_leaderboard()
+            tournament.save()
             leaderboard_data = {
                 'tournament_name': tournament.name,
                 'winner': tournament.winner.username if tournament.winner else None,
