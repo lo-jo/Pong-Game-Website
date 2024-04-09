@@ -16,5 +16,5 @@ class NotificationSerializer(serializers.ModelSerializer):
         sender = self.context['request'].user
         recipient_id = self.context['request'].data.get('recipient')
         recipient = User.objects.get(pk=recipient_id)
-        message = validated_data['message']
+        message = escape(validated_data['message'])
         return Notification.objects.create(message=message, sender=sender, recipient=recipient)

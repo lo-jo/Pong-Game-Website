@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, Friendship
 from rest_framework.permissions import AllowAny
+from django.utils.html import escape
 import os
 
 # A user serializer will translate python data to JSON data and vice versa
@@ -18,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Username must be less than 100 characters.")
         if not all(c in '-_.0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in value):
             raise serializers.ValidationError("Username must contain only ASCII alphanumerics, hyphens, underscores, or periods.")
-        return value
+        return escape(value)
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -36,9 +37,6 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'bio', 'profile_pic', 'otp_enabled')
 
     def validate_username(self, value):
-        """
-        Validate username to ensure it's unique and meets specified criteria.
-        """
         user = self.context['request'].user
         if len(value) > 100:
             raise serializers.ValidationError("Username must be less than 100 characters.")
@@ -46,24 +44,23 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Username must contain only ASCII alphanumerics, hyphens, underscores, or periods.")
         if User.objects.exclude(pk=user.pk).filter(username=value).exists():
             raise serializers.ValidationError("This username is already in use.")
-        return value
+        return escape(value)
 
     def validate_email(self, value):
         user = self.context['request'].user
         if User.objects.exclude(pk=user.pk).filter(email=value).exists():
             raise serializers.ValidationError({"This email is already in use."})
-        return value
+        return escape(value)
 
     def validate_bio(self, value):
         user = self.context['request'].user
-        return value
+        return escape(value)
 
     def validate_profile_pic(self, value):
         user = self.context['request'].user
         return value
 
     def validate_otp_enabled(self, value):
-        print("SWITCH", value)
         user = self.context['request'].user
         return value
 

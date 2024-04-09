@@ -1,6 +1,7 @@
 from django.core.serializers.json import Serializer
 from rest_framework import serializers
 from chat.models import BlackList
+from django.utils.html import escape
 
 JSON_ALLOWED_OBJECTS = (dict, list, tuple, str, int, bool)
 
@@ -20,7 +21,7 @@ class CustomSerializer(Serializer):
                         for f in fields:
                             value = getattr(value, f)
                         if value != obj and isinstance(value, JSON_ALLOWED_OBJECTS) or value == None:
-                            self._current[field] = value
+                            self._current[field] = escape(value)
 
                 except AttributeError:
                     pass

@@ -9,6 +9,7 @@ from chat.models import Message, BlackList
 from chat.serializers import CustomSerializer
 from rest_framework import status
 from rest_framework.response import Response
+from django.utils.html import escape
 from django.utils import timezone
 
 User = get_user_model()
@@ -67,7 +68,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = await self.get_user_from_token(token)
             if user:
                 print("RECEIVING", data)
-                message = data['message']
+                message = escape(data['message'])
                 receiver_id = user.username
                 sender = await self.get_user(receiver_id.replace('"', ''))
                 if await self.is_blocked(sender, self.room_group_name):
