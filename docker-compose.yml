@@ -9,9 +9,9 @@ services:
   backend:
     container_name : backend
     image: backend:trs
-    build : ./services/backend/
+    build : ./srcs/services/backend/
     volumes :
-      - ./services/backend/src:/code/src
+      - ./srcs/services/backend/src:/code/src
     restart: unless-stopped
     env_file : .env
     ports:
@@ -21,9 +21,9 @@ services:
   frontend:
     container_name : frontend
     image: frontend:trs
-    build : ./services/frontend/
+    build : ./srcs/services/frontend/
     volumes:
-      - ./services/frontend/src/:/app/src # Mount the source code
+      - ./srcs/services/frontend/src/:/app/src # Mount the source code
     restart: unless-stopped
     env_file : .env
     ports:

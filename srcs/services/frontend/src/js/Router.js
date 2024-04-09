@@ -151,7 +151,6 @@ let previousView = null;
 let styleCss = null;
 export const router = async () => {
     const appDiv = document.getElementById('app');
-    // appDiv.innerHTML = '';
     appDiv.style = 'display: none;';
 
     const path = window.location.pathname;
@@ -178,10 +177,12 @@ export const router = async () => {
         await connectUser();
 
     if (!viewObject) {
+        console.log("viewObject not found")
         const errorView = new ErrorClass();
         navbar.setIsAuthenticated(auth);
-        navbar.getHtml().then(html => document.getElementById('header').innerHTML = html);
-        document.getElementById('app').innerHTML = errorView.getHtmlForMainNotFound();
+        document.getElementById('nav-bar').innerHTML = navbar.getHtml();
+        appDiv.innerHTML = await errorView.getHtmlForMainNotFound();
+        appDiv.style = 'display: block;';
         return;
     }
 
@@ -209,7 +210,6 @@ export const router = async () => {
     appDiv.innerHTML = await view.getHtmlForMain();
     (viewObject.path === '/logout') ? navbar.setIsAuthenticated(false) : navbar.setIsAuthenticated(auth);
     document.getElementById('nav-bar').innerHTML = navbar.getHtml();
-    // navbar.getHtml().then(html => document.getElementById('nav-bar').innerHTML = html);
     appDiv.style = 'display: block;';
 }
 

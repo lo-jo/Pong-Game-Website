@@ -6,11 +6,11 @@ export class ErrorClass extends BaseClass
         super();
     }
 
-    getHtmlForMain() {
+    async getHtmlForMain() {
         return `<h1>You need to be logged in</h1>`
     }
 
-    getHtmlForMainNotFound() {
+    async getHtmlForMainNotFound() {
         return `<h1>Not found</h1>`
     }
 }

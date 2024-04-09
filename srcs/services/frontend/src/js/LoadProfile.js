@@ -19,17 +19,16 @@ export class LoadProfile
             });
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    console.error('Unauthorized access. Please log in.');
-                } else {
-                    console.error('Error:', response.status);
-                }
-                throw new Error('Unauthorized');
+                throw response.status
             }
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error('Error:', error);
+            if (error === 401)
+                throw `Unauthorized access. Please log in.`;
+            else if (error === 404)
+                throw `Not found`;
+            // console.error('Error:', error);
             throw error;
         }
     }
@@ -60,8 +59,11 @@ export class LoadProfile
                 friendRequestLink.innerText = `You and ${user.username} are friends :)`;
                 document.getElementById('friendRequest').appendChild(friendRequestLink);
             }
-                
-            else{
+            else if (this.id == decoded_token.user_id) {
+                const friendRequestLink = document.createElement('text');
+                friendRequestLink.innerText = ``;
+                document.getElementById('friendRequest').appendChild(friendRequestLink);
+            } else{
                 const friendRequestLink = document.createElement('button');
                 friendRequestLink.setAttribute('class', 'btn btn-dark');
                 friendRequestLink.setAttribute('id', 'addButton');
@@ -327,6 +329,7 @@ export class LoadProfile
     }
 
     async getHtmlForMain() {
+        try{
         const profileData = await this.getUserData();
         await this.delayedDisplayStatus(profileData);
         await this.displayMatchLogDelayed(profileData);
@@ -354,12 +357,11 @@ export class LoadProfile
                     </span>
                 </div>
 
-                <div class="row justify-content-center" id="nb">${profileData.id}</div>
-                <div class="row justify-content-center" id="email">${profileData.email}</div>
-                <div class="row justify-content-center" id="bio">${profileData.bio}</div>
-                <div  id="friendRequest"></div> 
-            </div>
-            
+                                <div class="row justify-content-center" id="nb">${profileData.id}</div>
+                                <div class="row justify-content-center" id="email">${profileData.email}</div>
+                                <div class="row justify-content-center" id="bio">${profileData.bio}</div>
+                                <div  id="friendRequest"></div> 
+                            </div>
 
             <div class="col" id="right-col">
                             
@@ -405,10 +407,9 @@ export class LoadProfile
                             </div>
 
                         </div>
-
-
-            </div>
-        </div>
-    </div>`
-    };
+                    </div>`;
+        } catch (error) {
+            return `<h1>${error}</h1>`;
+        };
+    }
 }

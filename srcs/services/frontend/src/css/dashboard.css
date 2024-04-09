@@ -17,7 +17,7 @@
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-.tournamentMatches button {
+.tournamentMatches .card button {
     background-color: #FF003D;
     border: #FF003D;
 }
@@ -27,7 +27,7 @@
     color: #FF003D;
 }
 
-.tournamentMatches button:hover, .page-link:hover {
+.tournamentMatches .card button:hover, .page-link:hover {
     background-color: #FFFFFC;
     color: #FF003D;
 }
@@ -100,4 +100,17 @@
     overflow-y: auto;
     overflow-x: auto;
     /* height:200px; */
+}
+
+.card a, .table a {
+    text-decoration: none;
+    color: #39ff7b;
+}
+
+.card a:hover, .table a:hover {
+    color: #39ff7ba9;
+}
+
+.title-winner {
+    color:#FCFF76;
 }

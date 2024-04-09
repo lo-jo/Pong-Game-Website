@@ -128,27 +128,35 @@ export class Tournament extends BaseClass {
         const tournamentLeaderboard = await this.fetchTournamentLeaderboard(tournamentId);
         const leaderboardData = tournamentLeaderboard.leaderboard;
     
-        let leaderboardHTML = `<div class="container">
-                                    <div class="row justify-content-center">
+        let leaderboardHTML = `<div class="row mb-2 align-items-center justify-content-center">
+                                    <div class="col-2">
+                                        <button type="button" id="goBackBtn" class="px-2 py-1 btn btn-dark">
+                                            <i id="goBack" class="bi bi-arrow-left-circle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-10 text-start">
                                         <h2 class="text-center">Tournament: ${tournamentLeaderboard.tournament_name}</h2>
-                                        <h3 class="text-center">Winner: ${tournamentLeaderboard.winner}</h3>
-                                        <div class="col-lg-8 col-md-10 col-sm-12">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Rank</th>
-                                                        <th>User</th>
-                                                        <th>Points</th>
-                                                        <th>Points against</th>
-                                                        <th>Time</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>`;
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <h3 class="text-center mb-1 title-winner">Winner: ${tournamentLeaderboard.winner}</h3>
+                                    <div class="col-lg-8 col-md-10 col-sm-12">
+                                        <table class="table table-dark table-hover my-3">
+                                            <thead>
+                                                <tr>
+                                                    <th>Rank</th>
+                                                    <th>User</th>
+                                                    <th>Points</th>
+                                                    <th>Points against</th>
+                                                    <th>Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table-group-divider">`;
     
         leaderboardData.forEach(entry => {
             leaderboardHTML += `<tr>
                                     <td>${entry.rank}</td>
-                                    <td>${entry.username}</td>
+                                    <td><a href="/test/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
                                     <td>${entry.total_duration}</td>
@@ -158,8 +166,7 @@ export class Tournament extends BaseClass {
         leaderboardHTML += `</tbody>
                         </table>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
     
         document.getElementById('app').innerHTML = leaderboardHTML;
     }
@@ -259,14 +266,13 @@ export class Tournament extends BaseClass {
             const score = (match.user_1 === currentUser.user_id) ? `${match.score_user_1} vs ${match.score_user_2}` : `${match.score_user_2} vs ${match.score_user_1}`;
             const buttonText = match.status === "completed" ? "Finished" : "Play";
             const buttonDisabled = match.status === "completed" ? "disabled" : "";
-            console.log(`match STATUS: ${match.status}`);
 
             return `<div class="card mb-2">
                         <div class="card-body">
-                            <h5 class="card-title">${currentUserName} vs ${opponentName}</h5>
-                            <div class="row">
+                            <h5 class="card-title mb-2">${currentUserName} vs <a class="opponent-link" href="/test/${opponentId}">${opponentName}</a></h5>
+                            <div class="row align-items-center mb-2">
                                 <div class="col-6">
-                                    <button class="btn btn-primary" data-match-id="${match.id}" data-match-status="${match.status}" ${buttonDisabled}>${buttonText}</button>
+                                    <button class="btn btn-primary py-1 px-3" data-match-id="${match.id}" data-match-status="${match.status}" ${buttonDisabled}>${buttonText}</button>
                                 </div>
                                 <div class="col-6 text-center">
                                     <h4>Score:</h4>
@@ -278,8 +284,17 @@ export class Tournament extends BaseClass {
         }).join('');
 
         document.getElementById('app').innerHTML = `<div class="tournamentMatches container">
+                                                        <div class="row justify-content-center mb-2">
+                                                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                                                <div class="d-flex align-items-center my-3">
+                                                                    <button type="button" id="goBackBtn" class="p-1 btn btn-dark me-3">
+                                                                        <i id="goBack" class="bi bi-arrow-left-circle m-2"></i>
+                                                                    </button>
+                                                                    <h3 class="text-center">Tournament: ${tournamentData.name}</h3>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="row justify-content-center">
-                                                            <h3 class="text-center">Tournament: ${tournamentData.name}</h3>
                                                             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                                                 ${matches}
                                                             </div>
@@ -290,12 +305,19 @@ export class Tournament extends BaseClass {
         buttons.forEach(button => {
             button.addEventListener('click', () => this.startMatch(button.getAttribute('data-match-id'), button.getAttribute('data-match-status')));
         });
+        const opponentLinks = document.querySelectorAll('.tournamentMatches .opponent-link');
+        opponentLinks.forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                navigateTo(link.href);
+            });
+        });
     }
 
     async startMatch(matchId, matchStatus) {
-        console.log(`match id: ${matchId}, match.status ${matchStatus}`);
+        // console.log(`match id: ${matchId}, match.status ${matchStatus}`);
         if (matchStatus && matchStatus !== "completed") {
-            console.log(`Starting matchId: ${matchId}`);
+            // console.log(`Starting matchId: ${matchId}`);
             history.pushState('', '', `/match/${matchId}`);
             router();
         } else {
@@ -319,25 +341,22 @@ export class Tournament extends BaseClass {
         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
 
         players.forEach((player, index) => {
+            // console.log(`currentUserId.user_id: ${currentUserId.user_id} player.id: ${player.id}`);
             let playerLink;
-            if (currentUserId.user_id == player.id) {
-                cardText.textContent += player.username;
-                if (index < players.length - 1) {
-                    cardText.textContent += ", ";
-                }
-            } else {
-                playerLink = document.createElement('a');
-                playerLink.setAttribute('href', `/test/${player.id}`);
+            playerLink = document.createElement('a');
+            playerLink.setAttribute('href', `/test/${player.id}`);
+            if (currentUserId.user_id != player.id) {
                 playerLink.addEventListener('click', (event) => {
                     event.preventDefault();
                     console.log(`clicking to id: ${player.id}`);
                     navigateTo(event.target.href);
                 });
-                playerLink.textContent = player.username;
-                cardText.appendChild(playerLink);
-                if (index < players.length - 1) {
-                    playerLink.textContent += ", ";
-                }
+            } else
+                playerLink.style.pointerEvents = "none";
+            playerLink.textContent = player.username;
+            cardText.appendChild(playerLink);
+            if (index < players.length - 1) {
+                playerLink.textContent += ", ";
             }
         });
     
@@ -384,7 +403,6 @@ export class Tournament extends BaseClass {
     
         return card;
     }
-    
 
     async displayOpenTournaments(pageNumber = 1, pageSize = 3) {
         const openTournaments = await this.fetchOpenTournaments();
