@@ -11,6 +11,99 @@ export class Tournament extends BaseClass {
         super();
         this.dashboard = dashboardInstance;
     }
+    async notifyGame(senderId, targetId, name){
+        const jwtAccess = localStorage.getItem('token');
+        console.log("senderID", senderId, targetId);
+        const requestBody = {
+            message: `@${senderId} IS WAITING FOR YOU IN THE ${name} TOURNAMENT `,
+            sender: senderId,
+            recipient: targetId
+        };
+    
+        try {
+            const response = await fetch(`http://localhost:8000/notify/invite/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+        } catch (error) {
+            // Handle error here
+            console.error('Error notifying match:', error);
+        }
+    }
+
+    async getMatchData(id) {
+        const jwtAccess = localStorage.getItem('token');
+    
+        try {
+            const response = await fetch(`http://localhost:8000/pong/matches/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            console.log("THIS IS THE MATCH DATA", data);
+            console.log('SENDING THIS TO NOTIFYGANE', data.user_1, data.user_2);
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    async getUserData(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw response.status
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            if (error === 401)
+                throw `Unauthorized access. Please log in.`;
+            else if (error === 404)
+                throw `Not found`;
+            // console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    async notifyUsers(data){
+        console.log("GOING TO SEND THAT NOTIFICATION", data.participants, data);
+        for (const matchId of data.matches) {
+            const matchData = await this.getMatchData(matchId);
+            console.log("NOTIFYUSER", matchData);
+            const user1 = await this.getUserData(matchData.user_1);
+            console.log("NUSER1", user1);
+            const user2 = await this.getUserData(matchData.user_2);
+            console.log("NUSER1", user2);
+            await this.notifyGame(user1.username, user2.id, data.name);
+            await this.notifyGame(user2.username, user1.id, data.name);
+            console.log("Match ID:", matchId);
+        }
+    }
 
     async createTournament(tournamentName) {
         // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
@@ -217,6 +310,8 @@ export class Tournament extends BaseClass {
             } else {
                 const tournamentData = await response.json();
                 console.log('Successfully joined tournament:', tournamentData);
+                if (tournamentData.status == 'full')
+                    this.notifyUsers(tournamentData);
             }
         } catch (error) {
             console.error('Error joining tournament:', error);

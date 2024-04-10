@@ -107,6 +107,7 @@ export const connectUser = async () => {
             };
             onlineSocket.onclose = function (e) {
                 console.log('Socket closed unexpectedly');
+                onlineSocket = null;
                 // setTimeout(connectUser(), 1000)
             }; 
         // }
