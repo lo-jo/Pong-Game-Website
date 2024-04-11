@@ -406,7 +406,6 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         query_params = parse_qs(self.scope['query_string'].decode())
         token = query_params.get('token', [None])[0]
-        print(token)
         # Getting id from url (ws)
         self.match_id = self.scope['url_route']['kwargs']['id']
         # Setting group (channels) for sending data to ws
@@ -440,7 +439,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             'id' : 1,
             'elem' : 'user',
             'score' : 0,
-            'size_x' : 0.05,
+            'size_x' : 0.04,
             'size_y' : 0.25,
             'top' : 0.4,
             'left' : 0,
@@ -450,7 +449,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             'id' : 2,
             'elem' : 'user',
             'score' : 0,
-            'size_x' : 0.05,
+            'size_x' : 0.04,
             'size_y' : 0.25,
             'top' : 0.4,
             'left' : 0.95,
@@ -497,9 +496,9 @@ class PongConsumer(AsyncWebsocketConsumer):
     async def websocket_disconnect(self, close_code):
         self.game_finish = True
         if close_code == 1:
-            await self.send_to_group('game_state', json.dumps({'event' : 'someone_left', 'how' : 'changing_url'}))
+            await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
         else:
-            await self.send_to_group('game_state', json.dumps({'event' : 'someone_left', 'how' : 'going out'}))
+            await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
 
 
     # Receivers
@@ -567,7 +566,6 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(match.save)()
 
                 self.game_finish = True
-                # self.time_remaining = 0
 
                 # Redirect
                 redirect_info = {
@@ -734,11 +732,27 @@ class PongConsumer(AsyncWebsocketConsumer):
             self.game_time += 1
 
     async def game_loop(self):
+        seconds_waiting = 0
         while not self.game_user_1 or not self.game_user_2:
-            # print("Waiting for the info...")
-            await asyncio.sleep(1)
+            print("Waiting for the info...")
+            if seconds_waiting == 2:
+                # This is the player 2
+                if not self.game_user_1:
+                    print("I don't have the self.game_user_1, so I retry")
+                    self.who_i_am_id = self.game_user_2["user_id"]
+                    game_user_2_str = json.dumps(self.game_user_2)
+                    await self.send_to_group('other_user', game_user_2_str)
 
-        # print("/////////////////// We are ready to start the game ////////////////////")
+                # This is the player 1
+                if not self.game_user_2:
+                    print("I don't have the self.game_user_2, so I retry")
+                    self.who_i_am_id = self.game_user_1["user_id"]
+                    game_user_1_str = json.dumps(self.game_user_1)
+                    await self.send_to_group('other_user', game_user_1_str)
+            await asyncio.sleep(1)
+            seconds_waiting += 1
+
+        print("/////////////////// We are ready to start the game ////////////////////")
         # print(f'Info user_1 {self.game_user_1}')
         # print(f'Info user_2 {self.game_user_2}')
 
@@ -763,11 +777,11 @@ class PongConsumer(AsyncWebsocketConsumer):
                 self.ball['speed_x'] *= -1
 
             # Checking possible hit with game_user_1
-            if self.ball['left'] <= 0.05:
+            if self.ball['left'] <= 0.04:
                 if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_1["paddle"]['top'], self.game_user_1["paddle"]['size_y']):
                     self.ball['speed_x'] *= -1
             # Checking possible hit with game_user_2
-            if (self.ball['left'] + self.ball['size_x']) >= 0.94:
+            if (self.ball['left'] + self.ball['size_x']) >= 0.95:
                 if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_2["paddle"]['top'], self.game_user_2["paddle"]['size_y']):
                     self.ball['speed_x'] *= -1
 
@@ -782,12 +796,12 @@ class PongConsumer(AsyncWebsocketConsumer):
                 self.ball['top'] = 0.5
                 self.ball['left'] = 0.5
         
-            # Checking and setting precision limits for ball in top and left coordinates
-            # self.ball['top'] += self.ball['speed_y']
-            # if self.ball['top'] <= 0:
-            #     self.ball['top'] = 0
-            # else:
-            #     self.ball['top'] = round(self.ball['top'], 5)
+            #Checking and setting precision limits for ball in top and left coordinates
+            self.ball['top'] += self.ball['speed_y']
+            if self.ball['top'] <= 0:
+                self.ball['top'] = 0
+            else:
+                self.ball['top'] = round(self.ball['top'], 5)
     
             self.ball['left'] += self.ball['speed_x']
             if self.ball['left'] <= 0:
@@ -866,6 +880,7 @@ class MatchConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        print("///////////////// HEREEEEEEE ///////////")
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name

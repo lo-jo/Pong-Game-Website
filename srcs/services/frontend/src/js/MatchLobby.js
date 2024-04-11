@@ -4,12 +4,12 @@ import { router } from './Router'
 export class MatchLobby extends BaseClass {
     constructor() {
         super();
+        console.log(`MATCH LOBBY constructor()!`);
+        this.initWebSocketLobby();
         this.postMatch();
-        this.initWebSocket();
-        this.match_status = null;
     }
     
-    postMatch() {
+    async postMatch() {
         const httpProtocol = window.location.protocol;
         const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
@@ -22,27 +22,26 @@ export class MatchLobby extends BaseClass {
             },
         };
         
-        
-        fetch(url, options)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('The request was not successful');
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Backend response:', data);
-            })
-            .catch(error => {
-                console.error('Error making request:', error);
-            });
+                throw new Error('Unauthorized');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
     }
 
-    initWebSocket() {
+    initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
-    
-        console.log(wsUrl);
+
         const socket = new WebSocket(wsUrl);
 
         socket.onopen = function() {
@@ -52,12 +51,16 @@ export class MatchLobby extends BaseClass {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { action, match_id } = data;
-            console.log(action, match_id);
-            if (action == 'create_join') {
-                this.match_status = 'waiting';
-            } else if (action == 'join_play') {
+            // if (action == 'create_join') {
+            //     this.getHtmlForWaitingSpinner();
+            // } else if (action == 'join_play') {
+            //     socket.close();
+            //     history.pushState('', '', `/match/${match_id}`);
+            //     router();
+            // }
+            if (action == 'join_play') {
                 socket.close();
-                history.pushState({ match_id }, '', `/match/${match_id}`);
+                history.pushState('', '', `/match/${match_id}`);
                 router();
             }
         };
@@ -74,7 +77,7 @@ export class MatchLobby extends BaseClass {
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
         return `<div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Waiting for someone..</span>
                 </div>`;
     }
 }

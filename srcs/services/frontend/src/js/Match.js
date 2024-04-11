@@ -119,8 +119,6 @@ export class Match extends BaseClass {
                 this.initKeyEvents();
                 break;
             case 'someone_left':
-                const { how } = game_state;
-                // console.log(`Someone left by this reason ${how}`);
                 this.socket.send(JSON.stringify({'type_message' : 'match_aborted'}));
                 break;
             case 'broadcasted_game_event':

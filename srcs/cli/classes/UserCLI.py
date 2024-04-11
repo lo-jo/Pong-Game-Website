@@ -4,6 +4,7 @@ import json
 import curses
 import time
 import os
+import requests
 
 
 class UserCLI:
