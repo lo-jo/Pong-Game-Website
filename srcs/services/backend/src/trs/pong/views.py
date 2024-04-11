@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status, generics
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 # Channels
 from channels.layers import get_channel_layer
@@ -14,6 +14,9 @@ from .serializers import MatchSerializer, TournamentSerializer, ParticipantSeria
 from django.db import transaction
 from itertools import combinations
 from django.db.models import Q
+# from notification.models import Notification
+# from notification.serializers import NotificationSerializer
+# from django.contrib.auth import get_user_model
 
 class PongDashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -204,6 +207,7 @@ class JoinTournamentView(APIView):
     def post(self, request, tournament_id):
         try:
             user = request.user
+            print("user: ", user)
             tournament = Tournament.objects.get(id=tournament_id)
 
             # Check if the user is already a participant in the tournament
@@ -218,11 +222,13 @@ class JoinTournamentView(APIView):
             with transaction.atomic():
                 Participant.objects.create(tournament_id=tournament, user_id=user)
                 
-                # Check if the tournament is complete
-                if tournament.participants.count() == 4:
-                    tournament.status = 'full'
-                    tournament.save()
-                    self.create_matches_for_tournament(tournament)
+            # Check if the tournament is complete
+            if tournament.participants.count() == 4:
+                tournament.status = 'full'
+                tournament.save()
+                # message = f"The tournament {tournament.name} is now full. Your matches have been created."
+                # Notification.objects.create(message=message, recipient=user, sender=user)
+                self.create_matches_for_tournament(tournament)
 
             serializer = TournamentSerializer(tournament)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -238,11 +244,21 @@ class JoinTournamentView(APIView):
 
         if participants.count() == 4:
             for p1, p2 in combinations(participants, 2):
+                # Retrieve User instances
+                # user1 = get_user_model().objects.get(username=p1.user_id)
+                # user2 = get_user_model().objects.get(username=p2.user_id)
+                # user1 = User.objects.get(username=p1.user_id)
+                # user2 = User.objects.get(username=p2.user_id)
+                # print(user1, user2)
                 Match.objects.create(
                     user_1=p1.user_id,
                     user_2=p2.user_id,
                     tournament=tournament
                 )
+                # message1 = f"You have a match against {user1.username} in tournament {tournament.name}."
+                # message2 = f"You have a match against {user2.username} in tournament {tournament.name}."
+                # Notification.objects.create(message=message1, recipient=p2.user_id, sender=user1)
+                # Notification.objects.create(message=message2, recipient=p1.user_id, sender=user2)  
 
 class TournamentLeaderboardView(APIView):
     def get(self, request, tournament_id):

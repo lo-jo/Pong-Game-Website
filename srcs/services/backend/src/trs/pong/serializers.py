@@ -32,7 +32,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tournament
-        fields = ['id', 'creator_id', 'name', 'created_at', 'status', 'participants', 'winner']
+        fields = ['id', 'creator_id', 'name', 'created_at', 'status', 'participants', 'matches', 'winner']
 
     def validate(self, data):
         if 'name' not in data or not data['name']:
