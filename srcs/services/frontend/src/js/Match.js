@@ -19,7 +19,7 @@ export class Match extends BaseClass {
         this.token = localStorage.getItem('token');
 
         this.addDocumentClickListener();
-        this.insertCssLink();
+        // this.insertCssLink();
         this.initWebSocket();
     }
 
@@ -266,7 +266,8 @@ export class Match extends BaseClass {
         appContainer.appendChild(board_game);
         
         /*Adding all the app container*/
-        app.appendChild(appContainer);
+        // app.appendChild(appContainer);
+        app.innerHTML = appContainer.innerHTML;
     }
 
     showTimerBeforeMatch(){

@@ -19,14 +19,15 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
 
         # Database match data
         self.match_info = None
-        # Database user data
-        # self.db_user_1 = None
-        # self.db_user_2 = None
 
         self.game_user_1 = {}
         self.game_user_2 = {}
 
-        # self.who_i_am_id = None
+        # Match url (Ping system)
+        self.match_url = f'http://localhost:5173/localmatch/{self.match_id}'
+        self.client_url = ''
+        self.request_ping_message = True
+    
 
         self.ball = {
             'elem' : 'ball',
@@ -80,11 +81,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         # Saving match info in consumer
         self.match_info = match_info
         # Requesting ws handshaking to client
-        print("sending match info")
         await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
-
-        # print("init ws handshake call()")
-        # await self.init_ws_handshake(token)
 
         # Adding a the current connection to the group
         await self.channel_layer.group_add(
@@ -96,16 +93,18 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        print(f"DISCONNECT  {close_code}")
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
         )
+        match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        # Match completed
+        match.status = 'aborted'
+        await sync_to_async(match.save)()
+        
 
     async def websocket_disconnect(self, close_code):
-        print("Someone left")
-        print(f"I am {self.who_i_am_id}")
-        await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
+        pass
 
 
     # Receivers
@@ -117,15 +116,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             case 'ws_handshake':
                 ws_handshake_message = data.get('ws_handshake')
                 await self.receive_ws_handshake(ws_handshake_message, data)
-            case 'other_user':
-                other_user = data.get('other_user')
-                other_user_data = json.loads(other_user)
-
-                if not self.game_user_2 and other_user_data["user_id"] != self.who_i_am_id:
-                    self.game_user_2 = other_user_data
-                
-                if not self.game_user_1 and other_user_data["user_id"] != self.who_i_am_id:
-                    self.game_user_1 = other_user_data
 
             case 'game_event':
                 print('GAME VEVENT', data)
@@ -153,37 +143,11 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             case 'broadcasted_game_event':
                 broadcast_game_event = data.get('broadcasted_game_event')
                 await self.receive_broadcast_event(broadcast_game_event)
-
-
-    # This function handle the messages received from the client in the `ws_handshake`    
-    async def init_ws_handshake(self, user_jwt_token):
-        decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
-        user_id = decoded_token['user_id']
-        # user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
-        # Checking if the user_id match with any user in db
-        if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
-            await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-        else:
-            if user_id == self.match_info['user_1']:
-                if not self.game_user_1:
-                    self.game_user_1['user_id'] = user_id
-                    self.game_user_1['paddle'] = self.game_user_1_paddle
-            elif user_id == self.match_info['user_2']:
-                if not self.game_user_2:
-                    self.game_user_2['user_id'] = user_id
-                    self.game_user_2['paddle'] = self.game_user_2_paddle
-
-            # This is the player 2
-            if not self.game_user_1:
-                self.who_i_am_id = self.game_user_2["user_id"]
-                game_user_2_str = json.dumps(self.game_user_2)
-                await self.send_to_group('other_user', game_user_2_str)
-
-            # This is the player 1
-            if not self.game_user_2:
-                self.who_i_am_id = self.game_user_1["user_id"]
-                game_user_1_str = json.dumps(self.game_user_1)
-                await self.send_to_group('other_user', game_user_1_str)
+            case 'ping':
+                self.client_url = data.get('url')
+            case 'match_completed':
+                # Stop of ping
+                self.request_ping_message = False
 
 
     # This function handle the messages received from the client in the `ws_handshake`    
@@ -191,37 +155,24 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         if ws_handshake_message == 'authorization':
             user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
             # Checking if the user_id match with any user in db
-            if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
-                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
+            if user_id == self.match_info["user_1"]:
+                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorized'})
+                self.game_user_1['user_id'] = user_id
+                self.game_user_1['paddle'] = self.game_user_1_paddle
             else:
-                if user_id == self.match_info['user_1']:
-                    if not self.game_user_1:
-                        self.game_user_1['user_id'] = user_id
-                        self.game_user_1['paddle'] = self.game_user_1_paddle
-                elif user_id == self.match_info['user_2']:
-                    if not self.game_user_2:
-                        self.game_user_2['user_id'] = user_id
-                        self.game_user_2['paddle'] = self.game_user_2_paddle
-
-                # This is the player 2
-                if not self.game_user_1:
-                    self.who_i_am_id = self.game_user_2["user_id"]
-                    game_user_2_str = json.dumps(self.game_user_2)
-                    await self.send_to_group('other_user', game_user_2_str)
-
-                # This is the player 1
-                if not self.game_user_2:
-                    self.who_i_am_id = self.game_user_1["user_id"]
-                    game_user_1_str = json.dumps(self.game_user_1)
-                    await self.send_to_group('other_user', game_user_1_str)
+                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
     
-        elif ws_handshake_message == 'user2':
+        elif ws_handshake_message == 'guest_user':
+            print('////////////////////////////////////////')
             print("IS THE ACTUAL DATA THAT IM GETTING", data)
-            self.game_user_2['user_id'] = data['user2']
+            self.game_user_2['user_id'] = data['guest_user']
             self.game_user_2['paddle'] = self.game_user_2_paddle
 
         elif ws_handshake_message == 'confirmation':
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
+            match.status = 'playing'
+            await sync_to_async(match.save)()
+            asyncio.create_task(self.game_loop())
 
             # if match.status == 'completed':
             #     print('///////////// HEREEEE /////////////////////////')
@@ -248,7 +199,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             #     elif match.status == 'joined':
             #         match.status = 'playing'
             #         await sync_to_async(match.save)()
-            asyncio.create_task(self.game_loop())
 
     async def receive_broadcast_event(self, broadcast_game_event_message):
         match broadcast_game_event_message:
@@ -292,15 +242,22 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             return None
 
     async def request_ping(self):
-        while self.game_finish == False:
-            await self.send_to_connection()
-            await asyncio.sleep(0.1)
+        while self.game_finish == False and self.request_ping_message == True:
+            if self.client_url != '':
+                # This connection has chaning of url
+                if self.client_url != self.match_url:
+                    self.game_finish = True
+                    # Deleting the user of the channels group
+                    await self.disconnect(1)
+                    await self.websocket_disconnect(1)
+                    break
+            await self.send_to_connection({'type_message' : 'request_ping'})
+            await asyncio.sleep(0.01)
 
     # Senders
     async def send_initial_data(self):
         self.db_user_1 = await self.user_in_db(self.match_info["user_1"])
         self.db_user_2 = await self.user_in_db(self.match_info["user_2"])
-        print('SENDING INITIAL DATA', self.db_user_1, self.db_user_2)
         users_data = {
             'type_message' : 'ws_handshake',
             'ws_handshake' : 'initial_data',
@@ -308,6 +265,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             'user_2_info' : self.db_user_2
         }
         await self.send_to_connection(users_data)
+        asyncio.create_task(self.request_ping())
 
     async def send_to_group(self, type_message, message):
         await self.channel_layer.group_send(
@@ -320,9 +278,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-
     async def send_to_connection(self, event):
-        print("SENDING TO CONNECTION")
         await self.send(text_data=json.dumps(event))
 
     async def send_game_state(self, event):
@@ -331,15 +287,14 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
     async def game_timer(self):
         timer_type = 'normal'
         while self.game_finish == False:
-            
             await self.send_to_group('timer', json.dumps({'time_remaininig' : f'{self.game_time}', 'type' : f'{timer_type}'}))
             await asyncio.sleep(1)
             self.game_time += 1
 
     async def game_loop(self):
-        # while not self.game_user_1 or not self.game_user_2:
-        #     print("Waiting for the info...")
-        #     await asyncio.sleep(1)
+        while not self.game_user_1 or not self.game_user_2:
+            print("Waiting for the info...")
+            await asyncio.sleep(1)
 
         print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
@@ -353,10 +308,8 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         }
 
         await self.send_to_group('game_state', json.dumps(init_pong_game_data))
-        # // REPLACE WITH SEND TO CONNECTION
         # Start timer
         asyncio.create_task(self.game_timer())
-        #  // GARDER LE THREAD
 
         while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
             # Bouncing the ball in Y Axis
@@ -625,38 +578,6 @@ class PongConsumer(AsyncWebsocketConsumer):
 
                 await self.send_to_group('game_state', json.dumps(redirect_info))
 
-
-    # This function handle the messages received from the client in the `ws_handshake`    
-    async def init_ws_handshake(self, user_jwt_token):
-        decoded_token = jwt.decode(user_jwt_token, os.getenv("SECRET_KEY"), algorithms=['HS256'])
-        user_id = decoded_token['user_id']
-        # user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
-        # Checking if the user_id match with any user in db
-        if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
-            await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-        else:
-            if user_id == self.match_info['user_1']:
-                if not self.game_user_1:
-                    self.game_user_1['user_id'] = user_id
-                    self.game_user_1['paddle'] = self.game_user_1_paddle
-            elif user_id == self.match_info['user_2']:
-                if not self.game_user_2:
-                    self.game_user_2['user_id'] = user_id
-                    self.game_user_2['paddle'] = self.game_user_2_paddle
-
-            # This is the player 2
-            if not self.game_user_1:
-                self.who_i_am_id = self.game_user_2["user_id"]
-                game_user_2_str = json.dumps(self.game_user_2)
-                await self.send_to_group('other_user', game_user_2_str)
-
-            # This is the player 1
-            if not self.game_user_2:
-                self.who_i_am_id = self.game_user_1["user_id"]
-                game_user_1_str = json.dumps(self.game_user_1)
-                await self.send_to_group('other_user', game_user_1_str)
-
-
     # This function handle the messages received from the client in the `ws_handshake`    
     async def receive_ws_handshake(self, ws_handshake_message, data):
         if ws_handshake_message == 'authorization':
@@ -798,7 +719,6 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-
     async def send_to_connection(self, event):
         await self.send(text_data=json.dumps(event))
 
@@ -812,18 +732,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.send_to_group('timer', json.dumps({'time_remaininig' : f'{self.game_time}', 'type' : f'{timer_type}'}))
             await asyncio.sleep(1)
             self.game_time += 1
-        #     if (self.time_remaining - 3) == 0:
-        #         if self.game_user_1["paddle"]["score"] == self.game_user_2["paddle"]["score"]:
-        #             timer_type = 'prorogation'
-        #             self.time_remaining += 11
-        #         else:
-        #             timer_type = 'normal'
-        #     else:
-        #         timer_type = 'normal'
-        #     self.time_remaining = self.time_remaining - 1
-
-        # # print("**********&&&&&&&&&&&&&&& hereeeeeee &&&&&&&&&&&&&&&&&&& /////////////////")
-        # self.game_finish = True
 
     async def game_loop(self):
         while not self.game_user_1 or not self.game_user_2:
@@ -834,12 +742,12 @@ class PongConsumer(AsyncWebsocketConsumer):
         # print(f'Info user_1 {self.game_user_1}')
         # print(f'Info user_2 {self.game_user_2}')
 
-        # init_pong_game_data = {
-        #     'event' : 'init_pong_game',
-        #     'ball_game' : self.ball,
-        #     'user_paddle_1' : self.game_user_1["paddle"],
-        #     'user_paddle_2' : self.game_user_2["paddle"]
-        # }
+        init_pong_game_data = {
+            'event' : 'init_pong_game',
+            'ball_game' : self.ball,
+            'user_paddle_1' : self.game_user_1["paddle"],
+            'user_paddle_2' : self.game_user_2["paddle"]
+        }
 
         await self.send_to_group('game_state', json.dumps(init_pong_game_data))
         # Start timer

@@ -466,6 +466,11 @@ export class Dashboard extends BaseClass {
                         <div class="col-4 col-sm-5">
                             <div id="game-actions" class="row justify-content-center">
                                 <div class="game-action col">
+                                    <button id="launch-local-game" class="btn my-3 py-2" type="button">PLAY A LOCAL MATCH</button>
+                                </div>
+                            </div>
+                            <div id="game-actions" class="row justify-content-center">
+                                <div class="game-action col">
                                     <button id="launch-game-button" class="btn my-3 py-2" type="button">PLAY A MATCH</button>
                                 </div>
                             </div>

@@ -91,6 +91,7 @@ class Match(models.Model):
         ('joined', 'Joined'),
         ('playing','Playing'),
         ('completed', 'Completed'),
+        ('aborted', 'Aborted')
     ]
 
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')

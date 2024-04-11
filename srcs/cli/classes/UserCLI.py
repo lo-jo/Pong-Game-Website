@@ -1,6 +1,5 @@
 # Standard modules
 import subprocess
-import requests
 import json
 import curses
 import time

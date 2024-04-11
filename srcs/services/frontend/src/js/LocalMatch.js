@@ -19,7 +19,7 @@ export class LocalMatch extends BaseClass {
         this.token = localStorage.getItem('token');
 
         this.addDocumentClickListener();
-        this.insertCssLink();
+        // this.insertCssLink();
         this.initWebSocket();
         this.user_1_info = null;
         this.user_2_info = null;
@@ -39,7 +39,6 @@ export class LocalMatch extends BaseClass {
         this.socket.onmessage = (event) => {
             
             const data = JSON.parse(event.data);
-            console.log(data);
             const { type_message } = data;
             switch(type_message)
             {
@@ -47,17 +46,13 @@ export class LocalMatch extends BaseClass {
                     const { ws_handshake } = data;
                     this.ws_handshake(ws_handshake, data);
                     break;
-                // case 'ping':
-                //     console.log('The server wants that I do ping')
+                case 'request_ping':
+                    this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
+                    break;
                 case 'game_state':
                     const { game_state } = data;
                     this.updateGameState(game_state);
                     break;
-                // case 'other_user':
-                //     const { other_user } = data;
-                //     console.log('sending other user!')
-                //     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
-                //     break;
                 case 'timer':
                     const { timer } = data
                     this.updateTimer(timer);
@@ -96,10 +91,12 @@ export class LocalMatch extends BaseClass {
                 const jwtToken = localStorage.getItem('token');
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
-            // case 'failed_authorization':
-            //     this.showMessageAndRedirect(`You don't have authorization to this match.`);
-            //     break;
-            
+            case 'authorized':
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'guest_user' , 'guest_user' : `${this.user_2_info.id}`}));
+                break;
+            case 'failed_authorization':
+                this.showMessageAndRedirect(`You don't have authorization to this match.`);
+                break;
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
                 this.user_1_info = user_1_info;
@@ -280,10 +277,7 @@ export class LocalMatch extends BaseClass {
             seconds_div.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
-                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'user2' , 'user2' : `${user_2_info.id}`}));
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-
-                console.log('sending confirmation');
             }
         }, 1000);
     }
