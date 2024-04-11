@@ -23,8 +23,11 @@
 }
 
 .active > .page-link, .disabled > .page-link{
-    background-color: #FFFFFC;
-    color: #FF003D;
+    /* background-color: #FFFFFC;
+    color: #FF003D; */
+    background-color: inherit;
+    border : 2px solid rgba(255, 255, 255, 0.5);
+    color: #FFFFFC;
 }
 
 .tournamentMatches .card button:hover, .page-link:hover {

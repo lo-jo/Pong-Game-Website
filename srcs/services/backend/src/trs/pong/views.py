@@ -88,70 +88,114 @@ class JoinMatchView(APIView):
         )
 
     def post(self, request):
-        try:
-            # Getting latest match posted
-            print("////////////////In POST////////////////////")
-            latest_match = Match.objects.latest('created_at')
+        # 1. Filter matches that are not part of a tournament
+        matches = Match.objects.filter(tournament__isnull=True)
+        
+        # 2. Filter the oldest 'pending' match
+        oldest_pending_match = matches.filter(status='pending').order_by('created_at')
 
-            if latest_match.status == 'completed':
-                new_match = Match.objects.create(status='pending')
-                new_match.user_1 = request.user
-                new_match.save()
-                serializer = MatchSerializer(new_match)
-                # Sends a message via WebSocket when a new match is created.
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    'matches_group',
-                    {
-                        'type': 'send_match_notification',
-                        'action': 'create_join',
-                        'match_id': new_match.id,
-                    }
-                )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if oldest_pending_match:
+            for match in oldest_pending_match:
+                # 2.1 If the oldest pending match is 'full', post a new match
+                if match.user_1 and match.user_2:
+                    continue
+                else:
 
-            if latest_match.user_1 != request.user:
-                print("You are going to join the last match created")
-                latest_match.user_2 = request.user
-                latest_match.save()
-                serializer = MatchSerializer(latest_match)
-                self.join_user_to_match_lobby('join_play', latest_match.id)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                print("Created new match because you are the other user")
-                new_match = Match.objects.create(status='pending')
-                new_match.user_1 = request.user
-                new_match.save()
-                serializer = MatchSerializer(new_match)
-                # Sends a message via WebSocket when a new match is created.
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    'matches_group',
-                    {
-                        'type': 'send_match_notification',
-                        'action': 'create_join',
-                        'match_id': new_match.id,
-                    }
-                )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Match.DoesNotExist:
-            print("Match does not exists, so creating another")
+                    # Joining match pending
+                    if match.user_1 == None:
+                        match.user_1 = request.user
+                    elif match.user_2 == None:
+                        match.user_2 = request.user
+
+                    match.save()
+                    self.join_user_to_match_lobby('join_play', match.id)
+                    # # Sending http response
+                    serializer = MatchSerializer(match)
+                    print(serializer.data)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            # Creating new match because there's not pending
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user
             new_match.save()
-
+            self.join_user_to_match_lobby('create_join', new_match.id)
+        
+            # Sending http response
             serializer = MatchSerializer(new_match)
-            # Sends a message via WebSocket when a new match is created.
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'matches_group',
-                {
-                    'type': 'send_match_notification',
-                    'action': 'create_join',
-                    'match_id': new_match.id,
-                }
-            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        
+
+    # def post(self, request):
+    #     try:
+    #         # Getting latest match posted
+    #         print("////////////////In POST////////////////////")
+    #         latest_match = Match.objects.latest('created_at')
+    #         # 1. Filtrer le matchs qui sont pas des tournois
+    #         # 2. Chercher le plus vieux 'pending'
+    #         #   2.1 SI il est 'full', post un nouveau
+    #         # 3. Si aucun 'pending' match, post un nouveau
+
+
+    #         if latest_match.status == 'completed':
+    #             new_match = Match.objects.create(status='pending')
+    #             new_match.user_1 = request.user
+    #             new_match.save()
+    #             serializer = MatchSerializer(new_match)
+    #             # Sends a message via WebSocket when a new match is created.
+    #             channel_layer = get_channel_layer()
+    #             async_to_sync(channel_layer.group_send)(
+    #                 'matches_group',
+    #                 {
+    #                     'type': 'send_match_notification',
+    #                     'action': 'create_join',
+    #                     'match_id': new_match.id,
+    #                 }
+    #             )
+    #             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    #         if latest_match.user_1 != request.user:
+    #             print("You are going to join the last match created")
+    #             latest_match.user_2 = request.user
+    #             latest_match.save()
+    #             serializer = MatchSerializer(latest_match)
+    #             self.join_user_to_match_lobby('join_play', latest_match.id)
+    #             return Response(serializer.data, status=status.HTTP_200_OK)
+    #         else:
+    #             print("Created new match because you are the other user")
+    #             new_match = Match.objects.create(status='pending')
+    #             new_match.user_1 = request.user
+    #             new_match.save()
+    #             serializer = MatchSerializer(new_match)
+    #             # Sends a message via WebSocket when a new match is created.
+    #             channel_layer = get_channel_layer()
+    #             async_to_sync(channel_layer.group_send)(
+    #                 'matches_group',
+    #                 {
+    #                     'type': 'send_match_notification',
+    #                     'action': 'create_join',
+    #                     'match_id': new_match.id,
+    #                 }
+    #             )
+    #             return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     except Match.DoesNotExist:
+    #         print("Match does not exists, so creating another")
+    #         new_match = Match.objects.create(status='pending')
+    #         new_match.user_1 = request.user
+    #         new_match.save()
+
+    #         serializer = MatchSerializer(new_match)
+    #         # Sends a message via WebSocket when a new match is created.
+    #         channel_layer = get_channel_layer()
+    #         async_to_sync(channel_layer.group_send)(
+    #             'matches_group',
+    #             {
+    #                 'type': 'send_match_notification',
+    #                 'action': 'create_join',
+    #                 'match_id': new_match.id,
+    #             }
+    #         )
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # TOURNAMENT STUFF
 class OpenTournamentsView(APIView):

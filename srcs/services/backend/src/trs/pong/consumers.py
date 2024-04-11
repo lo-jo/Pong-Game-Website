@@ -424,6 +424,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.game_user_1 = {}
         self.game_user_2 = {}
 
+        self.lauch_game = False
+
         self.who_i_am_id = None
 
         self.ball = {
@@ -632,34 +634,37 @@ class PongConsumer(AsyncWebsocketConsumer):
                         match = await sync_to_async(Match.objects.get)(id=self.match_id)
                     match.status = 'playing'
                     await sync_to_async(match.save)()
+                    self.lauch_game = True
                     asyncio.create_task(self.game_loop())
                 elif match.status == 'joined':
                     match.status = 'playing'
                     await sync_to_async(match.save)()
+                    self.lauch_game = True
                     asyncio.create_task(self.game_loop())
 
     async def receive_broadcast_event(self, broadcast_game_event_message):
-        match broadcast_game_event_message:
-            case 'move_up_paddle_1':
-                self.game_user_1["paddle"]["top"] -= 0.1
-                if self.game_user_1["paddle"]["top"] <= 0:
-                    self.game_user_1["paddle"]["top"] = 0
-                self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-            case 'move_up_paddle_2':
-                self.game_user_2["paddle"]["top"] -= 0.1
-                if self.game_user_2["paddle"]["top"] <= 0:
-                    self.game_user_2["paddle"]["top"] = 0
-                self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
-            case 'move_down_paddle_1':
-                self.game_user_1["paddle"]["top"] += 0.1
-                if self.game_user_1["paddle"]["top"] >= 0.75:
-                    self.game_user_1["paddle"]["top"] = 0.75
-                self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-            case 'move_down_paddle_2':
-                self.game_user_2["paddle"]["top"] += 0.1
-                if self.game_user_2["paddle"]["top"] >= 0.75:
-                    self.game_user_2["paddle"]["top"] = 0.75
-                self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+        if self.lauch_game == True:
+            match broadcast_game_event_message:
+                case 'move_up_paddle_1':
+                    self.game_user_1["paddle"]["top"] -= 0.1
+                    if self.game_user_1["paddle"]["top"] <= 0:
+                        self.game_user_1["paddle"]["top"] = 0
+                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                case 'move_up_paddle_2':
+                    self.game_user_2["paddle"]["top"] -= 0.1
+                    if self.game_user_2["paddle"]["top"] <= 0:
+                        self.game_user_2["paddle"]["top"] = 0
+                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+                case 'move_down_paddle_1':
+                    self.game_user_1["paddle"]["top"] += 0.1
+                    if self.game_user_1["paddle"]["top"] >= 0.75:
+                        self.game_user_1["paddle"]["top"] = 0.75
+                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                case 'move_down_paddle_2':
+                    self.game_user_2["paddle"]["top"] += 0.1
+                    if self.game_user_2["paddle"]["top"] >= 0.75:
+                        self.game_user_2["paddle"]["top"] = 0.75
+                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
 
 
     # Methods for calling to database

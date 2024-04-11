@@ -63,7 +63,7 @@ function createTunnel() {
   tunnelDiv.style.display = "flex";
   tunnelDiv.style.flexDirection = "column";
   tunnelDiv.style.justifyContent = "center";
-  tunnelDiv.style.maxWidth = "100vw";
+  tunnelDiv.style.maxWidth = "100%";
   tunnelDiv.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
   tunnelDiv.style.height = "100vh";
 
@@ -79,20 +79,8 @@ function createTunnel() {
   innerTunnelDiv.style.position = "absolute";
   innerTunnelDiv.style.top = "0px";
   innerTunnelDiv.style.left = "0px";
-  innerTunnelDiv.style.width = "100vw";
+  innerTunnelDiv.style.width = "100%";
   innerTunnelDiv.style.height = "100vh";
-
-
-  // const mainDiv = document.createElement("div");
-  // mainDiv.setAttribute('id', 'app')
-  // mainDiv.setAttribute('class', 'container')
-  // mainDiv.style.transformStyle = "preserve-3d";
-  // mainDiv.style.position = "absolute";
-  // mainDiv.style.top = "calc(50%)";
-  // mainDiv.style.left = "calc(50%)";
-  // mainDiv.style.transform = "translate(-50%, -50%)";
-  // mainDiv.style.width = "50vw";
-  // mainDiv.style.height = "50vh";
 
   walls.forEach((wall, i) => {
     const wallDiv = createWallDiv(wall);
@@ -101,8 +89,6 @@ function createTunnel() {
 
   scrollTunnelDiv.appendChild(innerTunnelDiv);
   tunnelDiv.appendChild(scrollTunnelDiv);
-  // tunnelDiv.appendChild(mainDiv);
-
   return tunnelDiv;
 }
 
