@@ -18,6 +18,11 @@ export class Match extends BaseClass {
         /*Getting token*/
         this.token = localStorage.getItem('token');
 
+        /*Game users*/
+        this.total_game_user = 0
+        this.game_user_1 = {}
+        this.game_user_2 = {}
+
         this.addDocumentClickListener();
         // this.insertCssLink();
         this.initWebSocket();
@@ -52,8 +57,12 @@ export class Match extends BaseClass {
                     break;
                 case 'other_user':
                     const { other_user } = data;
-                    console.log('sending other user!')
-                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    console.log("Receiving other user!")
+                    if (other_user !== '{}')
+                    {
+                        console.log('sending other user!')
+                        this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    }
                     break;
                 case 'timer':
                     const { timer } = data

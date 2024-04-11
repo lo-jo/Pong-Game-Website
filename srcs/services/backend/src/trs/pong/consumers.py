@@ -421,12 +421,14 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.db_user_1 = None
         self.db_user_2 = None
 
+        self.total_game_users = 0
         self.game_user_1 = {}
         self.game_user_2 = {}
 
         self.lauch_game = False
 
         self.who_i_am_id = None
+
 
         self.ball = {
             'elem' : 'ball',
@@ -512,13 +514,17 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await self.receive_ws_handshake(ws_handshake_message, data)
             # Receiving other user
             case 'other_user':
+
+                print("RECEIVING OTHER USER!")
                 other_user = data.get('other_user')
                 other_user_data = json.loads(other_user)
 
                 if not self.game_user_2 and other_user_data["user_id"] != self.who_i_am_id:
+                    self.total_game_users += 1
                     self.game_user_2 = other_user_data
                 
                 if not self.game_user_1 and other_user_data["user_id"] != self.who_i_am_id:
+                    self.total_game_users += 1
                     self.game_user_1 = other_user_data
             
             # Receiving game events (paddles movement)
@@ -584,6 +590,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
             else:
+                print("You are authorized for join the match!")
                 if user_id == self.match_info['user_1']:
                     if not self.game_user_1:
                         self.game_user_1['user_id'] = user_id
@@ -593,17 +600,28 @@ class PongConsumer(AsyncWebsocketConsumer):
                         self.game_user_2['user_id'] = user_id
                         self.game_user_2['paddle'] = self.game_user_2_paddle
 
-                # This is the player 2
-                if not self.game_user_1:
-                    self.who_i_am_id = self.game_user_2["user_id"]
-                    game_user_2_str = json.dumps(self.game_user_2)
-                    await self.send_to_group('other_user', game_user_2_str)
+                game_user_1_str = json.dumps(self.game_user_1)
+                # await self.send_to_group('other_user', game_user_1_str)
+                game_user_2_str = json.dumps(self.game_user_2)
+                # await self.send_to_group('other_user', game_user_2_str)
 
-                # This is the player 1
-                if not self.game_user_2:
-                    self.who_i_am_id = self.game_user_1["user_id"]
-                    game_user_1_str = json.dumps(self.game_user_1)
-                    await self.send_to_group('other_user', game_user_1_str)
+                # while self.total_game_users < 2:
+                #     print("Sending other user!!!!!!")
+                #     await self.send_to_group('other_user', game_user_1_str)
+                #     await self.send_to_group('other_user', game_user_2_str)
+                
+                # print("Yes!")
+                # # This is the player 2
+                # if not self.game_user_1:
+                #     self.who_i_am_id = self.game_user_2["user_id"]
+                #     game_user_2_str = json.dumps(self.game_user_2)
+                #     await self.send_to_group('other_user', game_user_2_str)
+
+                # # This is the player 1
+                # if not self.game_user_2:
+                #     self.who_i_am_id = self.game_user_1["user_id"]
+                #     game_user_1_str = json.dumps(self.game_user_1)
+                #     await self.send_to_group('other_user', game_user_1_str)
 
 
         elif ws_handshake_message == 'confirmation':
