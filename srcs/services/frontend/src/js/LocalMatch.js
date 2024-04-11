@@ -291,23 +291,25 @@ export class LocalMatch extends BaseClass {
     initKeyEvents = () => {
         const jwtToken = localStorage.getItem('token');
         document.addEventListener('keydown', (e) => {
-            switch(e.key){
-                case 'w':
-                    // console.log("`w` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_1_info.id}`}));
-                    break;
-                case 's':
-                    // console.log("`s` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_1_info.id}`}));
-                    break;
-                case 'ArrowUp':
-                    // console.log("`w` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_2_info.id}`}));
-                    break;
-                case 'ArrowDown':
-                    // console.log("`s` pressed");
-                    this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_2_info.id}`}));
-                    break;       
+            if (this.socket.readyState === WebSocket.OPEN)
+            {
+                switch(e.key){
+                    case 'w':
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_1_info.id}`}));
+                        break;
+                    case 's':
+                        // console.log("`s` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_1_info.id}`}));
+                        break;
+                    case 'ArrowUp':
+                        // console.log("`w` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_2_info.id}`}));
+                        break;
+                    case 'ArrowDown':
+                        // console.log("`s` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_2_info.id}`}));
+                        break;       
+                }
             }
         });
     }
