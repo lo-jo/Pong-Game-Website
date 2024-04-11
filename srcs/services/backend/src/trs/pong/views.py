@@ -14,6 +14,7 @@ from .serializers import MatchSerializer, TournamentSerializer, ParticipantSeria
 from django.db import transaction
 from itertools import combinations
 from django.db.models import Q
+from django.utils.html import escape
 # from notification.models import Notification
 # from notification.serializers import NotificationSerializer
 # from django.contrib.auth import get_user_model
@@ -179,7 +180,7 @@ class CreateTournamentView(APIView):
     def post(self, request):
         try:
             print("=> Creating new tournament")
-            tournament_name = request.data.get('tournamentName')
+            tournament_name = escape(request.data.get('tournamentName'))
 
             # Create tournament
             tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user, status='pending')
@@ -207,7 +208,6 @@ class JoinTournamentView(APIView):
     def post(self, request, tournament_id):
         try:
             user = request.user
-            print("user: ", user)
             tournament = Tournament.objects.get(id=tournament_id)
 
             # Check if the user is already a participant in the tournament
@@ -219,6 +219,7 @@ class JoinTournamentView(APIView):
                 return Response({'error': 'This tournament is already full.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Create participant entry for the user in the tournament
+            # atmoic() if any part of this process fails, all changes made within the transaction will be rolled back
             with transaction.atomic():
                 Participant.objects.create(tournament_id=tournament, user_id=user)
                 
