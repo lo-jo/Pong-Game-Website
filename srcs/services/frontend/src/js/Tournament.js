@@ -234,7 +234,7 @@ export class Tournament extends BaseClass {
                                 <div class="row justify-content-center">
                                     <h3 class="text-center mb-1 title-winner">Winner: ${tournamentLeaderboard.winner}</h3>
                                     <div class="col-lg-8 col-md-10 col-sm-12">
-                                        <table class="table table-dark table-hover my-3">
+                                        <table id="leaderboard" class="table table-dark table-hover my-3">
                                             <thead>
                                                 <tr>
                                                     <th>Rank</th>
@@ -249,7 +249,7 @@ export class Tournament extends BaseClass {
         leaderboardData.forEach(entry => {
             leaderboardHTML += `<tr>
                                     <td>${entry.rank}</td>
-                                    <td><a href="/test/${entry.user_id}">${entry.username}</a></td>
+                                    <td><a class="opponent-link" href="/test/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
                                     <td>${entry.total_duration}</td>
@@ -262,6 +262,13 @@ export class Tournament extends BaseClass {
                 </div>`;
     
         document.getElementById('app').innerHTML = leaderboardHTML;
+        const opponentLinks = document.querySelectorAll('#leaderboard .opponent-link');
+        opponentLinks.forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                navigateTo(link.href);
+            });
+        });
     }
 
     async joinTournament(tournamentId) {

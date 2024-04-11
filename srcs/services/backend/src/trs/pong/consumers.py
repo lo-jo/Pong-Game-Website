@@ -554,13 +554,13 @@ class PongConsumer(AsyncWebsocketConsumer):
                 match = await sync_to_async(Match.objects.get)(id=self.match_id)
 
                 if self.match_info["user_1"] == self.who_i_am_id:
-                    match.score_user_1 = 3
+                    match.score_user_1 = 5
                     match.score_user_2 = 0
                     match.winner = match.user_1
                     match.loser = match.user_2
                 else:
                     match.score_user_1 = 0
-                    match.score_user_2 = 3
+                    match.score_user_2 = 5
                     match.winner = match.user_2
                     match.loser = match.user_1
                 
@@ -579,6 +579,19 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }
 
                 await self.send_to_group('game_state', json.dumps(redirect_info))
+
+                if match.tournament:
+                    print("THIS MATCH IS PART OF A TOURNAMENT")
+                    tournament_id = match.tournament_id
+                    tournament = await sync_to_async(Tournament.objects.get)(id=tournament_id)
+
+                    tournament.matches_played += 1
+
+                    if tournament.matches_played == 6:
+                        tournament.status = 'finished'
+                        tournament.calculate_winner_and_leaderboard()
+
+                    await sync_to_async(tournament.save)()
 
     # This function handle the messages received from the client in the `ws_handshake`    
     async def receive_ws_handshake(self, ws_handshake_message, data):
