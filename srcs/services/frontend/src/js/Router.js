@@ -189,8 +189,7 @@ export const router = async () => {
     if (viewObject.auth === true && (!token || auth === false)) {
         navigateTo("/");
         return;
-    } else if (viewObject.auth === false && (token && auth === true))
-    {
+    } else if (viewObject.auth === false && (token && auth === true)) {
         navigateTo("/dashboard");
         return;
     }
@@ -232,7 +231,7 @@ async function checkAuthentication() {
         const token = localStorage.getItem('token');
 
         if (!token) {
-            return false;
+            throw false;
         }
 
         let decodedToken;
@@ -240,7 +239,7 @@ async function checkAuthentication() {
             decodedToken = jwt_decode(token);
         } catch (decodeError) {
             console.error('Error decoding token:', decodeError.message);
-            return false;
+            throw false;
         }
 
         const response = await fetch('http://localhost:8000/users/check-authentication/', {
@@ -253,7 +252,7 @@ async function checkAuthentication() {
 
         if (!response.ok) {
             // console.error('Error checking authentication:', response.statusText);
-            return false;
+            throw false;
         }
 
         const data = await response.json();
@@ -262,13 +261,20 @@ async function checkAuthentication() {
             return data.authenticated;
         } else {
             // console.error('Invalid response format:', data);
-            return false;
+            throw false;
         }
     } catch (error) {
         // console.error('Unexpected error checking authentication:', error);
         return false;
     }
 }
+
+// Removes token when browser closes without doing logout
+// window.addEventListener('beforeunload', function(event) {
+//     console.log("beforeunload happening => removing token from localStorage");
+//     localStorage.removeItem('token');
+// });
+
 
 let navbar = new Navbar();
 
@@ -286,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             navigateTo(event.target);
         }
-    });    
+    }); 
 });
 
 // document.getElementById("bellButton").addEventListener("click", function() {

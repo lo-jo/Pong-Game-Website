@@ -124,13 +124,21 @@ class UserProfileView(RetrieveAPIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
+# class CheckAuthentication(APIView):
+#     # authentication_classes = [JWTAuthentication]
+#     permission_classes = (IsAuthenticated,)
+
+#     def get(self, request):
+#         return Response({'authenticated': True})
+
 class CheckAuthentication(APIView):
-    # authentication_classes = [JWTAuthentication]
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-
-        return Response({'authenticated': True})
+        if request.user.is_authenticated:
+            return Response({'authenticated': True})
+        else:
+            return Response({'authenticated': False})
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):

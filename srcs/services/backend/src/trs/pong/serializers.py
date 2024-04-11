@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Match, Tournament, Participant
+from django.utils.html import escape
 
     # def validate(self, data):
     #     if 'status' not in data or not data['status']:
@@ -32,7 +33,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tournament
-        fields = ['id', 'creator_id', 'name', 'created_at', 'status', 'participants', 'winner']
+        fields = ['id', 'creator_id', 'name', 'created_at', 'status', 'participants', 'matches', 'winner']
 
     def validate(self, data):
         if 'name' not in data or not data['name']:
@@ -42,3 +43,9 @@ class TournamentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         new_tournament_created = Tournament.objects.create(**validated_data)
         return new_tournament_created
+
+    # Apply HTML escaping if rendering data directly in HTML templates
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['name'] = escape(data['name'])
+        return data
