@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background-color: #7000ff;
+  /* background-color: #7000ff; */
   /* align-items: flex-start; */
 }
 
@@ -22,13 +22,14 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #ff003d;
+  /* background-color: #ff003d; */
 }
 
 #seconds{
-  background-color: aqua;
+  /* background-color: aqua; */
   font-size: 10rem;
   text-align: center;
+  color : white
 }
 
 .user-info {
@@ -36,21 +37,25 @@
   /* margin: 5px; */
   padding: 5px;
   max-width: auto;
-  background-color: royalblue;
+  /* background-color: royalblue; */
 }
 
 .timer {
-  background-color: coral;
+  /* background-color: coral; */
   margin: 5px;
   padding: 5px;
-  /* max-width: 200px; */
+}
+
+.timer-prolongation {
+  border: 2px solid #7000ff;
+  border-radius: 0.5rem;
 }
 
 #board-game {
   position: relative;
   width: 100%;
   height: 90%;
-  background-color: cadetblue;
+  /* background-color: cadetblue; */
 }
 
 #confirm-match {
@@ -84,19 +89,9 @@
 } */
 
 .user-paddle {
-  /* width: calc(5%);
-  height: calc(15%); */
-  /* top : 0;
-  left : 0; */
   position: absolute;
-  background-color: black;
-  /* box-shadow: inset 0 0 18px #fffffc,
-  inset -6px 0 18px #fffffc,
-  inset 6px 0 18px #fffffc,
-  inset -6px 0 30px #fffffc,
-  inset 6px 0 30px #fffffc,
-  0 0 18px #fffffc, 4px 0 18px
-  #fffffc, -4px 0 18px #fffffc; */
+  background-color: #7000ff;
+  border-radius: 3%;
 }
 
 
@@ -104,13 +99,6 @@
   position: absolute;
   border-radius: 50%;
 }
-
-/* 
-#ball {
-  background-color: red;
-  width: 5rem;
-
-} */
 
 .ball_effect {
   height: 100%;
@@ -125,6 +113,17 @@
       0 0 18px #fffffc, -4px 0 18px
       #7000ff, 4px 0 18px #fffffc;
 }
+
+@keyframes colorChange {
+  0% { color: #7000ff; }
+  50% { color: red; }
+  100% { color: #7000ff; }
+}
+
+.color-changing {
+  animation: colorChange 0.5s infinite;
+}
+
 
 @keyframes spinBall {
   100% {
@@ -181,4 +180,12 @@
   margin: 0;
   color: #fffffc;
   font-weight: 500;
+}
+
+.controls-info {
+
+    padding: 2px 3px!important;
+    font-size:small;
+    border: solid 1px;
+    border-radius: 20%;
 }

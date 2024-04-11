@@ -3,7 +3,7 @@ import { router } from './Router'
 import { initGameTwoD, drawGameElements } from './GameElement';
 
 
-export class Match extends BaseClass {
+export class LocalMatch extends BaseClass {
     constructor(id) {
         super();
         /*Id of the match*/
@@ -21,12 +21,14 @@ export class Match extends BaseClass {
         this.addDocumentClickListener();
         this.insertCssLink();
         this.initWebSocket();
+        this.user_1_info = null;
+        this.user_2_info = null;
     }
 
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match/${this.id}/?token=${this.token}`;
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/localmatch/${this.id}/`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -35,7 +37,9 @@ export class Match extends BaseClass {
         };
 
         this.socket.onmessage = (event) => {
+            
             const data = JSON.parse(event.data);
+            console.log(data);
             const { type_message } = data;
             switch(type_message)
             {
@@ -43,18 +47,17 @@ export class Match extends BaseClass {
                     const { ws_handshake } = data;
                     this.ws_handshake(ws_handshake, data);
                     break;
-                case 'request_ping':
-                    this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
-                    break;
+                // case 'ping':
+                //     console.log('The server wants that I do ping')
                 case 'game_state':
                     const { game_state } = data;
                     this.updateGameState(game_state);
                     break;
-                case 'other_user':
-                    const { other_user } = data;
-                    console.log('sending other user!')
-                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
-                    break;
+                // case 'other_user':
+                //     const { other_user } = data;
+                //     console.log('sending other user!')
+                //     this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                //     break;
                 case 'timer':
                     const { timer } = data
                     this.updateTimer(timer);
@@ -89,21 +92,19 @@ export class Match extends BaseClass {
     {
         switch(ws_handshake_message)
         {
-            case 'match_do_not_exist':
-                this.showMessageAndRedirect('You have tried to join a non-existent match, try with a valid ID');
-                break;
-            case 'match_already_completed':
-                this.showMessageAndRedirect('You have tried to join a match already completed.');
-                break;
             case 'tell_me_who_you_are':
                 const jwtToken = localStorage.getItem('token');
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
-            case 'failed_authorization':
-                this.showMessageAndRedirect(`You don't have authorization to this match.`);
-                break;
+            // case 'failed_authorization':
+            //     this.showMessageAndRedirect(`You don't have authorization to this match.`);
+            //     break;
+            
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
+                this.user_1_info = user_1_info;
+                this.user_2_info = user_2_info;
+                console.log("INITIAL DATA", user_2_info.id);
                 this.initGame(user_1_info, user_2_info);
         }
     }
@@ -111,6 +112,7 @@ export class Match extends BaseClass {
     /*Methods to update the game state*/
     updateGameState(game_state_data)
     {
+        console.log('GAME EVEMT');
         const game_state = JSON.parse(game_state_data);
         switch (game_state.event)
         {
@@ -119,11 +121,10 @@ export class Match extends BaseClass {
                 this.initKeyEvents();
                 break;
             case 'someone_left':
-                const { how } = game_state;
-                // console.log(`Someone left by this reason ${how}`);
-                this.socket.send(JSON.stringify({'type_message' : 'match_aborted'}));
+                console.log('Someone left');
                 break;
             case 'broadcasted_game_event':
+                console.log("44444Supposed to b getting a broadcasted gane element");
                 const { broadcasted_game_event } = game_state;
                 this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
                 break;
@@ -131,12 +132,8 @@ export class Match extends BaseClass {
                 drawGameElements(game_state);
                 break;
             case 'match_completed':
-                this.socket.send(JSON.stringify({'type_message' : 'match_completed'}));  
                 this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
-            case 'disconnection':
-                this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
-                break;            
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
         }
@@ -205,13 +202,14 @@ export class Match extends BaseClass {
     
     initGame(user_1_info, user_2_info)
     {
-        // console.log(`initGame call()`);
+        console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
-        this.showTimerBeforeMatch();
+        this.showTimerBeforeMatch(user_1_info, user_2_info);
     }
 
     initBoard(user_1_info, user_2_info)
     {
+        console.log("init game board");
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -226,11 +224,11 @@ export class Match extends BaseClass {
         const user1Div = document.createElement('div');
         user1Div.classList.add('user-info');
         user1Div.innerHTML = `
-            <span>${user_1_info.username}</span>`;
+            <span>${user_1_info.username} <span class="controls-info">W</span><span class="controls-info">S</span></span>`;
 
         const user2Div = document.createElement('div');
         user2Div.classList.add('user-info');
-        user2Div.innerHTML = `<span>${user_2_info.username}</span>`;
+        user2Div.innerHTML = `<span><span class="controls-info">↑</span><span class="controls-info">↓</span></span> ${user_2_info.username} `;
 
         /*Creating timer*/
         const timerElement = document.createElement('div');
@@ -269,7 +267,7 @@ export class Match extends BaseClass {
         app.appendChild(appContainer);
     }
 
-    showTimerBeforeMatch(){
+    showTimerBeforeMatch(user_1_info, user_2_info){
         // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
@@ -282,7 +280,9 @@ export class Match extends BaseClass {
             seconds_div.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'user2' , 'user2' : `${user_2_info.id}`}));
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+
                 console.log('sending confirmation');
             }
         }, 1000);
@@ -291,21 +291,25 @@ export class Match extends BaseClass {
     initKeyEvents = () => {
         const jwtToken = localStorage.getItem('token');
         document.addEventListener('keydown', (e) => {
-            switch(e.key){
-                case 'w':
-                    if (this.socket.readyState === WebSocket.OPEN)
-                    {
-                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
-                    }
-                    // console.log("`w` pressed");
-                    break;
-                case 's':
-                    // console.log("`s` pressed");
-                    if (this.socket.readyState === WebSocket.OPEN)
-                    {
-                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));
-                    }
-                    break;       
+            if (this.socket.readyState === WebSocket.OPEN)
+            {
+                switch(e.key){
+                    case 'w':
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_1_info.id}`}));
+                        break;
+                    case 's':
+                        // console.log("`s` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_1_info.id}`}));
+                        break;
+                    case 'ArrowUp':
+                        // console.log("`w` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_2_info.id}`}));
+                        break;
+                    case 'ArrowDown':
+                        // console.log("`s` pressed");
+                        this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_2_info.id}`}));
+                        break;       
+                }
             }
         });
     }

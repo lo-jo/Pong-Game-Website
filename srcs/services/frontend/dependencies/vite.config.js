@@ -1,4 +1,25 @@
-// vite.config.js
+// // vite.config.js
+// import { defineConfig } from 'vite';
+
+// export default defineConfig({
+//   root: 'src',
+//   define: {
+//     'process.env': process.env
+//   },
+//   server: {
+//     // https: {
+//     //   key: '/etc/ssl/private/selfsigned.key',
+//     //   cert: '/etc/ssl/private/selfsigned.crt',
+//     // },
+//     watch: {
+//       usePolling: true
+//     }
+//   },
+//   optimizeDeps: {
+//     include: ['jquery'],
+//   },
+// });
+
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -7,12 +28,18 @@ export default defineConfig({
     'process.env': process.env
   },
   server: {
-    // https: {
-    //   key: '/etc/ssl/private/selfsigned.key',
-    //   cert: '/etc/ssl/private/selfsigned.crt',
-    // },
+    fs: {
+      strict: false
+    },
+    base: './',
     watch: {
       usePolling: true
+    },
+    // Función de reescritura para excluir rutas dinámicas
+    rewrite: (path) => {
+      if (path.match(/^\/match\/[a-zA-Z0-9]+$/)) {
+        return '/index.html'; // Redirigir rutas dinámicas al index.html
+      }
     }
   },
   optimizeDeps: {

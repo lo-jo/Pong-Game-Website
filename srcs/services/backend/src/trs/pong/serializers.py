@@ -10,7 +10,7 @@ from django.utils.html import escape
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ('id', 'status', 'user_1', 'user_2', 'winner', 'loser', 'score_user_1', 'score_user_2' , 'tournament', 'created_at', 'timer_started', 'time_elapsed')
+        fields = ('id', 'status', 'user_1', 'user_2', 'winner', 'loser', 'score_user_1', 'score_user_2' , 'tournament', 'created_at', 'time_elapsed')
 
     def validate(self, data):
         if 'status' not in data or not data['status']:

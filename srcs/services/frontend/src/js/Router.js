@@ -6,6 +6,7 @@ import { Settings } from './Settings.js'
 import { Dashboard } from './Dashboard.js';
 import { MatchLobby } from './MatchLobby.js'
 import { Match } from './Match.js'
+import { LocalMatch } from './LocalMatch.js'
 import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
@@ -71,6 +72,12 @@ export const routes = {
         view : Logout,
         auth : true
     },
+    '/localmatch/:id' : {
+        view : LocalMatch,
+        dinamic : true,
+        css : './css/game.css',
+        auth : true
+    }
 }
 
 export let onlineSocket = null;
