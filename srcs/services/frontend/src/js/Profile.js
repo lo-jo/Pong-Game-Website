@@ -280,7 +280,7 @@ export class Profile extends BaseClass {
                 winsCount++;
             }
         }
-        const winPercentage = (winsCount / totalMatches) * 100;
+        const winPercentage = Math.round((winsCount / totalMatches) * 100);
         return winPercentage; 
     }
 
@@ -293,7 +293,7 @@ export class Profile extends BaseClass {
                 lossCount++;
             }
         }
-        const lossPercentage = (lossCount / totalMatches) * 100;
+        const lossPercentage = Math.round((lossCount / totalMatches) * 100);
         return lossPercentage;
     }
 
