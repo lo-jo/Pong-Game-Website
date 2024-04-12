@@ -432,7 +432,7 @@ export class Dashboard extends BaseClass {
                         // CHECK THIS WITH DANIEL
                         continue;
                     }
-                    const log_div = document.createElement('div');
+                    const log_div = document.createElement('p');
                     log_div.setAttribute('class', 'p-1 log-content');
                     const user_1 = await this.getFriendData(match.user_1);
                     const user_2 = await this.getFriendData(match.user_2);
@@ -487,9 +487,10 @@ export class Dashboard extends BaseClass {
                         </div>
                         <div class="col-8 col-sm-7" id="game-stats">
                             <div class="row">
-                                <h3>Upcoming Matches</h3>
+                                <h3>Upcoming Matches</h3> 
+                                <div id="upcoming"></div>
                             </div>
-                            <div class="row text-center" id="upcoming"></div>
+                           
                         </div>
                     </div>
                 </div>`;

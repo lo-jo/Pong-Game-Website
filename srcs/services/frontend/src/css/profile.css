@@ -47,6 +47,7 @@ a{
     font-size: x-small;
     text-align: left;
     overflow-y: auto;
+    max-height: 200px;
     /* color:#FCFF76!important; */
 }
 
