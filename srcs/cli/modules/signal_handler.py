@@ -1,5 +1,9 @@
-# from modules import signal_handler
-def handler(signum, frame):
-    res = input("Ctrl-c was pressed. Do you really want to exit? y/n ")
-    if res == 'y':
-        exit(1)
+import sys
+import signal
+import time
+
+def signal_handler(sig, frame):
+    print("\nYou have pressed CTRL+C")
+    print("Goodbye. See you around!")
+    time.sleep(2)
+    sys.exit(0)

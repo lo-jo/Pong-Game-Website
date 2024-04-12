@@ -6,7 +6,6 @@ import curses
 import time
 import os
 
-
 class UserCLI:
     def __init__(self, username, password, host="127.0.0.1:8000", http="http://", ws="ws://"):
         self.username = username
@@ -26,7 +25,6 @@ class UserCLI:
         response = requests.post(url, json=data, headers=headers, verify=False)
         if response.status_code == 200:
             self.token = response.json()["access"]
-            print("Authentication succesfully!")
             return True
         else:
             print("Failed to get the token for authentication, are you admin?")

@@ -65,7 +65,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         }
 
         # Seconds of the match
-        self.time_remaining = 15
+        self.time_remaining = 120
         self.game_finish = False
 
         # Accepting the connection
