@@ -129,7 +129,7 @@ export class LocalMatch extends BaseClass {
                 drawGameElements(game_state);
                 break;
             case 'match_completed':
-                this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
+                this.displayWinner(game_state.winner, game_state.loser);
                 break;
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
@@ -173,6 +173,26 @@ export class LocalMatch extends BaseClass {
         }, 1000);
     }
 
+    displayWinner(winner, loser) {
+        document.getElementById('app').innerHTML = `
+        <div class="wrapper"><h1>game completed</h1><br>
+        ${winner} won against ${loser}</div>
+            
+            <p><br>Redirection to the dashboard in<p><time><strong id="seconds">5</strong><br> seconds</time>.</p>
+        `
+        let seconds = document.getElementById('seconds'),
+        total = seconds.innerHTML,
+        timeinterval = setInterval(() => {
+            total = --total;
+            seconds.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                this.socket.close();
+                history.pushState('', '', `/dashboard`);
+                router();
+            }
+        }, 1000);
+    }
     
     updateTimer(timer_data) {
         const timer = JSON.parse(timer_data);

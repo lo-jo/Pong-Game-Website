@@ -65,9 +65,8 @@ class FriendshipView(APIView):
 
     def get_queryset(self, username):
         user = get_object_or_404(User, username=username)
-        # List all the friendship objects where the target user was either a sender or a recipient (=all friends)
         return Friendship.objects.filter(sender=user) | Friendship.objects.filter(recipient=user)
-    #Show friend list of the target user 
+ 
     def get(self, request, username, *args, **kwargs):
         user = get_object_or_404(User, username=username)
         usernombre = user.username
@@ -76,7 +75,6 @@ class FriendshipView(APIView):
 
         modified_data = []
         for entry in serializer.data:
-            # print("is it looping thru : ", list(entry.values()))
             if usernombre in entry.values():
                 if (entry['sender_username'] == usernombre):
                     del entry['sender_username']
@@ -90,15 +88,12 @@ class FriendshipView(APIView):
     def post(self, request, username, *args, **kwargs):
             current_user = request.user
             target_user = get_object_or_404(User, id=username)
-            # Check if the users are the same
             if current_user == target_user:
                 return Response({"error": "Cannot add yourself as a friend."}, status=status.HTTP_400_BAD_REQUEST)
-            # Check if the friendship already exists
             if Friendship.objects.filter(sender=current_user, recipient=target_user).exists():
                 return Response({"error": "Friendship already exists."}, status=status.HTTP_400_BAD_REQUEST)
             if Friendship.objects.filter(sender=target_user, recipient=current_user).exists():
                 return Response({"error": "Friendship already exists."}, status=status.HTTP_400_BAD_REQUEST)
-            # Create a new friendship using the serializer
             serializer = FriendSerializer(data={'sender': current_user.pk, 'recipient': target_user.pk})
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -109,7 +104,6 @@ class UserDetailView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    # Defines the field to be used to search for the user by user ID
     lookup_field = 'pk'
 
 class UserProfileView(RetrieveAPIView):
@@ -130,15 +124,6 @@ class CheckAuthentication(APIView):
 
     def get(self, request):
         return Response({'authenticated': True})
-
-# class CheckAuthentication(APIView):
-#     permission_classes = (IsAuthenticated,)
-
-#     def get(self, request):
-#         if request.user.is_authenticated:
-#             return Response({'authenticated': True})
-#         else:
-#             return Response({'authenticated': False})
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -195,14 +180,9 @@ class OtpUserView(APIView):
             )
             qr.add_data(provisioning_uri)
             qr.make(fit=True)
-
-            # Generate QR code image with purple color and black background
             qr_img = qr.make_image(fill_color="#7000FF", back_color="black")
-
             user.otp_key = secret_key
             user.save()
-
-            # Save QR code image to user's account
             buffer = BytesIO()
             qr_img.save(buffer, format='PNG')
             buffer.seek(0)

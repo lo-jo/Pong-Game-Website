@@ -60,11 +60,9 @@ export class Profile extends BaseClass {
 
     async generateFriendElements(friends) {
         const friendListContainer = document.getElementById('friendList');
-        // friendListContainer.innerHTML = '';
     
         for (const friend of friends) {
             const friendId = friend[Object.keys(friend)[1]];
-
             try {
                 const friendData = await this.getFriendData(friendId);
                 const friendUsername = friendData.username;
@@ -86,8 +84,6 @@ export class Profile extends BaseClass {
         
                 contentContainer.appendChild(image);
                 contentContainer.appendChild(link);
-                
-                // divRow.appendChild(contentContainer);
                 friendListContainer.appendChild(contentContainer);
             }
             catch (error) {
@@ -332,13 +328,13 @@ export class Profile extends BaseClass {
     async displayMatchLogDelayed(user) {
         setTimeout(async () => {
             await this.displayMatchLog(user);
-        }, 80); // Delayed by 1 second (1000 milliseconds)
+        }, 80);
     }
 
     async delayedDisplayStatus(user) {
         setTimeout(() => {
             this.displayStatus(user);
-        }, 100); // Delayed by 1 second (1000 milliseconds)
+        }, 80);
     }
 
     async getHtmlForMain() {
@@ -439,8 +435,3 @@ export class Profile extends BaseClass {
     }
     
 }
-
-{/* <div class="progress bg-danger mb-2" role="progressbar" aria-label="Success example" aria-valuemin="0" aria-valuemax="100">
-<div class="progress-bar bg-success" style="width: ${wins}%">${wins}% winner</div> ${losses}% loser
-</div> 
-<span class="position-relative top-0 start-0 p-2 bg-success border border-light translate-middle rounded-circle" id="status"></span>*/}

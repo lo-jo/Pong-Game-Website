@@ -58,7 +58,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         await super().disconnect(close_code)
-        # store the disconnection time to the group in database
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -144,9 +143,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user_id = payload['user_id']
             return User.objects.get(pk=user_id)
         except jwt.ExpiredSignatureError:
-            return None  # Token has expired
+            return None
         except (jwt.InvalidTokenError, User.DoesNotExist):
-            return None  # Invalid token or user not found
+            return None
 
     @database_sync_to_async
     def is_blocked(self, user, thread_name):

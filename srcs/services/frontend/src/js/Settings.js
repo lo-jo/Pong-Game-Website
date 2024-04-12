@@ -87,9 +87,7 @@ export class Settings extends BaseClass {
         const email = document.getElementById('newemail').value;
         const bio = document.getElementById('newbio').value;
         const profile_pic = document.getElementById('newavatar');
-        console.log("ISCHECKED VALUE", this.isChecked)
     
-        // Prepare data object for JSON
         const jsonData = {};
         if (username.trim() !== '') {
             jsonData.username = username.trim();
@@ -103,12 +101,10 @@ export class Settings extends BaseClass {
         if (this.isChecked != null)
             jsonData.otp_enabled = this.isChecked;
     
-        // Create FormData for file upload
         const formData = new FormData();
         if (profile_pic.files && profile_pic.files.length > 0) {
             formData.append('profile_pic', profile_pic.files[0]);
             const fileName = profile_pic.files[0].name;
-            console.log('Selected File:', fileName)
         }
         else
             console.log('No file selected');
