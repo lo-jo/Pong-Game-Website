@@ -65,7 +65,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         }
 
         # Seconds of the match
-        self.time_remaining = 120
+        self.game_time = 0
         self.game_finish = False
 
         # Accepting the connection
@@ -175,7 +175,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(match.save)()
 
                 self.game_finish = True
-                self.time_remaining = 0
+                # self.time_remaining = 0
 
                 # Redirect
                 redirect_info = {
@@ -368,21 +368,23 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def game_timer(self):
         timer_type = 'normal'
-        while self.time_remaining >= 0 and self.game_finish == False:
-            await self.send_to_group('timer', json.dumps({'time_remaininig' : f'{self.time_remaining}', 'type' : f'{timer_type}'}))
+        while self.game_finish == False:
+            
+            await self.send_to_group('timer', json.dumps({'time_remaininig' : f'{self.game_time}', 'type' : f'{timer_type}'}))
             await asyncio.sleep(1)
-            if (self.time_remaining - 3) == 0:
-                if self.game_user_1["paddle"]["score"] == self.game_user_2["paddle"]["score"]:
-                    timer_type = 'prorogation'
-                    self.time_remaining += 11
-                else:
-                    timer_type = 'normal'
-            else:
-                timer_type = 'normal'
-            self.time_remaining = self.time_remaining - 1
+            self.game_time += 1
+        #     if (self.time_remaining - 3) == 0:
+        #         if self.game_user_1["paddle"]["score"] == self.game_user_2["paddle"]["score"]:
+        #             timer_type = 'prorogation'
+        #             self.time_remaining += 11
+        #         else:
+        #             timer_type = 'normal'
+        #     else:
+        #         timer_type = 'normal'
+        #     self.time_remaining = self.time_remaining - 1
 
-        # print("**********&&&&&&&&&&&&&&& hereeeeeee &&&&&&&&&&&&&&&&&&& /////////////////")
-        self.game_finish = True
+        # # print("**********&&&&&&&&&&&&&&& hereeeeeee &&&&&&&&&&&&&&&&&&& /////////////////")
+        # self.game_finish = True
 
     async def game_loop(self):
         while not self.game_user_1 or not self.game_user_2:
@@ -404,7 +406,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Start timer
         asyncio.create_task(self.game_timer())
 
-        while self.game_finish == False:
+        while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
             # Bouncing the ball in Y Axis
             if self.ball['top'] <= 0 or self.ball['top'] >= 0.96:
                 self.ball['speed_y'] *= -1
@@ -458,6 +460,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Sleeping one miliseconds for thread 
             await asyncio.sleep(0.1)
 
+        self.game_finish = True
         await self.finish_and_save_match()
 
     async def finish_and_save_match(self):
@@ -478,6 +481,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         # Match completed
         match.status = 'completed'
+        match.time_elapsed = self.game_time
         await sync_to_async(match.save)()
 
         # Redirect
