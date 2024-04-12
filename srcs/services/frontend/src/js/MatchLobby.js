@@ -4,11 +4,17 @@ import { router } from './Router'
 export class MatchLobby extends BaseClass {
     constructor() {
         super();
-        console.log(`MATCH LOBBY constructor()!`);
-        this.initWebSocketLobby();
-        this.postMatch();
+        this.socket = null;
+        this.run();
     }
     
+    async run()
+    {
+        this.initWebSocketLobby();
+        await this.postMatch();
+    }
+
+
     async postMatch() {
         const httpProtocol = window.location.protocol;
         const url = `${httpProtocol}//localhost:8000/pong/join_match/`;
@@ -41,43 +47,54 @@ export class MatchLobby extends BaseClass {
     initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+    
+        this.socket = new WebSocket(wsUrl);
 
-        const socket = new WebSocket(wsUrl);
-
-        socket.onopen = function() {
+        this.socket.onopen = function() {
             console.log('WebSocket(match lobby) connection established.');
         };
 
-        socket.onmessage = (event) => {
+        this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const { action, match_id } = data;
-            // if (action == 'create_join') {
-            //     this.getHtmlForWaitingSpinner();
-            // } else if (action == 'join_play') {
-            //     socket.close();
-            //     history.pushState('', '', `/match/${match_id}`);
-            //     router();
-            // }
-            if (action == 'join_play') {
-                socket.close();
-                history.pushState('', '', `/match/${match_id}`);
-                router();
+            const { type_message } = data;
+            switch (type_message)
+            {
+                case 'action':
+                    const { action } = data;
+                    const { match_id } = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
+                    if (action == 'join_play')
+                    {
+                        this.socket.close();
+                        history.pushState('', '', `/match/${match_id}`);
+                        router();
+                    }
+                    break;
+                case 'request_ping':
+                    this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
+                    break;
+                case 'match_aborted':
+                    this.socket.close();
+                    break;
             }
         };
 
-        socket.onerror = function(error) {
+        this.socket.onerror = function(error) {
             console.error('WebSocket error:', error);
         };
     
-        socket.onclose = function() {
+        this.socket.onclose = function() {
             console.log('WebSocket (match lobby) connection closed.');
         };
     }
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
-        return `<div class="spinner-border" role="status">
-                    <span class="visually-hidden">Waiting for someone..</span>
+        return `<div>
+                    <p> Waiting for someone...</p>
+                    <br>
+                </div>
+                <div class="spinner-border" role="status">
                 </div>`;
     }
 }

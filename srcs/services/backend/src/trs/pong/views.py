@@ -81,9 +81,10 @@ class JoinMatchView(APIView):
         async_to_sync(channel_layer.group_send)(
             'matches_group',
             {
-                'type': 'send_match_notification',
-                'action': action,
-                'match_id': match_id,
+                    'type': 'send_match_lobby_notification',
+                    'type_message' : 'action',
+                    'action': f'{action}',
+                    'match_id' : match_id
             }
         )
 
@@ -111,7 +112,6 @@ class JoinMatchView(APIView):
                     self.join_user_to_match_lobby('join_play', match.id)
                     # # Sending http response
                     serializer = MatchSerializer(match)
-                    print(serializer.data)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             # Creating new match because there's not pending
