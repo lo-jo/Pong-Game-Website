@@ -227,8 +227,8 @@ export class Tournament extends BaseClass {
                                             <i id="goBack" class="bi bi-arrow-left-circle"></i>
                                         </button>
                                     </div>
-                                    <div class="col-10 text-start">
-                                        <h2 class="text-center">Tournament: ${tournamentLeaderboard.tournament_name}</h2>
+                                    <div class="col-10">
+                                        <h2 class="text-start">Tournament: ${tournamentLeaderboard.tournament_name}</h2>
                                     </div>
                                 </div>
                                 <div class="row justify-content-center">
@@ -241,7 +241,6 @@ export class Tournament extends BaseClass {
                                                     <th>User</th>
                                                     <th>Points</th>
                                                     <th>Points against</th>
-                                                    <th>Time</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-group-divider">`;
@@ -252,7 +251,6 @@ export class Tournament extends BaseClass {
                                     <td><a class="opponent-link" href="/test/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
-                                    <td>${entry.total_duration}</td>
                                 </tr>`;
         });
     
@@ -447,14 +445,11 @@ export class Tournament extends BaseClass {
             let playerLink;
             playerLink = document.createElement('a');
             playerLink.setAttribute('href', `/test/${player.id}`);
-            if (currentUserId.user_id != player.id) {
-                playerLink.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    console.log(`clicking to id: ${player.id}`);
-                    navigateTo(event.target.href);
-                });
-            } else
-                playerLink.style.pointerEvents = "none";
+            playerLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                console.log(`clicking to id: ${player.id}`);
+                navigateTo(event.target.href);
+            });
             playerLink.textContent = player.username;
             cardText.appendChild(playerLink);
             if (index < players.length - 1) {
@@ -486,12 +481,12 @@ export class Tournament extends BaseClass {
                 joinButton.textContent = 'Joined';
             }
         } else if (isTournamentFull) {
-            joinButton.setAttribute('class', 'btn btn-outline-primary');
+            joinButton.setAttribute('class', 'px-3 py-1 btn btn-outline-primary');
             joinButton.disabled = true;
-            joinButton.textContent = 'Complete';
+            joinButton.textContent = 'In progress';
         } else if (tournament.status == "finished") {
-            joinButton.setAttribute('class', 'btn btn-outline-warning');
-            joinButton.textContent = 'Leaderboard';
+            joinButton.setAttribute('class', 'px-3 py-1 btn btn-outline-warning');
+            joinButton.textContent = 'Finished';
             joinButton.addEventListener('click', () => this.leaderboardTournament(tournament.id));
         } else {
             joinButton.addEventListener('click', () => this.joinTournament(tournament.id));

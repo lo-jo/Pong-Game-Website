@@ -89,6 +89,13 @@ export class Settings extends BaseClass {
         const profile_pic = document.getElementById('newavatar');
         console.log("ISCHECKED VALUE", this.isChecked)
     
+        // Check if any field has been modified
+        const isModified = username.trim() !== '' || email.trim() !== '' || bio.trim() !== '' || this.isChecked != null || (profile_pic.files && profile_pic.files.length > 0);
+        if (!isModified) {
+            this.displayMessage("No changes detected. Form not submitted", false);
+            return;
+        }
+
         // Prepare data object for JSON
         const jsonData = {};
         if (username.trim() !== '') {
@@ -152,36 +159,47 @@ export class Settings extends BaseClass {
         if (this.formerState == true)
             switchValue = "checked";
         
-        return `<div class="container">
-            <div class="row">
-            <h1>Edit profile</h1>
-            </div>
-        <div class="form-group">
-        <form id="editprofile" enctype="multipart/form-data">
-            <label for="username">Username:</label>
-            <input class="form-control form-control-sm" type="text" id="newusername" name="username" placeholder="Enter username">
-
-            <label for="email">E-mail:</label>
-            <input class="form-control form-control-sm" type="email" id="newemail" name="email" placeholder="Enter e-mail">
-
-            <label for="password">bio:</label>
-            <input class="form-control form-control-sm" type="text" id="newbio" name="bio" placeholder="bio">
-
-            <div class="mb-3">
-                <label for="formFile" class="form-label">Profile Pic:</label>
-                <input class="form-control" type="file" id="newavatar">
-              </div>
-
-            <div class="form-check form-switch text-start" id="twoFA">
-                <input class="form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
-                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA <i class="bi bi-question-circle"></i></p></label>
-            </div>
-            <button type="submit" id="editButton" class="btn btn-dark btn-sm">Submit</button>
-            <div id="redWarning" class="alert alert-danger" role="alert" style="display :none;"></div>
-            
-        </form>
-        </div>
-        </div>`
+        return `<h1 class="mb-2">Edit profile</h1>
+                <div class="form-group">
+                    <form id="editprofile" enctype="multipart/form-data" class="text-start">
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="username">Username:</label>
+                                <input class="form-control form-control-sm" type="text" id="newusername" name="username" placeholder="Enter username">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="email">E-mail:</label>
+                                <input class="form-control form-control-sm" type="email" id="newemail" name="email" placeholder="Enter e-mail">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="password">Bio:</label>
+                                <input class="form-control form-control-sm" type="text" id="newbio" name="bio" placeholder="Pizza is life">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <label for="formFile" class="form-label">Profile Pic:</label>
+                                <input class="form-control" type="file" id="newavatar">
+                            </div>
+                        </div>
+                        <div class="row my-3 justify-content-center align-items-center">
+                            <div class="col-lg-4 col-md-8 form-group form-check form-switch text-start" id="twoFA">
+                                <input class="m-1 form-check-input" type="checkbox" role="switch" id="twoFA_switch" ${switchValue}>
+                                <label class="form-check-label" for="flexSwitchCheckDefault" id="twoFA_label"><p data-bs-toggle="tooltip" data-bs-placement="right" title="Enable / disable this to add an extra layer of security upon connection.">2FA <i class="bi bi-question-circle"></i></p></label>
+                            </div>
+                        </div>
+                        <div class="row m-3 text-center justify-content-center">
+                            <div class="col-xl-4 col-lg-6 col-md-8">
+                                <button type="submit" id="editButton" class="py-1 px-2 btn btn-dark btn-sm">Submit</button>
+                                <div id="redWarning" class="mt-3 alert alert-danger" role="alert" style="display :none;"></div>
+                            </div>
+                        </div>            
+                    </form>
+                </div>`
     }
 }
 
