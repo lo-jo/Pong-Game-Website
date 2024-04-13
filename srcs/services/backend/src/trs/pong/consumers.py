@@ -422,7 +422,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Database user data
         self.db_user_1 = None
         self.db_user_2 = None
-
+        # Flags variables for ws_handshaking
         self.total_game_users = 0
         self.game_user_1 = {}
         self.game_user_2 = {}
@@ -431,8 +431,14 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.role_id = 0
         self.confirmation = False
 
+        # Total connections
+        self.other_know_I_am_here = 0
         # Other is connected
         self.other_is_connected = False
+
+        # Consumers leader
+        self.leader = False
+        self.not_leader = True
 
         self.ball = {
             'elem' : 'ball',
@@ -515,14 +521,27 @@ class PongConsumer(AsyncWebsocketConsumer):
         type_message = data.get('type_message')
 
         match type_message:
+            # Catching other connection for lauch the ws_handshake
+            case 'user_token':
+                print('user_token message')
+                user_token = data.get('user_token')
+                if (int(user_token) != self.id_from_token) and self.other_is_connected == False:
+                    self.other_is_connected = True
+            case 'i_am_the_other':
+                print('i am the other one message')
+                user_token = data.get('i_am_the_other')
+                if (int(user_token) != self.id_from_token) and self.other_is_connected == True:
+                    self.other_know_I_am_here = 1
+            
+            case 'leader':
+                print('leader message')
+                user_token = data.get('leader')
+                if (int(user_token) != self.id_from_token) and self.not_leader == True:
+                    self.not_leader = False
             # Handling ws_handshake message
             case 'ws_handshake':
                 ws_handshake_message = data.get('ws_handshake')
                 await self.receive_ws_handshake(ws_handshake_message, data)
-            case 'user_token':
-                user_token = data.get('user_token')
-                if int(user_token) != self.id_from_token:
-                    self.other_is_connected = True
             # Receiving other user
             case 'other_user':
                 other_user = data.get('other_user')
@@ -698,6 +717,46 @@ class PongConsumer(AsyncWebsocketConsumer):
         except User.DoesNotExist:
             return None
 
+    # Waiting for both connections
+    async def waiting_users(self):
+
+        # Total connections
+        # self.total_connections_from_other_user = 0
+        # Other is connected
+        # self.other_is_connected = False
+
+        while self.other_is_connected == False or self.other_know_I_am_here == 0:
+            print("ws_handshaking...")
+            # print(f'My id is {self.id_from_token}')
+            # print(f"The other is connected {self.other_is_connected}")
+            # print(f"The other knows that I am here {self.other_know_I_am_here}")
+            # print("/////////////////////////////////////////////")
+            await self.send_to_group('user_token', self.id_from_token)
+            await self.send_to_group('i_am_the_other', self.id_from_token)
+            if self.not_leader == False:
+                print("I will stopppppp")
+                await asyncio.sleep(3)    
+                return
+            await asyncio.sleep(0.5)
+
+
+        self.leader = True
+        await self.send_to_group('leader', self.id_from_token)
+        print("**************************************************")
+        print("****************       LEADER     ****************")        
+        print("**************************************************")
+        print(f'My id is {self.id_from_token}')
+        print(f"The other is here {self.other_is_connected}")
+        print("/////////////////////////////////////////////")
+        print(f"The other knows that Ia m here {self.other_know_I_am_here}")
+        # One last time (:
+        await self.send_to_group('user_token', self.id_from_token)
+        print("Ready to lauch the logic!")
+        await asyncio.sleep(0.5)
+        print(f'My id is {self.id_from_token}')
+        # # Requesting ws handshaking to client
+        # await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
+
     async def request_ping(self):
         while self.game_finish == False and self.request_ping_message == True:
             if self.client_url != '':
@@ -751,20 +810,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Requesting ping for handling deconnection
         asyncio.create_task(self.request_ping())
 
-
-    async def waiting_users(self):
-        while self.other_is_connected == False:
-            print("Waiting for other user...")
-            await self.send_to_group('user_token', self.id_from_token)
-            await asyncio.sleep(0.5)
-
-        # One last time (:
-        await self.send_to_group('user_token', self.id_from_token)
-        print("Ready to lauch the logic!")
-        await asyncio.sleep(0.5)
-        # Requesting ws handshaking to client
-        await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
-
+    # Senders
     async def send_to_group(self, type_message, message):
         await self.channel_layer.group_send(
                 self.group_name,

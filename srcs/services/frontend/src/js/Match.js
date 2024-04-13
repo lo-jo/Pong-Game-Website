@@ -67,9 +67,16 @@ export class Match extends BaseClass {
                     }
                     break;
                 case 'user_token':
-                    console.log('User token received, now sended!')
                     const { user_token } = data;
                     this.socket.send(JSON.stringify({'type_message' : 'user_token', 'user_token' : user_token}));
+                    break;
+                case 'i_am_the_other':
+                    const { i_am_the_other} = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'i_am_the_other', 'i_am_the_other' : i_am_the_other}));
+                    break;
+                case 'leader':
+                    const { leader} = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'leader', 'leader' : leader}));
                     break;
                 case 'timer':
                     const { timer } = data
