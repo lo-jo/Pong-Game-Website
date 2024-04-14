@@ -123,7 +123,7 @@ export class Match extends BaseClass {
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
             case 'failed_authorization':
-                this.showMessageAndRedirect(`You don't have authorization to this match.`);
+                this.showMessageAndRedirect(`You don't have authorization to play this match.`);
                 break;
             case 'initial_data':
                 const { user_1_info, user_2_info } = data

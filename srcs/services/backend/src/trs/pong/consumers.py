@@ -487,7 +487,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'match_already_completed'})
             await self.close()
             return
-    
+
+        # Requesting authentification
+        await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
+        await asyncio.sleep(1)
+
         # Saving match info in consumer
         self.match_info = match_info
 
@@ -521,57 +525,29 @@ class PongConsumer(AsyncWebsocketConsumer):
         type_message = data.get('type_message')
 
         match type_message:
-            # Catching other connection for lauch the ws_handshake
-            case 'user_token':
-                print('user_token message')
-                user_token = data.get('user_token')
-                if (int(user_token) != self.id_from_token) and self.other_is_connected == False:
-                    self.other_is_connected = True
-            case 'i_am_the_other':
-                print('i am the other one message')
-                user_token = data.get('i_am_the_other')
-                if (int(user_token) != self.id_from_token) and self.other_is_connected == True:
-                    self.other_know_I_am_here = 1
-            
-            case 'leader':
-                print('leader message')
-                user_token = data.get('leader')
-                if (int(user_token) != self.id_from_token) and self.not_leader == True:
-                    self.not_leader = False
             # Handling ws_handshake message
             case 'ws_handshake':
                 ws_handshake_message = data.get('ws_handshake')
                 await self.receive_ws_handshake(ws_handshake_message, data)
+            # Catching other connection
+            case 'user_token':
+                user_token = data.get('user_token')
+                if (int(user_token) != self.id_from_token) and self.other_is_connected == False:
+                    self.other_is_connected = True
+            case 'i_am_the_other':
+                user_token = data.get('i_am_the_other')
+                if (int(user_token) != self.id_from_token) and self.other_is_connected == True:
+                    self.other_know_I_am_here = 1
+            # Setting one consumer connection as leader
+            case 'leader':
+                user_token = data.get('leader')
+                if (int(user_token) != self.id_from_token) and self.not_leader == True:
+                    self.not_leader = False
             # Receiving other user
             case 'other_user':
                 other_user = data.get('other_user')
                 other_user_data = json.loads(other_user)
 
-
-                if not self.game_user_2 and self.role_id == 1:
-                    #print("Soy el 1 y estoy recibiendo el 2")
-                    #print('///////////////////////////////////')
-                    #print(self.game_user_1)
-                    #print(self.game_user_2)
-                    if other_user_data["user_id"] == self.match_info["user_2"]:
-                        self.total_game_users += 1
-                        self.game_user_2 = other_user_data
-                    #print('///////////////////////////////////')
-                    #print(self.game_user_1)
-                    #print(self.game_user_2)
-                
-                if not self.game_user_1 and self.role_id == 2:
-                    #print("Soy el 2 y estoy recibiendo el 1")
-                    #print('**********************************')
-                    #print(self.game_user_1)
-                    #print(self.game_user_2)
-                    if other_user_data["user_id"] == self.match_info["user_1"]:
-                        self.total_game_users += 1
-                        self.game_user_1 = other_user_data
-                    #print('**********************************')
-                    #print(self.game_user_1)
-                    #print(self.game_user_2)
-            
             # Receiving game events (paddles movement)
             case 'game_event':
                 game_event = data.get('game_event')
@@ -630,32 +606,33 @@ class PongConsumer(AsyncWebsocketConsumer):
     # This function handle the messages received from the client in the `ws_handshake`    
     async def receive_ws_handshake(self, ws_handshake_message, data):
         if ws_handshake_message == 'authorization':
+            # Getting id for authorization
             user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
             # Checking if the user_id match with any user in db
             if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-            else:
-                #print("You are authorized for join the match !!!")
-                if user_id == self.match_info['user_1']:
-                    if not self.game_user_1:
-                        #print("I am the user 1")
-                        self.total_game_users += 1
-                        self.who_i_am_id = user_id
-                        self.role_id = 1
-                        self.game_user_1['user_id'] = user_id
-                        self.game_user_1['paddle'] = self.game_user_1_paddle
+            # else:
+            #     #print("You are authorized for join the match !!!")
+            #     if user_id == self.match_info['user_1']:
+            #         if not self.game_user_1:
+            #             #print("I am the user 1")
+            #             self.total_game_users += 1
+            #             self.who_i_am_id = user_id
+            #             self.role_id = 1
+            #             self.game_user_1['user_id'] = user_id
+            #             self.game_user_1['paddle'] = self.game_user_1_paddle
 
-                elif user_id == self.match_info['user_2']:
-                    if not self.game_user_2:
-                        #print("I am the user 2")
-                        self.total_game_users += 1
-                        self.who_i_am_id = user_id
-                        self.role_id = 2
-                        self.game_user_2['user_id'] = user_id
-                        self.game_user_2['paddle'] = self.game_user_2_paddle
+            #     elif user_id == self.match_info['user_2']:
+            #         if not self.game_user_2:
+            #             #print("I am the user 2")
+            #             self.total_game_users += 1
+            #             self.who_i_am_id = user_id
+            #             self.role_id = 2
+            #             self.game_user_2['user_id'] = user_id
+            #             self.game_user_2['paddle'] = self.game_user_2_paddle
 
-                # Sending user for the other connection!
-                asyncio.create_task(self.sending_other_user())
+            #     # Sending user for the other connection!
+            #     asyncio.create_task(self.sending_other_user())
 
 
         elif ws_handshake_message == 'confirmation':
@@ -677,27 +654,28 @@ class PongConsumer(AsyncWebsocketConsumer):
                 asyncio.create_task(self.game_loop())
 
     async def receive_broadcast_event(self, broadcast_game_event_message):
-        match broadcast_game_event_message:
-            case 'move_up_paddle_1':
-                self.game_user_1["paddle"]["top"] -= 0.1
-                if self.game_user_1["paddle"]["top"] <= 0:
-                    self.game_user_1["paddle"]["top"] = 0
-                self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-            case 'move_up_paddle_2':
-                self.game_user_2["paddle"]["top"] -= 0.1
-                if self.game_user_2["paddle"]["top"] <= 0:
-                    self.game_user_2["paddle"]["top"] = 0
-                self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
-            case 'move_down_paddle_1':
-                self.game_user_1["paddle"]["top"] += 0.1
-                if self.game_user_1["paddle"]["top"] >= 0.75:
-                    self.game_user_1["paddle"]["top"] = 0.75
-                self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-            case 'move_down_paddle_2':
-                self.game_user_2["paddle"]["top"] += 0.1
-                if self.game_user_2["paddle"]["top"] >= 0.75:
-                    self.game_user_2["paddle"]["top"] = 0.75
-                self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+        if self.leader == True:
+            match broadcast_game_event_message:
+                case 'move_up_paddle_1':
+                    self.game_user_1["paddle"]["top"] -= 0.1
+                    if self.game_user_1["paddle"]["top"] <= 0:
+                        self.game_user_1["paddle"]["top"] = 0
+                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                case 'move_up_paddle_2':
+                    self.game_user_2["paddle"]["top"] -= 0.1
+                    if self.game_user_2["paddle"]["top"] <= 0:
+                        self.game_user_2["paddle"]["top"] = 0
+                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+                case 'move_down_paddle_1':
+                    self.game_user_1["paddle"]["top"] += 0.1
+                    if self.game_user_1["paddle"]["top"] >= 0.75:
+                        self.game_user_1["paddle"]["top"] = 0.75
+                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                case 'move_down_paddle_2':
+                    self.game_user_2["paddle"]["top"] += 0.1
+                    if self.game_user_2["paddle"]["top"] >= 0.75:
+                        self.game_user_2["paddle"]["top"] = 0.75
+                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
 
 
     # Methods for calling to database
@@ -719,26 +697,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # Waiting for both connections
     async def waiting_users(self):
-
-        # Total connections
-        # self.total_connections_from_other_user = 0
-        # Other is connected
-        # self.other_is_connected = False
-
         while self.other_is_connected == False or self.other_know_I_am_here == 0:
-            print("ws_handshaking...")
-            # print(f'My id is {self.id_from_token}')
-            # print(f"The other is connected {self.other_is_connected}")
-            # print(f"The other knows that I am here {self.other_know_I_am_here}")
-            # print("/////////////////////////////////////////////")
             await self.send_to_group('user_token', self.id_from_token)
             await self.send_to_group('i_am_the_other', self.id_from_token)
             if self.not_leader == False:
-                print("I will stopppppp")
-                await asyncio.sleep(3)    
                 return
-            await asyncio.sleep(0.5)
-
+            await asyncio.sleep(0.2)
 
         self.leader = True
         await self.send_to_group('leader', self.id_from_token)
@@ -746,16 +710,39 @@ class PongConsumer(AsyncWebsocketConsumer):
         print("****************       LEADER     ****************")        
         print("**************************************************")
         print(f'My id is {self.id_from_token}')
-        print(f"The other is here {self.other_is_connected}")
-        print("/////////////////////////////////////////////")
-        print(f"The other knows that Ia m here {self.other_know_I_am_here}")
-        # One last time (:
-        await self.send_to_group('user_token', self.id_from_token)
-        print("Ready to lauch the logic!")
-        await asyncio.sleep(0.5)
-        print(f'My id is {self.id_from_token}')
-        # # Requesting ws handshaking to client
-        # await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'tell_me_who_you_are'})
+        
+        # print(f"The other is here {self.other_is_connected}")
+        # print("/////////////////////////////////////////////")
+        # print(f"The other knows that I am here {self.other_know_I_am_here}")
+        print("Ready to lauch the setting the users in match")
+        print(self.match_info)
+        if self.leader == True and self.id_from_token == self.match_info["user_1"]:
+            print("Leader is the player one in the match")
+            # Setting leader as user_1 in match
+            self.game_user_1['user_id'] = self.id_from_token
+            self.game_user_1['paddle'] = self.game_user_1_paddle
+            print("//////// Leaderrrrrrr and user 1 /////////")
+            print(self.game_user_1)
+            # Setting other user as user_2 in match
+            self.game_user_2['user_id'] = self.match_info["user_2"]
+            self.game_user_2['paddle'] = self.game_user_2_paddle
+            print('////////// Other user and user 2 //////////')
+            print(self.game_user_2)
+        elif self.leader == True and self.id_from_token == self.match_info["user_2"]:
+            print("Leader is the player is two in the match")
+            # Setting leader as user_2 in match
+            self.game_user_2['user_id'] = self.id_from_token
+            self.game_user_2['paddle'] = self.game_user_2_paddle
+            print("//////// Leaderrrrrrr and user 2 /////////")
+            print(self.game_user_2)
+
+            # Setting other user as user_1 in match
+            self.game_user_1['user_id'] = self.match_info["user_1"]
+            self.game_user_1['paddle'] = self.game_user_1_paddle
+            print('////////// Other user and user 1 //////////')
+            print(self.game_user_1)
+
+        asyncio.create_task(self.game_loop())
 
     async def request_ping(self):
         while self.game_finish == False and self.request_ping_message == True:
@@ -771,6 +758,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             # print('Requesting ping')
             await asyncio.sleep(0.01)
 
+    # Deprecated
     async def sending_other_user(self):
         while self.total_game_users != 2:
             if self.role_id == 1:
@@ -840,9 +828,9 @@ class PongConsumer(AsyncWebsocketConsumer):
             print("That never happens")
             return
        
-        # print("/////////////////// We are ready to start the game ////////////////////")
-        # print(f'Info user_1 {self.game_user_1}')
-        # print(f'Info user_2 {self.game_user_2}')
+        print("/////////////////// We are ready to start the game ////////////////////")
+        print(f'Info user_1 {self.game_user_1}')
+        print(f'Info user_2 {self.game_user_2}')
 
         init_pong_game_data = {
             'event' : 'init_pong_game',
