@@ -550,23 +550,31 @@ class PongConsumer(AsyncWebsocketConsumer):
 
             # Receiving game events (paddles movement)
             case 'game_event':
+                print('Receiving game event!')
                 game_event = data.get('game_event')
                 user_id = get_user_id_by_jwt_token(data, 'token')
-                if user_id == self.game_user_1["user_id"]:
-                    if game_event == 'move_up':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_1'}))
-                    elif game_event == 'move_down':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_1'}))
-                elif user_id == self.game_user_2["user_id"]:
-                    if game_event == 'move_up':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_2'}))
-                    elif game_event == 'move_down':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_2'}))
+                print(game_event)
+                print(user_id)
+                await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : f'{game_event}', 'user_id' : f'{user_id}'}))
+                # if user_id == self.game_user_1["user_id"]:
+                #     if game_event == 'move_up':
+                #         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_1'}))
+                #     elif game_event == 'move_down':
+                #         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_1'}))
+                # elif user_id == self.game_user_2["user_id"]:
+                #     if game_event == 'move_up':
+                #         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_2'}))
+                #     elif game_event == 'move_down':
+                #         await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_2'}))
             
             # Broadcasting an event
             case 'broadcasted_game_event':
+                print('broadcasted game event')
                 broadcast_game_event = data.get('broadcasted_game_event')
-                await self.receive_broadcast_event(broadcast_game_event)
+                user_id = data.get('user_id')
+                print(broadcast_game_event)
+                print(user_id)
+                await self.receive_broadcast_event(broadcast_game_event, user_id)
             # Receiving url from client ping
             case 'ping':
                 self.client_url = data.get('url')
@@ -602,6 +610,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }
 
                 await self.send_to_group('game_state', json.dumps(redirect_info))
+
+
 
     # This function handle the messages received from the client in the `ws_handshake`    
     async def receive_ws_handshake(self, ws_handshake_message, data):
@@ -653,29 +663,34 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(match.save)()
                 asyncio.create_task(self.game_loop())
 
-    async def receive_broadcast_event(self, broadcast_game_event_message):
+    async def receive_broadcast_event(self, broadcast_game_event_message, user_id):
         if self.leader == True:
             match broadcast_game_event_message:
-                case 'move_up_paddle_1':
-                    self.game_user_1["paddle"]["top"] -= 0.1
-                    if self.game_user_1["paddle"]["top"] <= 0:
-                        self.game_user_1["paddle"]["top"] = 0
-                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-                case 'move_up_paddle_2':
-                    self.game_user_2["paddle"]["top"] -= 0.1
-                    if self.game_user_2["paddle"]["top"] <= 0:
-                        self.game_user_2["paddle"]["top"] = 0
-                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
-                case 'move_down_paddle_1':
-                    self.game_user_1["paddle"]["top"] += 0.1
-                    if self.game_user_1["paddle"]["top"] >= 0.75:
-                        self.game_user_1["paddle"]["top"] = 0.75
-                    self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
-                case 'move_down_paddle_2':
-                    self.game_user_2["paddle"]["top"] += 0.1
-                    if self.game_user_2["paddle"]["top"] >= 0.75:
-                        self.game_user_2["paddle"]["top"] = 0.75
-                    self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+                case 'move_up':
+                    if int(user_id) == self.game_user_1["user_id"]:
+                        self.game_user_1["paddle"]["top"] -= 0.1
+                        if self.game_user_1["paddle"]["top"] <= 0:
+                            self.game_user_1["paddle"]["top"] = 0
+                        self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                    
+                    elif int(user_id) == self.game_user_2["user_id"]:
+                        self.game_user_2["paddle"]["top"] -= 0.1
+                        if self.game_user_2["paddle"]["top"] <= 0:
+                            self.game_user_2["paddle"]["top"] = 0
+                        self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
+                
+                case 'move_down':
+                    if int(user_id) == self.game_user_1["user_id"]:
+                        self.game_user_1["paddle"]["top"] += 0.1
+                        if self.game_user_1["paddle"]["top"] >= 0.75:
+                            self.game_user_1["paddle"]["top"] = 0.75
+                        self.game_user_1["paddle"]["top"] = round(self.game_user_1["paddle"]["top"], 4)
+                        
+                    elif int(user_id) == self.game_user_2["user_id"]:
+                        self.game_user_2["paddle"]["top"] += 0.1
+                        if self.game_user_2["paddle"]["top"] >= 0.75:
+                            self.game_user_2["paddle"]["top"] = 0.75
+                        self.game_user_2["paddle"]["top"] = round(self.game_user_2["paddle"]["top"], 4)
 
 
     # Methods for calling to database
@@ -706,41 +721,31 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         self.leader = True
         await self.send_to_group('leader', self.id_from_token)
-        print("**************************************************")
-        print("****************       LEADER     ****************")        
-        print("**************************************************")
-        print(f'My id is {self.id_from_token}')
-        
-        # print(f"The other is here {self.other_is_connected}")
-        # print("/////////////////////////////////////////////")
-        # print(f"The other knows that I am here {self.other_know_I_am_here}")
-        print("Ready to lauch the setting the users in match")
-        print(self.match_info)
         if self.leader == True and self.id_from_token == self.match_info["user_1"]:
-            print("Leader is the player one in the match")
+            #print("Leader is the player one in the match")
             # Setting leader as user_1 in match
             self.game_user_1['user_id'] = self.id_from_token
             self.game_user_1['paddle'] = self.game_user_1_paddle
-            print("//////// Leaderrrrrrr and user 1 /////////")
-            print(self.game_user_1)
+            #print("//////// Leaderrrrrrr and user 1 /////////")
+            #print(self.game_user_1)
             # Setting other user as user_2 in match
             self.game_user_2['user_id'] = self.match_info["user_2"]
             self.game_user_2['paddle'] = self.game_user_2_paddle
-            print('////////// Other user and user 2 //////////')
-            print(self.game_user_2)
+            #print('////////// Other user and user 2 //////////')
+            #print(self.game_user_2)
         elif self.leader == True and self.id_from_token == self.match_info["user_2"]:
-            print("Leader is the player is two in the match")
+            #print("Leader is the player is two in the match")
             # Setting leader as user_2 in match
             self.game_user_2['user_id'] = self.id_from_token
             self.game_user_2['paddle'] = self.game_user_2_paddle
-            print("//////// Leaderrrrrrr and user 2 /////////")
-            print(self.game_user_2)
+            #print("//////// Leaderrrrrrr and user 2 /////////")
+            #print(self.game_user_2)
 
             # Setting other user as user_1 in match
             self.game_user_1['user_id'] = self.match_info["user_1"]
             self.game_user_1['paddle'] = self.game_user_1_paddle
-            print('////////// Other user and user 1 //////////')
-            print(self.game_user_1)
+            #print('////////// Other user and user 1 //////////')
+            #print(self.game_user_1)
 
         asyncio.create_task(self.game_loop())
 
