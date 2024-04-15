@@ -180,7 +180,7 @@ class OtpUserView(APIView):
             )
             qr.add_data(provisioning_uri)
             qr.make(fit=True)
-            qr_img = qr.make_image(fill_color="#7000FF", back_color="black")
+            qr_img = qr.make_image(fill_color="#ffFF", back_color="black")
             user.otp_key = secret_key
             user.save()
             buffer = BytesIO()

@@ -9,9 +9,9 @@ export const initGameTwoD = (data) => {
 
     const board_game = document.getElementById('board-game');
 
-    const seconds_timer = document.getElementById('seconds');
-    if (seconds_timer) {
-        board_game.removeChild(seconds_timer);
+    const waiting_message = document.getElementById('waiting-message');
+    if (waiting_message) {
+        board_game.removeChild(waiting_message);
     } else {
         console.error("Element with ID 'seconds' not found.");
     }

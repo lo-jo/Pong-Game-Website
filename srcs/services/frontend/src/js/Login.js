@@ -77,23 +77,25 @@ export class Login extends BaseClass {
     async getVerifyTwoFaHtml() {
         console.log("userData: ", this.userData);
         return `<div class="container-fluid">
-                    <div class="row justify-content-center">
+                    <div class="row align-items-center">
                         <div class="col-2">
                             <h1 class="titreTwofa">Verify 2FA</h1>
                         </div>
-                        <div class="col align-items-center">
-                            <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
-                            <div class="col-3">
-                            <form id="twofaForm">
-                            <label for="password"></label>
-                            <input class="form-control form-control-sm p-3 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" required><br>
-                            <button type="submit" id="twoFaButton" class="btn btn-dark btn-sm">Send code</button>
-                            </form>
+                        <div class="col-10 align-items-center justify-content-center">
+                            <div class="row justify-content-center align-items-center">
+                                <p>Please scan the QR code with Google authenticator:</p>
+                                <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                            </div>
+                            <div class="row">
+                                <form id="twofaForm">
+                                    <label for="password"></label>
+                                    <input class="form-control form-control-sm p-3 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" required><br>
+                                    <button type="submit" id="twoFaButton" class="btn btn-dark btn-sm">Send code</button>
+                                </form>
                             </div>
                         </div>
-                    </div>   
-                </div>
-        `;
+                    </div>
+                </div>`;
     }
 
     async handleButtonClick(event) {

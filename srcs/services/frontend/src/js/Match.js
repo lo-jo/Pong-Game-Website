@@ -18,6 +18,11 @@ export class Match extends BaseClass {
         /*Getting token*/
         this.token = localStorage.getItem('token');
 
+        /*Game users*/
+        this.total_game_user = 0
+        this.game_user_1 = {}
+        this.game_user_2 = {}
+
         this.addDocumentClickListener();
         // this.insertCssLink();
         this.initWebSocket();
@@ -52,8 +57,19 @@ export class Match extends BaseClass {
                     break;
                 case 'other_user':
                     const { other_user } = data;
-                    console.log('sending other user!')
-                    this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    console.log("Receiving other user!")
+                    const otro_usuario  = JSON.parse(other_user)
+                    console.log(otro_usuario);
+                    if (Object.keys(otro_usuario).length > 0)
+                    {
+                        console.log('Sending other user!')
+                        this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
+                    }
+                    break;
+                case 'user_token':
+                    console.log('User token received, now sended!')
+                    const { user_token } = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'user_token', 'user_token' : user_token}));
                     break;
                 case 'timer':
                     const { timer } = data
@@ -105,6 +121,11 @@ export class Match extends BaseClass {
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
                 this.initGame(user_1_info, user_2_info);
+                break;
+            case 'request_confirmation':
+                console.log("Sending confirmation!");
+                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
+                break;
         }
     }
 
@@ -118,9 +139,10 @@ export class Match extends BaseClass {
                 initGameTwoD(game_state);
                 this.initKeyEvents();
                 break;
+            case 'show_timer':
+                this.showTimerBeforeMatch();
+                break;
             case 'someone_left':
-                const { how } = game_state;
-                // console.log(`Someone left by this reason ${how}`);
                 this.socket.send(JSON.stringify({'type_message' : 'match_aborted'}));
                 break;
             case 'broadcasted_game_event':
@@ -228,7 +250,7 @@ export class Match extends BaseClass {
     {
         // console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
-        this.showTimerBeforeMatch();
+        // this.showTimerBeforeMatch();
     }
 
     initBoard(user_1_info, user_2_info)
@@ -283,6 +305,15 @@ export class Match extends BaseClass {
         const board_game = document.createElement('div');
         board_game.setAttribute('id', 'board-game');
 
+        /*Waiting for the other user*/
+
+        const waiting_message = document.createElement('div');
+        waiting_message.setAttribute('id', 'waiting-message');
+
+        waiting_message.innerHTML = `<p>Waiting for the other user!</p>`;
+
+        board_game.appendChild(waiting_message);
+
         /*Adding board game to app div */
         appContainer.appendChild(board_game);
         
@@ -292,7 +323,6 @@ export class Match extends BaseClass {
     }
 
     showTimerBeforeMatch(){
-        // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
         seconds_div.setAttribute('id', 'seconds');
@@ -303,9 +333,7 @@ export class Match extends BaseClass {
             total = --total;
             seconds_div.textContent = total;
             if (total <= 0) {
-                clearInterval(timeinterval);
-                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
-                console.log('sending confirmation');
+                clearInterval(timeinterval);      
             }
         }, 1000);
     }
@@ -315,14 +343,16 @@ export class Match extends BaseClass {
         document.addEventListener('keydown', (e) => {
             switch(e.key){
                 case 'w':
+                    // console.log("`w` pressed");
+                    // console.log(this.socket.readyState);
                     if (this.socket.readyState === WebSocket.OPEN)
                     {
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
                     }
-                    // console.log("`w` pressed");
                     break;
                 case 's':
                     // console.log("`s` pressed");
+                    // console.log(this.socket.readyState);
                     if (this.socket.readyState === WebSocket.OPEN)
                     {
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));

@@ -100,20 +100,13 @@ class UsersEndpoint(BaseEndpoint):
         self.switch_request_http = {
             '/users/': {
                 'GET' : self.request_get_collection,
-                # 'POST' : self.request_post_collection,
-                # 'PUT': self.request_put_collection,
-                # 'PATCH': self.request_patch_collection,
-                # 'DELETE': self.request_delete_collection,
             },
             '/users/<id>/' : {
                 'GET' : self.request_get_single_element
             },
             '/users/<id>/profile' : {
                 'GET' : self.request_get_single_element
-            },
-            # '/users/<id>/update_profile/' : {
-            #     'GET' : self.request_get_single_element
-            # }
+            }
         }
 
         self.uri_id_question = "Enter the user ID: "
@@ -127,21 +120,16 @@ class PongEndpoint(BaseEndpoint):
         super().__init__('/pong/')
 
         self.switch_request = ['HTTPS', 'WSS']
-        
-        # self.switch_request_wss = ['ws/pong/lobby', 'ws/pong/match/<id>']
+
         self.switch_request_wss = {
             'ws/pong/match/<id>' : self.request_join_match,
             'ws/pong/lobby' : self.request_join_lobby
         }  
 
         self.switch_request_http = {
-            '/last-request' : '',
             '/pong/matches/': {
                 'GET' : self.request_get_collection,
                 'POST' : self.request_post_collection,
-                # 'PUT': self.request_put_collection,
-                # 'PATCH': self.request_patch_collection,
-                # 'DELETE': self.request_delete_collection,
             },
             '/pong/matches/<id>/' : {
                 'GET' : self.request_get_single_element

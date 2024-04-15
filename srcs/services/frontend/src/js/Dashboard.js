@@ -15,19 +15,14 @@ export class Dashboard extends BaseClass {
         console.log(`button clicked:[${event.target.id || event.target.className }]`);
         if (event.target.id === 'launch-game-button') {
             event.preventDefault();
-            const button = document.getElementById('launch-game-button');
-            // button.disabled = true;
-            try {
-                this.initWebSocketLobby();
-                await this.postMatch();
-                console.log('web socket');
-            } catch (error) {
-                console.error('Error:', error);
-                // button.disabled = false;
-            }
-            // history.pushState({}, '', '/match_lobby');
-            // router();
-        
+            history.pushState({}, '', '/match_lobby');
+            router();
+            // try {
+            //     this.initWebSocketLobby();
+            //     await this.postMatch();
+            // } catch (error) {
+            //     console.error('Error:', error);
+            // }
         }
         else if (event.target.id == 'launch-local-game'){
             event.preventDefault();
@@ -242,27 +237,10 @@ export class Dashboard extends BaseClass {
                 }
                 throw new Error('Unauthorized');
             }
-            // Add action ? 
-            const data = await response.json();
-            console.log('Backend response:', data);
         } catch (error) {
             console.error('Error:', error);
             throw error;
         }
-
-        // fetch(url, options)
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('The request was not successful');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         console.log('Backend response:', data);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error making request:', error);
-        //     });
     }
 
     initWebSocketLobby() {
@@ -278,12 +256,11 @@ export class Dashboard extends BaseClass {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { action, match_id } = data;
-            console.log(action, match_id);
             if (action == 'create_join') {
                 this.getHtmlForWaitingSpinner();
             } else if (action == 'join_play') {
                 socket.close();
-                history.pushState({ match_id }, '', `/match/${match_id}`);
+                history.pushState('', '', `/match/${match_id}`);
                 router();
             }
         };

@@ -56,6 +56,12 @@ export const routes = {
         auth : true,
         css : './css/chat.css'
     },
+    '/match_lobby' : {
+        path : '/match_lobby',
+        view : MatchLobby,
+        css : '../css/game.css',
+        auth : true
+    },
     '/match/:id' : {
         view : Match,
         dinamic : true,
