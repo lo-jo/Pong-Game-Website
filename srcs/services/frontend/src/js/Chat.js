@@ -93,10 +93,10 @@ export class Chat extends BaseClass {
 
     generateChatBubble(sender, message, time){
         return `
-        <div class="d-flex flex-row text-start ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
+        <div class="text-start" ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
 
         <div>
-          <p class="small p-2 m-2 mb-0 rounded-3 custom-text-color" style="background-color: #FFFFFC;">
+          <p class="small p-2 m-2 mb-0 rounded-3 custom-text-color conchasuwrawra" style="background-color: #FFFFFC;">
           ${message}</p>
           <p class="time ms-3 mb-0 rounded-3 text-muted ${(this.profileData.username == sender) ? `text-end` : `text-start`}">${time}</p>
         </div>
@@ -349,7 +349,7 @@ export class Chat extends BaseClass {
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col-6" id="conchasucolita">
                 <div class="row" id="chatHeader"></div>
                 <div class="row" id="chatWindow"></div>
                 <div class="row" id="chatInput"></div>
