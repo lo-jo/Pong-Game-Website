@@ -454,8 +454,10 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.game_finish = True
         if close_code == 1:
             await self.send_to_group('game_state', json.dumps({'event' : 'someone_left', 'how' : 'changing_url'}))
+            # raise StopConsumer()
         else:
             await self.send_to_group('game_state', json.dumps({'event' : 'someone_left', 'how' : 'going out'}))
+            # raise StopConsumer()
 
 
     # Receivers
