@@ -423,6 +423,7 @@ export class Dashboard extends BaseClass {
             const data = await response.json();
             const log_content = document.getElementById('upcoming');
             if (data.length == 0){
+                log_content.classList.add('align-items-start', 'justify-content-center');
                 log_content.innerText = "No upcoming matches";
                 return;
             }
@@ -438,7 +439,7 @@ export class Dashboard extends BaseClass {
                     const user_2 = await this.getFriendData(match.user_2);
                     log_div.innerText = `${user_1.username} vs. ${user_2.username} `;
                     const playButt = document.createElement('button');
-                    playButt.setAttribute('class', "btn btn-danger btn-sm");
+                    playButt.setAttribute('class', "px-2 btn btn-danger btn-sm");
                     playButt.setAttribute('id', `${match.id}`);
                     playButt.innerText = 'PLAY';
                     playButt.addEventListener('click', (event) => {
@@ -489,7 +490,7 @@ export class Dashboard extends BaseClass {
                             <div class="row p-3 text-center">
                                 <h3>Upcoming Matches</h3>
                             </div>
-                            <div class="row p-3 text-center align-items-center" id="upcoming"></div>
+                            <div class="row p-3 text-center" id="upcoming"></div>
                         </div>
                     </div>
                 </div>`;
