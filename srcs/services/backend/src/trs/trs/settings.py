@@ -35,12 +35,10 @@ ALLOWED_HOSTS = ['paul-f5ar3s9', os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED
 INSTALLED_APPS = [
     # server pong app
     #'server_side_pong.apps.ServerSidePongConfig',
-    # channels
     'channels',
     'daphne',
     'corsheaders',
     #custom apps
-    # 'SPA',
     'users',
     'notification',
     'pong',

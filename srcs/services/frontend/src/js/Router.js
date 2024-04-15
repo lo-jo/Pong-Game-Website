@@ -11,6 +11,7 @@ import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
+import { Sock } from './Sock.js';
 import Navbar from './Navbar.js';
 import jwt_decode from 'jwt-decode';
 
@@ -76,6 +77,12 @@ export const routes = {
         view : LocalMatch,
         dinamic : true,
         css : '../css/game.css',
+        auth : true
+    },
+    '/sock' :{
+        path : '/sock',
+        view : Sock,
+        css : './css/game.css',
         auth : true
     }
 }

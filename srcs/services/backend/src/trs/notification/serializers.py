@@ -7,7 +7,6 @@ class PublicRoomSerializer(serializers.ModelSerializer):
         model = PublicRoom
         fields = ['user']
 
-
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification

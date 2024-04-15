@@ -132,7 +132,8 @@ export class Match extends BaseClass {
                 break;
             case 'match_completed':
                 this.socket.send(JSON.stringify({'type_message' : 'match_completed'}));  
-                this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
+                // this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
+                this.displayWinner(game_state.winner, game_state.loser);
                 break;
             case 'disconnection':
                 this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
@@ -164,7 +165,7 @@ export class Match extends BaseClass {
     }
 
     showMessageAndRedirect(redirect_reason) {
-        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
+        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong><br> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML,
         timeinterval = setInterval(() => {
@@ -179,7 +180,27 @@ export class Match extends BaseClass {
         }, 1000);
     }
 
-    
+    displayWinner(winner, loser) {
+        document.getElementById('app').innerHTML = `
+        <div class="wrapper"><h1>game completed</h1><br>
+        ${winner} won against ${loser}</div>
+            
+            <p><br>Redirection to the dashboard in<p><time><strong id="seconds">5</strong><br> seconds</time>.</p>
+        `
+        let seconds = document.getElementById('seconds'),
+        total = seconds.innerHTML,
+        timeinterval = setInterval(() => {
+            total = --total;
+            seconds.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                this.socket.close();
+                history.pushState('', '', `/dashboard`);
+                router();
+            }
+        }, 1000);
+    }
+
     updateTimer(timer_data) {
         const timer = JSON.parse(timer_data);
         const { time_remaininig, type } = timer;

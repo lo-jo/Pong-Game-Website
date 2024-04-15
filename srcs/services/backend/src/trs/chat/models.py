@@ -1,7 +1,6 @@
 from django.db import models
 from users.models import User
 
-# Create your models here.
 class Message(models.Model):
     # User that sends a message
     sender = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

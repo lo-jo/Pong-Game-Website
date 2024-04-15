@@ -20,7 +20,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers, serializers, viewsets
 from users.models import User
-
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 # Serializers define the API representation.

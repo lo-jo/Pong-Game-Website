@@ -26,7 +26,7 @@ export class Login extends BaseClass {
                 console.error(res.error);
             }
             else {
-                console.log(res.message);
+                // console.log(res.message);
                 localStorage.setItem('token', this.token);
                 await connectUser();
                 history.pushState({}, '', '/dashboard');
@@ -40,7 +40,7 @@ export class Login extends BaseClass {
             await this.handleButtonClick(event);
         } else if (event.target.id === 'twoFaButton'){
             event.preventDefault();
-            console.log('submitting code...');
+            // console.log('submitting code...');
             const codeTwoFa = document.getElementById("codeTwoFa").value;
             if (this.userData)
                 await this.verifyCode(codeTwoFa);
@@ -128,7 +128,7 @@ export class Login extends BaseClass {
                         router();
                     }
                 } else {
-                    console.log("Invalid Credentials");
+                    // console.log("Invalid Credentials");
                     this.displayMessage("Invalid Credentials", false);
                     // Handle invalid credentials
                 }
