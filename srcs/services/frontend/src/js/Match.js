@@ -154,7 +154,6 @@ export class Match extends BaseClass {
                 break;
             case 'broadcasted_game_event':
                 const { broadcasted_game_event, user_id } = game_state;
-                console.log(`IN fronted ${broadcasted_game_event} et ${user_id}`)
                 this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`, 'user_id' : `${user_id}`}));
                 break;
             case 'game_elements':

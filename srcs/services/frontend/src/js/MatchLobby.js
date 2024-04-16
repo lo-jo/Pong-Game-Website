@@ -5,12 +5,12 @@ export class MatchLobby extends BaseClass {
     constructor() {
         super();
         this.socket = null;
+        this.initWebSocketLobby();
         this.run();
     }
     
     async run()
     {
-        this.initWebSocketLobby();
         await this.postMatch();
     }
 
@@ -38,6 +38,24 @@ export class MatchLobby extends BaseClass {
                 }
                 throw new Error('Unauthorized');
             }
+            else
+            {
+                const json_response = await response.json();
+                
+                const { action, match_id } = json_response;
+                if (this.socket.readyState === WebSocket.OPEN)
+                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
+
+                console.log(json_response);
+                console.log(action);
+                if (action === 'join_play')
+                {
+                    console.log('JOIN PLAY BY HTTP RESPONSE');
+                    this.socket.close();
+                    history.pushState('', '', `/match/${match_id}`);
+                    router();
+                }
+            }
         } catch (error) {
             console.error('Error:', error);
             throw error;
@@ -60,13 +78,10 @@ export class MatchLobby extends BaseClass {
             switch (type_message)
             {
                 case 'action':
-                    const { action } = data;
-                    const { match_id } = data;
-                    console.log(action);
-                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
+                    const { action, match_id } = data;
                     if (action === 'join_play')
                     {
-                        console.log('JOIIIINNN PLAY');
+                        console.log('JOIN PLAY BY WSS');
                         this.socket.close();
                         history.pushState('', '', `/match/${match_id}`);
                         router();

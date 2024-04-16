@@ -1,15 +1,1 @@
-[
-    {
-        "id": 44,
-        "status": "completed",
-        "user_1": 1,
-        "user_2": 2,
-        "winner": 2,
-        "loser": 1,
-        "score_user_1": 0,
-        "score_user_2": 3,
-        "tournament": null,
-        "created_at": "2024-04-16T14:18:39.371085+02:00",
-        "time_elapsed": 0
-    }
-]
+{"id":23,"status":"pending","user_1":2,"user_2":4,"winner":null,"loser":null,"score_user_1":0,"score_user_2":0,"tournament":null,"created_at":"2024-04-16T17:45:33.605236+02:00","time_elapsed":0}
