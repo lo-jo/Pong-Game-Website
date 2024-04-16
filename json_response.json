@@ -1,0 +1,15 @@
+[
+    {
+        "id": 1,
+        "status": "completed",
+        "user_1": 1,
+        "user_2": 2,
+        "winner": 2,
+        "loser": 1,
+        "score_user_1": 0,
+        "score_user_2": 3,
+        "tournament": null,
+        "created_at": "2024-04-16T13:45:38.580005+02:00",
+        "time_elapsed": 0
+    }
+]

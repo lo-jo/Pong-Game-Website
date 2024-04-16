@@ -836,6 +836,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
+        print(f'Leader flag {self.leader}')
 
         init_pong_game_data = {
             'event' : 'init_pong_game',
@@ -844,67 +845,68 @@ class PongConsumer(AsyncWebsocketConsumer):
             'user_paddle_2' : self.game_user_2["paddle"]
         }
 
+        # Sending ball and paddles
         await self.send_to_group('game_state', json.dumps(init_pong_game_data))
         # Start timer
         asyncio.create_task(self.game_timer())
 
-        while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
-            # Bouncing the ball in Y Axis
-            if self.ball['top'] <= 0 or self.ball['top'] >= 0.96:
-                self.ball['speed_y'] *= -1
+        # while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
+        #     # Bouncing the ball in Y Axis
+        #     if self.ball['top'] <= 0 or self.ball['top'] >= 0.96:
+        #         self.ball['speed_y'] *= -1
 
-            # Bouncing the ball in X Axis
-            if self.ball['left'] <= 0 or (self.ball['left'] + self.ball['size_x']) >= 0.985:
-                self.ball['speed_x'] *= -1
+        #     # Bouncing the ball in X Axis
+        #     if self.ball['left'] <= 0 or (self.ball['left'] + self.ball['size_x']) >= 0.985:
+        #         self.ball['speed_x'] *= -1
 
-            # Checking possible hit with game_user_1
-            if self.ball['left'] <= 0.05:
-                if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_1["paddle"]['top'], self.game_user_1["paddle"]['size_y']):
-                    # self.ball['speed_x'] =
-                    self.ball['speed_x'] *= -1
-            # Checking possible hit with game_user_2
-            if (self.ball['left'] + self.ball['size_x']) >= 0.94:
-                if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_2["paddle"]['top'], self.game_user_2["paddle"]['size_y']):
-                    self.ball['speed_x'] *= -1
+        #     # Checking possible hit with game_user_1
+        #     if self.ball['left'] <= 0.05:
+        #         if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_1["paddle"]['top'], self.game_user_1["paddle"]['size_y']):
+        #             # self.ball['speed_x'] =
+        #             self.ball['speed_x'] *= -1
+        #     # Checking possible hit with game_user_2
+        #     if (self.ball['left'] + self.ball['size_x']) >= 0.94:
+        #         if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_2["paddle"]['top'], self.game_user_2["paddle"]['size_y']):
+        #             self.ball['speed_x'] *= -1
 
-            # Checking for points
-            if self.ball['left'] <= 0:
-                self.game_user_2["paddle"]["score"] += 1
-                self.ball['top'] = 0.5
-                self.ball['left'] = 0.5
+        #     # Checking for points
+        #     if self.ball['left'] <= 0:
+        #         self.game_user_2["paddle"]["score"] += 1
+        #         self.ball['top'] = 0.5
+        #         self.ball['left'] = 0.5
 
-            if (self.ball['left'] + self.ball['size_x']) >= 1:
-                self.game_user_1["paddle"]["score"] += 1
-                self.ball['top'] = 0.5
-                self.ball['left'] = 0.5
+        #     if (self.ball['left'] + self.ball['size_x']) >= 1:
+        #         self.game_user_1["paddle"]["score"] += 1
+        #         self.ball['top'] = 0.5
+        #         self.ball['left'] = 0.5
         
-            #Checking and setting precision limits for ball in top and left coordinates
-            self.ball['top'] += self.ball['speed_y']
-            if self.ball['top'] <= 0:
-                self.ball['top'] = 0
-            else:
-                self.ball['top'] = round(self.ball['top'], 5)
+        #     #Checking and setting precision limits for ball in top and left coordinates
+        #     self.ball['top'] += self.ball['speed_y']
+        #     if self.ball['top'] <= 0:
+        #         self.ball['top'] = 0
+        #     else:
+        #         self.ball['top'] = round(self.ball['top'], 5)
     
-            self.ball['left'] += self.ball['speed_x']
-            if self.ball['left'] <= 0:
-                self.ball['left'] = 0
-            else:
-                self.ball['left'] = round(self.ball['left'], 5)
+        #     self.ball['left'] += self.ball['speed_x']
+        #     if self.ball['left'] <= 0:
+        #         self.ball['left'] = 0
+        #     else:
+        #         self.ball['left'] = round(self.ball['left'], 5)
             
-            game_elements = {
-                'event' : 'game_elements',
-                'ball_game' : self.ball,
-                'user_paddle_1' : self.game_user_1["paddle"],
-                'user_paddle_2' : self.game_user_2["paddle"]
-            }
+        #     game_elements = {
+        #         'event' : 'game_elements',
+        #         'ball_game' : self.ball,
+        #         'user_paddle_1' : self.game_user_1["paddle"],
+        #         'user_paddle_2' : self.game_user_2["paddle"]
+        #     }
 
-            # Sending elements info
-            await self.send_to_group('game_state', json.dumps(game_elements))
-            # Sleeping one miliseconds for thread 
-            await asyncio.sleep(0.1)
+        #     # Sending elements info
+        #     await self.send_to_group('game_state', json.dumps(game_elements))
+        #     # Sleeping one miliseconds for thread 
+        #     await asyncio.sleep(0.1)
 
-        self.game_finish = True
-        await self.finish_and_save_match()
+        # self.game_finish = True
+        # await self.finish_and_save_match()
 
     async def finish_and_save_match(self):
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
