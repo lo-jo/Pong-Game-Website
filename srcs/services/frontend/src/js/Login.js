@@ -145,6 +145,8 @@ export class Login extends BaseClass {
 
     hideMessage(id) {
         const alertElement = document.getElementById("redWarning");
+        if (!alertElement)
+            return;
         alertElement.textContent = '';
         alertElement.style.display = 'none';
     }
