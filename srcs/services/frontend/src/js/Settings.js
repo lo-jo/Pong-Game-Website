@@ -44,6 +44,7 @@ export class Settings extends BaseClass {
         }
         else if (event.target.id == 'twoFA_switch'){
             this.isChecked = (this.switchCheck.checked) ? true : false;
+        
         }
     }
 
@@ -63,6 +64,21 @@ export class Settings extends BaseClass {
         if (!res.ok)
         {
             console.error("ERROR POSTING OTP");
+        }
+        else {
+            await this.getUserData();
+            document.getElementById('app').innerHTML += `<br>
+            <p class="text-center">Please scan the QR code with Google authenticator:</p>
+            <p class="text-center">Disclaimer : This is your only chance to scan it!</p>
+            <div class="container">
+            <div class="row align-items-center">
+                        
+                            <div class="row justify-content-center align-items-center">
+                                <img src="${this.httpProtocol}//localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                        
+                        </div>
+            </div>
+            </div>`;
         }
     }
 
