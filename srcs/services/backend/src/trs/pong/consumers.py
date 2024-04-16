@@ -964,13 +964,14 @@ class MatchConsumer(AsyncWebsocketConsumer):
         self.match_url = f'http://localhost:5173/match_lobby'
         self.client_url = ''
         self.request_ping_message = True
+        
+        await self.accept()
 
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
 
-        await self.accept()
 
         asyncio.create_task(self.request_ping())
 

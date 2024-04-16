@@ -91,30 +91,52 @@ class JoinMatchView(APIView):
     def post(self, request):
         # 1. Filter matches that are not part of a tournament
         matches = Match.objects.filter(tournament__isnull=True)
-        
         # 2. Filter the oldest 'pending' match
-        oldest_pending_match = matches.filter(status='pending').order_by('created_at')
+        if matches:
+            oldest_pending_match = matches.filter(status='pending').order_by('created_at')
+            if oldest_pending_match:
+                print("IF OLDEST PENDING MATCH JOIN MATCH VIEW")
+                for match in oldest_pending_match:
+                    print("GOING THRU MATCHES")
+                    # 2.1 If the oldest pending match is 'full', post a new match
+                    if match.user_1 and match.user_2:
+                        print("MATCH IS FULL")
+                        continue
+                    else:
+                        print("MATCH PENDINGUND", match.id)
+                        # Joining match pending
+                        if match.user_1 == None and match.user_2 != request.user:
+                            match.user_1 = request.user
+                        elif match.user_2 == None and match.user_1 != request.user:
+                            match.user_2 = request.user
 
-        if oldest_pending_match:
-            for match in oldest_pending_match:
-                # 2.1 If the oldest pending match is 'full', post a new match
-                if match.user_1 and match.user_2:
-                    continue
-                else:
+                        match.save()
+                        self.join_user_to_match_lobby('join_play', match.id)
+                        # # Sending http response
+                        serializer = MatchSerializer(match)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+                print("ELSE IN JOIN MATCH VIEW")
+                # Creating new match because there's not pending
+                new_match = Match.objects.create(status='pending')
+                new_match.user_1 = request.user
+                new_match.save()
+                self.join_user_to_match_lobby('create_join', new_match.id)
+            
+                # Sending http response
+                serializer = MatchSerializer(new_match)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                new_match = Match.objects.create(status='pending')
+                new_match.user_1 = request.user
+                new_match.save()
+                self.join_user_to_match_lobby('create_join', new_match.id)
+            
+                # Sending http response
+                serializer = MatchSerializer(new_match)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-                    # Joining match pending
-                    if match.user_1 == None:
-                        match.user_1 = request.user
-                    elif match.user_2 == None:
-                        match.user_2 = request.user
-
-                    match.save()
-                    self.join_user_to_match_lobby('join_play', match.id)
-                    # # Sending http response
-                    serializer = MatchSerializer(match)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            # Creating new match because there's not pending
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user
             new_match.save()
@@ -123,8 +145,6 @@ class JoinMatchView(APIView):
             # Sending http response
             serializer = MatchSerializer(new_match)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        
 
     # def post(self, request):
     #     try:

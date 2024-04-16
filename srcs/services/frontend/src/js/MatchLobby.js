@@ -62,9 +62,11 @@ export class MatchLobby extends BaseClass {
                 case 'action':
                     const { action } = data;
                     const { match_id } = data;
+                    console.log(action);
                     this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
-                    if (action == 'join_play')
+                    if (action === 'join_play')
                     {
+                        console.log('JOIIIINNN PLAY');
                         this.socket.close();
                         history.pushState('', '', `/match/${match_id}`);
                         router();
