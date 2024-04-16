@@ -46,7 +46,7 @@ export class MatchLobby extends BaseClass {
 
     initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby/`;
     
         this.socket = new WebSocket(wsUrl);
 

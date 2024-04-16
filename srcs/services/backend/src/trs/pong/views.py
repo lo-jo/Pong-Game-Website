@@ -93,19 +93,23 @@ class JoinMatchView(APIView):
         matches = Match.objects.filter(tournament__isnull=True)
         
         # 2. Filter the oldest 'pending' match
-        oldest_pending_match = matches.filter(status='pending').order_by('created_at')
+        if matches:
+            oldest_pending_match = matches.filter(status='pending').order_by('created_at')
 
         if oldest_pending_match:
+            print("IF OLDEST PENDING MATCH JOIN MATCH VIEW")
             for match in oldest_pending_match:
+                print("GOING THRU MATCHES")
                 # 2.1 If the oldest pending match is 'full', post a new match
                 if match.user_1 and match.user_2:
+                    print("MATCH IS FULL")
                     continue
                 else:
-
+                    print("MATCH PENDINGUND", match.id)
                     # Joining match pending
-                    if match.user_1 == None:
+                    if match.user_1 == None and match.user_2 != request.user:
                         match.user_1 = request.user
-                    elif match.user_2 == None:
+                    elif match.user_2 == None and match.user_1 != request.user:
                         match.user_2 = request.user
 
                     match.save()
@@ -113,7 +117,8 @@ class JoinMatchView(APIView):
                     # # Sending http response
                     serializer = MatchSerializer(match)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
+        
+            print("ELSE IN JOIN MATCH VIEW")
             # Creating new match because there's not pending
             new_match = Match.objects.create(status='pending')
             new_match.user_1 = request.user

@@ -183,13 +183,16 @@ export class LocalMatch extends BaseClass {
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML,
         timeinterval = setInterval(() => {
-            total = --total;
-            seconds.textContent = total;
-            if (total <= 0) {
-                clearInterval(timeinterval);
-                this.socket.close();
-                history.pushState('', '', `/dashboard`);
-                router();
+            this.socket.close();
+            if (document.getElementById('seconds'))
+            {
+                total = --total;
+                seconds.textContent = total;
+                if (total <= 0) {
+                    clearInterval(timeinterval);
+                    history.pushState('', '', `/dashboard`);
+                    router();
+                }
             }
         }, 1000);
     }

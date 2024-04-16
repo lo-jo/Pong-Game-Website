@@ -93,7 +93,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
-        raise StopConsumer()
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
         # Match completed
         match.status = 'aborted'
@@ -101,7 +100,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         
 
     async def websocket_disconnect(self, close_code):
-        raise StopConsumer()
+        # raise StopConsumer()
         pass
 
 
@@ -464,8 +463,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def websocket_disconnect(self, close_code):
         # print("DISCONNECT!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        
         self.game_finish = True
         await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
+        # raise StopConsumer()
 
     # Receivers
     async def receive(self, text_data):
@@ -916,12 +917,13 @@ class MatchConsumer(AsyncWebsocketConsumer):
             self.request_ping_message = False
             # Getting match
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            print('////// DECONNECTIONNNNNNN //////////////')     
-            # Match aborted
-            match.status = 'aborted'
-            await sync_to_async(match.save)()
-
-            await self.send_to_group('match_aborted', 'match_aborted')
+            if match :
+                print('////// DECONNECTIONNNNNNN //////////////')     
+                # Match aborted
+                match.status = 'aborted'
+                await sync_to_async(match.save)()
+                await self.send_to_group('match_aborted', 'match_aborted')
+           
 
     async def receive(self, text_data):
         data = json.loads(text_data)

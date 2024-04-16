@@ -9,7 +9,7 @@ export const initGameTwoD = (data) => {
 
     const board_game = document.getElementById('board-game');
 
-    const waiting_message = document.getElementById('waiting-message');
+    const waiting_message = document.getElementById('seconds');
     if (waiting_message) {
         board_game.removeChild(waiting_message);
     } else {
