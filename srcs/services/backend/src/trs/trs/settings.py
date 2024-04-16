@@ -68,13 +68,13 @@ MIDDLEWARE = [
 
 
 # HTTPS
-# SECURE_SSL_REDIRECT = True
-# SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
-# SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
+SECURE_SSL_REDIRECT = True
+SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
+SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "https://localhost:5173",
 ]
 
 
@@ -107,6 +107,8 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("redis", 6379)],
+            "capacity": 1500,  # default 100
+            "expiry": 10,  # default 60
         },
     },
 }

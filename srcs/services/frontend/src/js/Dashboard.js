@@ -74,7 +74,7 @@ export class Dashboard extends BaseClass {
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch('http://localhost:8000/users/profile/', {
+        return fetch(`${this.httpProtocol}//localhost:8000/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -104,7 +104,7 @@ export class Dashboard extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -136,7 +136,7 @@ export class Dashboard extends BaseClass {
             user_2: targetId,
         };
         try {
-            const response = await fetch(`http://localhost:8000/pong/matches/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/matches/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -181,7 +181,7 @@ export class Dashboard extends BaseClass {
         const email = `${username}@amigo.org`;
         
         try {
-            const response = await fetch('http://localhost:8000/users/register/', {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -323,7 +323,7 @@ export class Dashboard extends BaseClass {
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch('http://localhost:8000/users/profile/', {
+        return fetch(`${this.httpProtocol}//localhost:8000/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -353,7 +353,7 @@ export class Dashboard extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -381,7 +381,7 @@ export class Dashboard extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/pending_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/pending_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -422,7 +422,7 @@ export class Dashboard extends BaseClass {
                     playButt.addEventListener('click', (event) => {
                         if (event.target.id == `${match.id}`){
                             event.preventDefault();
-                            navigateTo(`http://localhost:5173/match/${match.id}`);
+                            navigateTo(`${this.httpProtocol}//localhost:5173/match/${match.id}`);
                         }
                     });
                     log_div.appendChild(playButt);

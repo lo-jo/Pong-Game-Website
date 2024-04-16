@@ -11,7 +11,7 @@ export class Login extends BaseClass {
     }
 
     async verifyCode(codeTwoFa) {
-        const res =  await fetch('http://localhost:8000/users/otp_verify/', { 
+        const res =  await fetch(`${this.httpProtocol}//localhost:8000/users/otp_verify/`, { 
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -49,7 +49,7 @@ export class Login extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`http://localhost:8000/users/profile/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -84,7 +84,7 @@ export class Login extends BaseClass {
                         <div class="col-10 align-items-center justify-content-center">
                             <div class="row justify-content-center align-items-center">
                                 <p>Please scan the QR code with Google authenticator:</p>
-                                <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                                <img src="${this.httpProtocol}//localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
                             </div>
                             <div class="row">
                                 <form id="twofaForm">
@@ -103,7 +103,7 @@ export class Login extends BaseClass {
         const password = document.getElementById("password").value;
 
         try {
-            const response = await fetch('http://localhost:8000/users/token/', {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/token/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

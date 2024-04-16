@@ -105,7 +105,7 @@ export const connectUser = async () => {
     }
 
     if (token){
-        onlineSocket = new WebSocket(`ws://localhost:8000/ws/notify/?token=${token}`);
+        onlineSocket = new WebSocket(`wss://localhost:8000/ws/notify/?token=${token}`);
 
             onlineSocket.onopen = function (e) {
                 // console.log('WebSocket connection established.');
@@ -248,6 +248,8 @@ function loadCss(url) {
 
 async function checkAuthentication() {
     console.log("checking authentication (Router.js)");
+    const httpProtocol = window.location.protocol;
+
     try {
         const token = localStorage.getItem('token');
 
@@ -263,7 +265,7 @@ async function checkAuthentication() {
             throw false;
         }
 
-        const response = await fetch('http://localhost:8000/users/check-authentication/', {
+        const response = await fetch(`${httpProtocol}//localhost:8000/users/check-authentication/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,16 +1,17 @@
 import { BaseClass } from './BaseClass';
 import jwt_decode from 'jwt-decode';
 
-export class LoadProfile
+export class LoadProfile extends BaseClass
 {
     constructor(id) {
+        super();
         this.id = id;
     }
 
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${this.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/${this.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -34,7 +35,7 @@ export class LoadProfile
     async getFriendshipStatus(user) {
         const jwtAccess = localStorage.getItem('token');
         let decoded_token = jwt_decode(jwtAccess);
-        fetch(`http://localhost:8000/users/friendship/${user.username}/`, {
+        fetch(`${this.httpProtocol}//localhost:8000/users/friendship/${user.username}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -87,7 +88,7 @@ export class LoadProfile
 
     displayStatus = (user) => {
         const jwtAccess = localStorage.getItem('token');
-        fetch(`http://localhost:8000/notify/${user.username}/`, {
+        fetch(`${this.httpProtocol}//localhost:8000/notify/${user.username}/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -117,7 +118,7 @@ export class LoadProfile
 
     addFriend = (user) => {
         const jwtAccess = localStorage.getItem('token');
-        fetch(`http://localhost:8000/users/friendship/${user.id}/`, {
+        fetch(`${this.httpProtocol}//localhost:8000/users/friendship/${user.id}/`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -145,7 +146,7 @@ export class LoadProfile
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -179,7 +180,7 @@ export class LoadProfile
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -222,7 +223,7 @@ export class LoadProfile
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -249,7 +250,7 @@ export class LoadProfile
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/tournaments/wins/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/tournaments/wins/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,

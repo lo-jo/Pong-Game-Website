@@ -91,15 +91,6 @@ export class Match extends BaseClass {
         };
     }
 
-
-    insertCssLink()
-    {
-        const styleCss = document.createElement('link');
-        styleCss.rel = 'stylesheet';
-        styleCss.href = `http://localhost:5173/${this.css}`;
-        document.head.appendChild(styleCss);
-    }
-
     /*Methods for match handshake*/
     async ws_handshake(ws_handshake_message, data)
     {
@@ -189,8 +180,8 @@ export class Match extends BaseClass {
     showMessageAndRedirect(redirect_reason) {
         document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong><br> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
-        total = seconds.innerHTML,
-        timeinterval = setInterval(() => {
+        total = seconds.innerHTML;
+        let timeinterval = setInterval(() => {
             total = --total;
             seconds.textContent = total;
             if (total <= 0) {
@@ -212,7 +203,7 @@ export class Match extends BaseClass {
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML;
         this.socket.close();
-        timeinterval = setInterval(() => {
+        let timeinterval = setInterval(() => {
             
             if (document.getElementById('seconds'))
             {

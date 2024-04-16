@@ -3,6 +3,7 @@ export class BaseClass {
         if (this.constructor === BaseClass) {
             throw new Error("Cannot instantiate abstract class.");
         }
+        this.httpProtocol = window.location.protocol;
     }
 
     // run() {

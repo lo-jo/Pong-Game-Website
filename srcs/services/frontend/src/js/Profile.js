@@ -9,15 +9,16 @@ class User{
         this.email = email;
         this.bio = bio;
         this.friendMap = new Map();
+        this.httpProtocol = window.location.protocol;
     }
     getProfilePicPath() {
-        return "http://localhost:8000" + this.pic;
+        return `${this.httpProtocol}//localhost:8000` + this.pic;
     }
     getFriendReq() {
-        return "http://localhost:8000/users/friendship/" + this.username + "/";
+        return `${this.httpProtocol}//localhost:8000/users/friendship/` + this.username + "/";
     }
     getStatus() {
-        return "http://localhost:8000/notify/" + this.username + "/";
+        return `${this.httpProtocol}//localhost:8000/notify/` + this.username + "/";
     }
 }
 
@@ -94,7 +95,7 @@ export class Profile extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8000/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -147,7 +148,7 @@ export class Profile extends BaseClass {
     async displayProfile() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch('http://localhost:8000/users/profile/', {
+        return fetch(`${this.httpProtocol}//localhost:8000/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -180,7 +181,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -221,7 +222,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/tournaments/wins/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/tournaments/wins/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -248,7 +249,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`http://localhost:8000/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//localhost:8000/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -337,6 +338,11 @@ export class Profile extends BaseClass {
         }, 80);
     }
 
+    async delayedgetFriendList(user) {
+        setTimeout(() => {
+            this.getFriendList(user);
+        }, 80);
+    }
     async getHtmlForMain() {
         const currentUser = await this.displayProfile();
         await this.delayedDisplayStatus(currentUser);
@@ -350,7 +356,7 @@ export class Profile extends BaseClass {
             losses = 0;
         const tournData = await this.getTournData(currentUser);
         let twins = this.getCurrentWeekWins(tournData);
-        await this.getFriendList(currentUser);
+        await this.delayedgetFriendList(currentUser);
         return `<div class="container text-center">
                     <div class="row align-items-center">
                         <div class="col-4" id="leftCol">
