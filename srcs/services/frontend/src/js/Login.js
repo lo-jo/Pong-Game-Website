@@ -79,22 +79,19 @@ export class Login extends BaseClass {
     async getVerifyTwoFaHtml() {
         console.log("userData: ", this.userData);
         return `<div class="container-fluid">
-                    <div class="row p-2 align-items-center">
+                    <div class="row p-2 align-items-center justify-content-center">
                         <div class="col-2">
                             <h1 class="titreTwofa">Verify 2FA</h1>
                         </div>
-                        <div class="col-10 align-items-center justify-content-center">
-                            <div class="row justify-content-center align-items-center">
-                                <p>Please scan the QR code with Google authenticator:</p>
-                                <img src="${this.httpProtocol}//localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
-                            </div>
-                            <div class="row justify-content-center align-items-center">
-                                <div class="col-lg-4 col-md-6 col-8">
+                        <div class="col-lg-4 col-md-8 col-10 align-items-center justify-content-center">
+                            <div class="row justify-content-center">
+                                <p> Enter your verification code from your Google Authenticator app </p>
+                                <div class="col-lg-6 col-3">
                                     <form id="twofaForm">
                                         <label for="password"></label>
-                                        <input class="form-control form-control-sm p-3 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" required><br>
-                                        <div id="redWarning" class="mb-2 alert alert-danger" role="alert" style="display :none;"></div>    
-                                        <button type="submit" id="twoFaButton" class="p-2 btn btn-dark btn-sm">Send code</button>
+                                        <input class="form-control form-control-sm p-3 mb-4 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" style="text-align: center;" required>
+                                        <div id="redWarning" class="my-2 alert alert-danger" role="alert" style="display :none;"></div>
+                                        <button type="submit" id="twoFaButton" class="p-1 btn btn-dark btn-sm">Send code</button>
                                     </form>
                                 </div>
                             </div>
@@ -124,9 +121,8 @@ export class Login extends BaseClass {
                 if (data.access) {
                     this.token = data.access;
                     this.userData = await this.getUserData();
-                    if (this.userData.otp_enabled  === true && this.userData.otp_verified === false)
+                    if (this.userData.otp_enabled  === true)
                     {
-                        
                         document.getElementById('app').innerHTML = await this.getVerifyTwoFaHtml();
                     } else {
                         localStorage.setItem('token', data.access);
