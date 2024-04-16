@@ -23,7 +23,7 @@ export class Login extends BaseClass {
             });
             if (!res.ok)
             {
-                console.error(res.error);
+                this.displayMessage("Invalid code", false);
             }
             else {
                 // console.log(res.message);
@@ -42,7 +42,9 @@ export class Login extends BaseClass {
             event.preventDefault();
             // console.log('submitting code...');
             const codeTwoFa = document.getElementById("codeTwoFa").value;
-            if (this.userData)
+            if (!codeTwoFa)
+                this.displayMessage("Please enter a code", false);
+            else if (this.userData)
                 await this.verifyCode(codeTwoFa);
         }
     }
@@ -77,21 +79,26 @@ export class Login extends BaseClass {
     async getVerifyTwoFaHtml() {
         console.log("userData: ", this.userData);
         return `<div class="container-fluid">
-                    <div class="row align-items-center">
+                    <div class="row p-2 align-items-center">
                         <div class="col-2">
                             <h1 class="titreTwofa">Verify 2FA</h1>
                         </div>
                         <div class="col-10 align-items-center justify-content-center">
                             <div class="row justify-content-center align-items-center">
-                                <p>Please scan the QR code with Google authenticator:</p>
-                                <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                                <div class="col-lg-4 col-md-6 col-8">
+                                    <p>Please scan the QR code with Google authenticator:</p>
+                                    <img src="http://localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                                </div>
                             </div>
-                            <div class="row">
-                                <form id="twofaForm">
-                                    <label for="password"></label>
-                                    <input class="form-control form-control-sm p-3 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" required><br>
-                                    <button type="submit" id="twoFaButton" class="btn btn-dark btn-sm">Send code</button>
-                                </form>
+                            <div class="row justify-content-center align-items-center">
+                                <div class="col-lg-4 col-md-6 col-8">
+                                    <form id="twofaForm">
+                                        <label for="password"></label>
+                                        <input class="form-control form-control-sm p-3 bg-dark text-light border-0" id="codeTwoFa" name="codeTwoFa" required><br>
+                                        <div id="redWarning" class="mb-2 alert alert-danger" role="alert" style="display :none;"></div>    
+                                        <button type="submit" id="twoFaButton" class="p-2 btn btn-dark btn-sm">Send code</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

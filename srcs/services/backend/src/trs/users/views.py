@@ -14,6 +14,7 @@ from django.http import JsonResponse
 import pyotp
 import qrcode
 from io import BytesIO
+from django.utils.html import escape
 
 class AllUsersView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -194,6 +195,7 @@ class VerifyOtpView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
+        otp_entered = escape(request.data.get('otp'))  # Input sanitization
         otp_entered = request.data.get('otp')
         secret_key = user.otp_key
         totp = pyotp.TOTP(secret_key)
