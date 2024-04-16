@@ -8,8 +8,6 @@ export class LocalMatch extends BaseClass {
         super();
         /*Id of the match*/
         this.id = id;
-        /*Path to css */
-        this.css = './css/game.css';
         /*Socket*/
         this.socket = null;
         /*URL of match*/
@@ -19,7 +17,6 @@ export class LocalMatch extends BaseClass {
         this.token = localStorage.getItem('token');
 
         this.addDocumentClickListener();
-        // this.insertCssLink();
         this.initWebSocket();
         this.user_1_info = null;
         this.user_2_info = null;
@@ -71,15 +68,6 @@ export class LocalMatch extends BaseClass {
         this.socket.onclose = function() {
             console.log('WebSocket (match game) connection closed.');
         };
-    }
-
-
-    insertCssLink()
-    {
-        const styleCss = document.createElement('link');
-        styleCss.rel = 'stylesheet';
-        styleCss.href = `http://localhost:5173/${this.css}`;
-        document.head.appendChild(styleCss);
     }
 
     /*Methods for match handshake*/
@@ -288,7 +276,9 @@ export class LocalMatch extends BaseClass {
         // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
-        seconds_div.setAttribute('id', 'seconds');
+        seconds_div.setAttribute('id', 'waiting-message');
+        seconds_div.setAttribute('class', 'message-before-local-match');
+        // seconds_div.setAttribute('id', 'seconds');
         board_game.appendChild(seconds_div);
         let seconds = 6;
         let total = seconds

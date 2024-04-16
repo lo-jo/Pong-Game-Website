@@ -13,7 +13,7 @@ export const initGameTwoD = (data) => {
     if (waiting_message) {
         board_game.removeChild(waiting_message);
     } else {
-        console.error("Element with ID 'seconds' not found.");
+        console.error("Element with ID 'waiting-message' not found.");
     }
 
 	board_game.appendChild(ball);
@@ -73,6 +73,8 @@ export const drawGameElements = (game_state_info) => {
 
 const drawBall = (ball_info) => {
     const ball = document.getElementById('ball');
+    if (!ball)
+        return;
     const top = 100 * ball_info.top;
     const left = 100 * ball_info.left
     ball.style.setProperty("top", `calc(${top}%)`);
@@ -81,6 +83,8 @@ const drawBall = (ball_info) => {
 
 const drawUserPaddle = (paddle_user_info) => {
     const paddle = document.getElementById(`paddle-${paddle_user_info.id}`);
+    if (!paddle)
+        return;
     const top = 100 * paddle_user_info.top;
     if (paddle_user_info.id == 1)
         paddle.style.backgroundColor = '#FF003D';
@@ -91,11 +95,15 @@ const drawUserPaddle = (paddle_user_info) => {
 
 const drawScoreUser = (user_info) => {
     const score = document.getElementById(`score-${user_info.id}`);
+    if (!score)
+        return;
     score.innerHTML = `${user_info.score}`;
 }
 
 export const drawUser = (user_info) => {
     const user = document.createElement('div');
+    if (!user)
+        return;
     user.className = 'game_user';
     const top = 100 * user_info.top;
     const left = 100 * user_info.left

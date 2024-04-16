@@ -51,19 +51,25 @@ export class Dashboard extends BaseClass {
             if (!tournamentName) {
                 this.displayMessage("Tournament name cannot be empty.", false);
                 setTimeout(async () => {
-                    tournamentNameInput.disabled = false;
-                    createTournamentButton.disabled = false;
-                    goBackBtn.disabled = false;
+                    if (document.getElementById("tournamentName"))
+                    {
+                        tournamentNameInput.disabled = false;
+                        createTournamentButton.disabled = false;
+                        goBackBtn.disabled = false;
+                    }
                 }, 1500);
                 return;
             }
             let obj = await this.tournament.createTournament(tournamentName);
             this.displayMessage(`${obj.message}`, obj.success);
             setTimeout(async () => {
-                tournamentNameInput.disabled = false;
-                tournamentNameInput.value = '';
-                createTournamentButton.disabled = false;
-                document.getElementById('app').innerHTML = await this.getHtmlForMain();
+                if (document.getElementById("createTournament"))
+                {
+                    tournamentNameInput.disabled = false;
+                    tournamentNameInput.value = '';
+                    createTournamentButton.disabled = false;
+                    document.getElementById('app').innerHTML = await this.getHtmlForMain();
+                }
             }, 1500);
         } else if (event.target.id === 'join-tournament') {
             event.preventDefault();
@@ -174,7 +180,7 @@ export class Dashboard extends BaseClass {
 
     async postLocalMatch() {
         console.log("Posting that local match");
-        const userData = await this.getUserData();
+        // const userData = await this.getUserData();
         const username = this.generateRandomName();
         console.log(username);
         const password = this.generateRandomPassword();
@@ -277,6 +283,8 @@ export class Dashboard extends BaseClass {
     displayMessage(message, flag) {
         const id = (flag) ? ".alert-success" : ".alert-danger";
         const alertElement = document.querySelector(`#tournamentForm ${id}`);
+        if (!alertElement)
+            return;
         alertElement.textContent = message;
         alertElement.style.display = 'block';
         setTimeout(() => {
@@ -286,6 +294,8 @@ export class Dashboard extends BaseClass {
     
     hideMessage(id) {
         const alertElement = document.querySelector(`#tournamentForm ${id}`);
+        if (!alertElement)
+            return;
         alertElement.textContent = '';
         alertElement.style.display = 'none';
     }
