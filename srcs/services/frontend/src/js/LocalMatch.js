@@ -148,8 +148,8 @@ export class LocalMatch extends BaseClass {
     showMessageAndRedirect(redirect_reason) {
         document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
-        total = seconds.innerHTML,
-        timeinterval = setInterval(() => {
+        total = seconds.innerHTML;
+        let timeinterval = setInterval(() => {
             total = --total;
             seconds.textContent = total;
             if (total <= 0) {
@@ -169,15 +169,18 @@ export class LocalMatch extends BaseClass {
             <p><br>Redirection to the dashboard in<p><time><strong id="seconds">5</strong><br> seconds</time>.</p>
         `
         let seconds = document.getElementById('seconds'),
-        total = seconds.innerHTML,
-        timeinterval = setInterval(() => {
-            total = --total;
-            seconds.textContent = total;
-            if (total <= 0) {
-                clearInterval(timeinterval);
-                this.socket.close();
-                history.pushState('', '', `/dashboard`);
-                router();
+        total = seconds.innerHTML;
+        let timeinterval = setInterval(() => {
+            this.socket.close();
+            if (document.getElementById('seconds'))
+            {
+                total = --total;
+                seconds.textContent = total;
+                if (total <= 0) {
+                    clearInterval(timeinterval);
+                    history.pushState('', '', `/dashboard`);
+                    router();
+                }
             }
         }, 1000);
     }

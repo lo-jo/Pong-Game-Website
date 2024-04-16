@@ -18,7 +18,7 @@ python manage.py makemigrations
 python manage.py migrate
 
 echo "Starting server..."
-# daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
+daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application
 
 
 # Start server

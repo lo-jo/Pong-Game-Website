@@ -24,7 +24,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         self.game_user_2 = {}
 
         # Match url (Ping system)
-        self.match_url = f'http://localhost:5173/localmatch/{self.match_id}'
+        self.match_url = f'https://localhost:5173/localmatch/{self.match_id}'
         self.client_url = ''
         self.request_ping_message = True
     
@@ -93,7 +93,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
-        raise StopConsumer()
         match = await sync_to_async(Match.objects.get)(id=self.match_id)
         # Match completed
         match.status = 'aborted'
@@ -101,7 +100,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         
 
     async def websocket_disconnect(self, close_code):
-        raise StopConsumer()
+        # raise StopConsumer()
         pass
 
 
@@ -370,7 +369,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Setting group (channels) for sending data to ws
         self.group_name = f'match_{self.match_id}'
         # Match url (Ping system)
-        self.match_url = f'http://localhost:5173/match/{self.match_id}'
+        self.match_url = f'https://localhost:5173/match/{self.match_id}'
         self.client_url = ''
         self.request_ping_message = True
         # Database match data
@@ -464,8 +463,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     async def websocket_disconnect(self, close_code):
         # print("DISCONNECT!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        
         self.game_finish = True
         await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
+        # raise StopConsumer()
 
     # Receivers
     async def receive(self, text_data):
@@ -895,34 +896,37 @@ class MatchConsumer(AsyncWebsocketConsumer):
         self.match_url = f'http://localhost:5173/match_lobby'
         self.client_url = ''
         self.request_ping_message = True
+        
+        await self.accept()
 
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
 
-        await self.accept()
-
         asyncio.create_task(self.request_ping())
 
     async def disconnect(self, close_code):
+        print('////// DECONNECTIONNNNNNN //////////////')
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
+        self.request_ping_message = False
 
     async def websocket_disconnect(self, close_code):
+        print('////// DECONNECTION WEBSOCKET  1//////////////')
+        self.request_ping_message = False
         if close_code == 1:
-            self.request_ping_message = False
             # Getting match
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            print('////// DECONNECTIONNNNNNN //////////////')     
-            # Match aborted
-            match.status = 'aborted'
-            await sync_to_async(match.save)()
-
-            await self.send_to_group('match_aborted', 'match_aborted')
-
+            print('////// DECONNECTION WEBSOCKET //////////////')
+            if match:  
+                # Match aborted
+                match.status = 'aborted'
+                await sync_to_async(match.save)()
+                await self.send_to_group('match_aborted', 'match_aborted')
+    
     async def receive(self, text_data):
         data = json.loads(text_data)
         type_message = data.get('type_message')
@@ -933,7 +937,6 @@ class MatchConsumer(AsyncWebsocketConsumer):
             # Receiving url from client ping
             case 'ping':
                 self.client_url = data.get('url')
-
 
     async def request_ping(self):
         while self.request_ping_message == True:
@@ -947,6 +950,10 @@ class MatchConsumer(AsyncWebsocketConsumer):
             await self.send_to_group('request_ping', 'ping')
             # print('Requesting ping')
             await asyncio.sleep(0.01)
+
+        print('/////////////////////////////////////')
+        print("Finish the ping in MatchConsumer!!!!")
+        print('/////////////////////////////////////')
 
     async def send_to_group(self, type_message, message):
         await self.channel_layer.group_send(

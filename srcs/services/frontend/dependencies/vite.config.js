@@ -28,6 +28,10 @@ export default defineConfig({
     'process.env': process.env
   },
   server: {
+    https: {
+        key: '/etc/ssl/private/selfsigned.key',
+        cert: '/etc/ssl/private/selfsigned.crt',
+    },
     fs: {
       strict: false
     },

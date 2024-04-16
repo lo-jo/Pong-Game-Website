@@ -47,6 +47,7 @@ a{
     font-size: x-small;
     text-align: left;
     overflow-y: auto;
+    overflow-x: hidden;
     max-height: 200px;
     /* color:#FCFF76!important; */
 }
@@ -129,4 +130,9 @@ a{
     text-overflow: ellipsis; /* Display ellipsis (...) when text overflows */
 
 
+}
+
+#bio{
+    /* overflow-x: auto; */
+    overflow-x: hidden;
 }
