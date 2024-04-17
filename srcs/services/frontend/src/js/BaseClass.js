@@ -4,6 +4,8 @@ export class BaseClass {
             throw new Error("Cannot instantiate abstract class.");
         }
         this.httpProtocol = window.location.protocol;
+        this.host = process.env.HOST_IN_USE;
+        this.backendPort = process.env.BACKEND_PORT;
     }
 
     // run() {

@@ -17,7 +17,7 @@ export class MatchLobby extends BaseClass {
 
     async postMatch() {
 
-        const url = `${this.httpProtocol}//localhost:8000/pong/join_match/`;
+        const url = `${this.httpProtocol}//${this.host}:${this.backendPort}/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
         
         const options = {

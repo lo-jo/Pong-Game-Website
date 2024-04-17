@@ -10,7 +10,7 @@ export class Settings extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/profile/`, {
+            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -53,7 +53,7 @@ export class Settings extends BaseClass {
     }
 
     async enableTwoFa(){
-        const res =  await fetch(`${this.httpProtocol}//localhost:8000/users/otp/`, { 
+        const res =  await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/otp/`, { 
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${this.token}`,
@@ -141,7 +141,7 @@ export class Settings extends BaseClass {
         }
     
         try {
-            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/update_profile/${this.userData.id}/`, {
+            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/update_profile/${this.userData.id}/`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,

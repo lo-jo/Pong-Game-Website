@@ -46,7 +46,7 @@ export class Register extends BaseClass
         const email = document.getElementById('email').value;
         
         try {
-            const response = await fetch(`${this.httpProtocol}//localhost:8000/users/register/`, {
+            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

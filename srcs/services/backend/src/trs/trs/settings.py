@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['paul-f5ar3s9', os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
+ALLOWED_HOSTS = [os.getenv("REMOTE_HOST"), os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
 
 
 # Application definition
@@ -75,6 +75,7 @@ SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:5173",
+    f"{os.getenv('PROTOCOL')}://{os.getenv('HOST_IN_USE')}:{os.getenv('FRONTEND_PORT')}",
 ]
 
 

@@ -265,7 +265,7 @@ async function checkAuthentication() {
             throw false;
         }
 
-        const response = await fetch(`${httpProtocol}//localhost:8000/users/check-authentication/`, {
+        const response = await fetch(`${httpProtocol}//${process.env.HOST_IN_USE}:${process.env.BACKEND_PORT}/users/check-authentication/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
