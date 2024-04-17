@@ -12,7 +12,7 @@ all:
 # Start services in the foreground
 up:
 	@echo "Start service of ft_transcendence in the foreground ..."
-	@bash ./srcs/certs/certicate_generator.sh
+# @bash ./srcs/certs/certicate_generator.sh
 	@docker compose -f $(COMPOSE_FILE) up --build
 
 # Start services in the background
@@ -44,7 +44,7 @@ remove_images:
 		docker compose -f $(COMPOSE_FILE) down --rmi all; \
 		echo "Images removed $(GREEN)\t\t\t\t[ ✔ ]$(RESET)"; \
 	else \
-		echo "\n$(BOLD)$(RED)No Docker volumes found.\n$(RESET)"; \
+		echo "\n$(BOLD)$(RED)No Docker images found.\n$(RESET)"; \
 	fi
 
 remove_containers:
@@ -57,13 +57,20 @@ remove_containers:
 	fi
 
 remove_certs:
-	@if [ -z "$(wildcard $(CERTS))" ]; then \
-		echo "\n$(BOLD)$(RED)No SSL certificates found.$(RESET)\n"; \
+	@if [ -n "$$(docker volume ls -q)" ]; then \
+		echo "$(YELLOW)\n. . . removing docker volumes . . . \n$(RESET)"; \
+		docker compose -f $(COMPOSE_FILE) down --volumes; \
+		echo "\n$(BOLD)$(GREEN)Volumes removed [ ✔ ]\n$(RESET)"; \
 	else \
-		echo "$(YELLOW)\n. . . deleting SSL certificates . . . \n$(RESET)"; \
-		rm -f $(CERTS); \
-		echo "\n$(BOLD)$(GREEN)SSL certificates removed [ ✔ ]\n$(RESET)"; \
-	fi	
+		echo "\n$(BOLD)$(RED)No Docker volumes found.\n$(RESET)"; \
+	fi
+# @if [ -z "$(wildcard $(CERTS))" ]; then \
+# 	echo "\n$(BOLD)$(RED)No SSL certificates found.$(RESET)\n"; \
+# else \
+# 	echo "$(YELLOW)\n. . . deleting SSL certificates . . . \n$(RESET)"; \
+# 	rm -f $(CERTS); \
+# 	echo "\n$(BOLD)$(GREEN)SSL certificates removed [ ✔ ]\n$(RESET)"; \
+# fi	
 
 clean: remove_certs
 	@echo "ft_transcendence certs cleaned $(GREEN)\t\t[ ✔ ]$(RESET)"
@@ -87,6 +94,21 @@ exec:
 
 cli:
 	@python3 $(CLI)
+
+status:
+	@echo "\n$(YELLOW)docker ps -a $(RESET)" && docker ps -a
+	@echo "\n$(YELLOW)docker volume ls $(RESET)" && docker volume ls
+	@echo "\n$(YELLOW)docker images -a $(RESET)" && docker images -a
+	@echo "\n$(YELLOW)docker network ls $(RESET)" && docker network ls
+
+logs:
+	@if [ -n "$$(docker ps -aq)" ]; then \
+		echo "$(YELLOW)\n. . . showing docker logs . . . \n$(RESET)"; \
+		echo "\n$(YELLOW)Backend container logs:$(RESET)"; docker logs backend; \
+		echo "\n$(YELLOW)Frontend container logs:$(RESET)"; docker logs frontend; \
+	else \
+		echo "\n$(BOLD)$(RED)No Docker containers found.$(RESET)\n"; \
+	fi
 
 .PHONY: all up up-detached build-no-cache stop down debug prune re clean fclean
 

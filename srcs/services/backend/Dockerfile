@@ -7,6 +7,11 @@ RUN apt-get update && \
 # Main directory in docker container
 WORKDIR /code
 
+# Generate SSL certificate
+RUN openssl genrsa -out /etc/ssl/private/selfsigned.key 2048
+
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -key /etc/ssl/private/selfsigned.key -out /etc/ssl/private/selfsigned.crt -subj "/C=FR/ST=Ile-de-France/L=Paris/O=42/OU=42Paris/CN=ft_transcendence"
+
 #  Prevents Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -33,8 +38,8 @@ WORKDIR /code
 # Copy source code of project
 COPY src/ /code/src/
 
-COPY selfsigned.crt /etc/ssl/private/selfsigned.crt
-COPY selfsigned.key /etc/ssl/private/selfsigned.key
+# COPY selfsigned.crt /etc/ssl/private/selfsigned.crt
+# COPY selfsigned.key /etc/ssl/private/selfsigned.key
 
 # Copy script
 COPY ./script/start_django.sh ./script/start_django.sh
