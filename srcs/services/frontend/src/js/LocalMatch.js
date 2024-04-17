@@ -25,7 +25,7 @@ export class LocalMatch extends BaseClass {
 
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/localmatch/${this.id}/`;
     
         this.socket = new WebSocket(wsUrl);

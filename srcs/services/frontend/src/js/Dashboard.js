@@ -80,7 +80,7 @@ export class Dashboard extends BaseClass {
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
+        return fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -110,7 +110,7 @@ export class Dashboard extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -142,7 +142,7 @@ export class Dashboard extends BaseClass {
             user_2: targetId,
         };
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/matches/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/matches/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -187,7 +187,7 @@ export class Dashboard extends BaseClass {
         const email = `${username}@amigo.org`;
         
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/register/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,8 +221,7 @@ export class Dashboard extends BaseClass {
 
 
     async postMatch() {
-        const httpProtocol = window.location.protocol;
-        const url = `${this.httpProtocol}//${this.host}:${this.backendPort}/pong/join_match/`;
+        const url = `${this.httpProtocol}://${this.host}:${this.backendPort}/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
         
         const options = {
@@ -250,7 +249,7 @@ export class Dashboard extends BaseClass {
     }
 
     initWebSocketLobby() {
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/lobby`;
 
         const socket = new WebSocket(wsUrl);
@@ -333,7 +332,7 @@ export class Dashboard extends BaseClass {
     async getUserData() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
+        return fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -363,7 +362,7 @@ export class Dashboard extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -391,7 +390,7 @@ export class Dashboard extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/pending_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/pending_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -432,7 +431,7 @@ export class Dashboard extends BaseClass {
                     playButt.addEventListener('click', (event) => {
                         if (event.target.id == `${match.id}`){
                             event.preventDefault();
-                            navigateTo(`${this.httpProtocol}//${this.host}:${process.env.FRONTEND_PORT}/match/${match.id}`);
+                            navigateTo(`${this.httpProtocol}://${this.host}:${process.env.FRONTEND_PORT}/match/${match.id}`);
                         }
                     });
                     log_div.appendChild(playButt);

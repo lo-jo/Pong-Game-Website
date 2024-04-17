@@ -13,6 +13,10 @@ export const initGameTwoD = (data) => {
     if (waiting_message) {
         board_game.removeChild(waiting_message);
     }
+    const message = document.getElementById('seconds');
+    if (message) {
+        board_game.removeChild(message);
+    }
 
 	board_game.appendChild(ball);
 	board_game.appendChild(paddle_1);

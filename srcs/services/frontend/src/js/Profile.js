@@ -9,18 +9,18 @@ class User{
         this.email = email;
         this.bio = bio;
         this.friendMap = new Map();
-        this.httpProtocol = window.location.protocol;
+        this.httpProtocol = process.env.PROTOCOL;
         this.host = process.env.HOST_IN_USE;
         this.backendPort = process.env.BACKEND_PORT;
     }
     getProfilePicPath() {
-        return `${this.httpProtocol}//${this.host}:${this.backendPort}` + this.pic;
+        return `${this.httpProtocol}://${this.host}:${this.backendPort}` + this.pic;
     }
     getFriendReq() {
-        return `${this.httpProtocol}//${this.host}:${this.backendPort}/users/friendship/` + this.username + "/";
+        return `${this.httpProtocol}://${this.host}:${this.backendPort}/users/friendship/` + this.username + "/";
     }
     getStatus() {
-        return `${this.httpProtocol}//${this.host}:${this.backendPort}/notify/` + this.username + "/";
+        return `${this.httpProtocol}://${this.host}:${this.backendPort}/notify/` + this.username + "/";
     }
 }
 
@@ -97,7 +97,7 @@ export class Profile extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -150,7 +150,7 @@ export class Profile extends BaseClass {
     async displayProfile() {
         const jwtAccess = localStorage.getItem('token');
     
-        return fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
+        return fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/profile/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwtAccess}`,
@@ -183,7 +183,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -224,7 +224,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/tournaments/wins/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/tournaments/wins/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -251,7 +251,7 @@ export class Profile extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/user_matches/${user.id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/user_matches/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,

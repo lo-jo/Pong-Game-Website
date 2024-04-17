@@ -11,7 +11,7 @@ export class Login extends BaseClass {
     }
 
     async verifyCode(codeTwoFa) {
-        const res =  await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/otp_verify/`, { 
+        const res =  await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/otp_verify/`, { 
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -51,7 +51,7 @@ export class Login extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -105,7 +105,7 @@ export class Login extends BaseClass {
         const password = document.getElementById("password").value;
 
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/token/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/token/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

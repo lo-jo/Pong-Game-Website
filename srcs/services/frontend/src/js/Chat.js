@@ -29,7 +29,7 @@ export class Chat extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/notify/invite/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/notify/invite/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -50,7 +50,7 @@ export class Chat extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/matches/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/matches/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
@@ -72,7 +72,7 @@ export class Chat extends BaseClass {
     }
 
     async blockFriendUser(targetId){
-        await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/chat/block-user/${targetId}`, {
+        await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/chat/block-user/${targetId}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -114,8 +114,8 @@ export class Chat extends BaseClass {
             this.chatSocket.close();
             this.chatSocket = null;
         }
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        this.chatSocket = new WebSocket(`${wsProtocol}://${this.host}:${this.backendPort}/ws/chat/${targetId}/?token=${this.token}`);
+        const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
+        this.chatSocket = new WebSocket(`${wsProtocol}//${this.host}:${this.backendPort}/ws/chat/${targetId}/?token=${this.token}`);
         this.chatSocket.onopen = function (e) {
             console.log('Socket successfully connected.');
             const authenticateMessage = {
@@ -208,7 +208,7 @@ export class Chat extends BaseClass {
     async getFriendData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -283,7 +283,7 @@ export class Chat extends BaseClass {
     }
 
     async displayFriendList() {
-        await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/friendship/${this.profileData.username}/`, {
+        await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/friendship/${this.profileData.username}/`, {
             method : 'GET',
             headers: {
                 'Authorization': `Bearer ${this.token}`,
@@ -311,7 +311,7 @@ export class Chat extends BaseClass {
 
     async getUserData() {
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/profile/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,

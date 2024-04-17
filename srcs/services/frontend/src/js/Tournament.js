@@ -21,7 +21,7 @@ export class Tournament extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/notify/invite/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/notify/invite/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -39,7 +39,7 @@ export class Tournament extends BaseClass {
         const jwtAccess = localStorage.getItem('token');
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/matches/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/matches/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -67,7 +67,7 @@ export class Tournament extends BaseClass {
     async getUserData(id) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${id}/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,
@@ -107,7 +107,7 @@ export class Tournament extends BaseClass {
 
     async createTournament(tournamentName) {
         // document.getElementById('app').innerHTML = await this.getWaitingForGameHtml();
-        const url = `${this.httpProtocol}//${this.host}:${this.backendPort}/pong/create_tournament/`;
+        const url = `${this.httpProtocol}://${this.host}:${this.backendPort}/pong/create_tournament/`;
 
         const jwtAccess = localStorage.getItem('token');
 
@@ -152,7 +152,7 @@ export class Tournament extends BaseClass {
                 'Content-Type': 'application/json',
             },
         };
-        const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/tournaments/`, options);
+        const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/tournaments/`, options);
         const data = await response.json();
         console.log("tournament list", data);
         return data;
@@ -170,7 +170,7 @@ export class Tournament extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/tournaments/${tournamentId}/leaderboard/`, options);
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/tournaments/${tournamentId}/leaderboard/`, options);
     
             if (!response.ok) {
                 const errorData = await response.json();
@@ -197,7 +197,7 @@ export class Tournament extends BaseClass {
         };
     
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/tournaments/${tournamentId}/`, options);
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/tournaments/${tournamentId}/`, options);
     
             if (!response.ok) {
                 const errorData = await response.json();
@@ -301,7 +301,7 @@ export class Tournament extends BaseClass {
         };
 
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/pong/join_tournament/${tournamentId}/`, options);
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/join_tournament/${tournamentId}/`, options);
             
             if (!response.ok) {
                 const errorData = await response.json();
@@ -320,7 +320,7 @@ export class Tournament extends BaseClass {
     async getParticipants(userId) {
         const jwtAccess = localStorage.getItem('token');
         try {
-            const response = await fetch(`${this.httpProtocol}//${this.host}:${this.backendPort}/users/${userId}/profile/`, {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/${userId}/profile/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtAccess}`,

@@ -105,7 +105,7 @@ export const connectUser = async () => {
     }
 
     if (token){
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
         onlineSocket = new WebSocket(`${wsProtocol}//${process.env.HOST_IN_USE}:${process.env.BACKEND_PORT}/ws/notify/?token=${token}`);
 
             onlineSocket.onopen = function (e) {
@@ -249,7 +249,7 @@ function loadCss(url) {
 
 async function checkAuthentication() {
     console.log("checking authentication (Router.js)");
-    const httpProtocol = window.location.protocol;
+    const httpProtocol = process.env.PROTOCOL;
 
     try {
         const token = localStorage.getItem('token');
@@ -266,7 +266,7 @@ async function checkAuthentication() {
             throw false;
         }
 
-        const response = await fetch(`${httpProtocol}//${process.env.HOST_IN_USE}:${process.env.BACKEND_PORT}/users/check-authentication/`, {
+        const response = await fetch(`${httpProtocol}://${process.env.HOST_IN_USE}:${process.env.BACKEND_PORT}/users/check-authentication/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

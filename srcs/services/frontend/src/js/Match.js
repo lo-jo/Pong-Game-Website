@@ -10,8 +10,6 @@ export class Match extends BaseClass {
         this.id = id;
         /*Socket*/
         this.socket = null;
-        /*URL of match*/
-        this.url = window.location.href;
 
         /*Getting token*/
         this.token = localStorage.getItem('token');
@@ -28,7 +26,7 @@ export class Match extends BaseClass {
 
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/match/${this.id}/?token=${this.token}`;
     
         this.socket = new WebSocket(wsUrl);

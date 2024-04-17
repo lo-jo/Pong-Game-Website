@@ -74,7 +74,7 @@ SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost:5173",
+    # "https://localhost:5173",
     f"{os.getenv('PROTOCOL')}://{os.getenv('HOST_IN_USE')}:{os.getenv('FRONTEND_PORT')}",
 ]
 
