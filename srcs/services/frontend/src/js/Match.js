@@ -8,8 +8,6 @@ export class Match extends BaseClass {
         super();
         /*Id of the match*/
         this.id = id;
-        /*Path to css */
-        this.css = './css/game.css';
         /*Socket*/
         this.socket = null;
         /*URL of match*/
@@ -31,7 +29,7 @@ export class Match extends BaseClass {
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/match/${this.id}/?token=${this.token}`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/match/${this.id}/?token=${this.token}`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -67,9 +65,16 @@ export class Match extends BaseClass {
                     }
                     break;
                 case 'user_token':
-                    console.log('User token received, now sended!')
                     const { user_token } = data;
                     this.socket.send(JSON.stringify({'type_message' : 'user_token', 'user_token' : user_token}));
+                    break;
+                case 'i_am_the_other':
+                    const { i_am_the_other} = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'i_am_the_other', 'i_am_the_other' : i_am_the_other}));
+                    break;
+                case 'leader':
+                    const { leader} = data;
+                    this.socket.send(JSON.stringify({'type_message' : 'leader', 'leader' : leader}));
                     break;
                 case 'timer':
                     const { timer } = data
@@ -107,7 +112,7 @@ export class Match extends BaseClass {
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
             case 'failed_authorization':
-                this.showMessageAndRedirect(`You don't have authorization to this match.`);
+                this.showMessageAndRedirect(`You don't have authorization to play this match.`);
                 break;
             case 'initial_data':
                 const { user_1_info, user_2_info } = data
@@ -137,16 +142,16 @@ export class Match extends BaseClass {
                 this.socket.send(JSON.stringify({'type_message' : 'match_aborted'}));
                 break;
             case 'broadcasted_game_event':
-                const { broadcasted_game_event } = game_state;
-                this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
+                const { broadcasted_game_event, user_id } = game_state;
+                this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`, 'user_id' : `${user_id}`}));
                 break;
             case 'game_elements':
                 drawGameElements(game_state);
                 break;
             case 'match_completed':
-                this.socket.send(JSON.stringify({'type_message' : 'match_completed'}));  
-                // this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
+                // this.socket.send(JSON.stringify({'type_message' : 'match_completed'}));
                 this.displayWinner(game_state.winner, game_state.loser);
+                // this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
             case 'disconnection':
                 this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
@@ -178,15 +183,15 @@ export class Match extends BaseClass {
     }
 
     showMessageAndRedirect(redirect_reason) {
-        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong><br> seconds</time>.</p>`
+        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML;
+        this.socket.close();
         let timeinterval = setInterval(() => {
             total = --total;
             seconds.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
-                this.socket.close();
                 history.pushState('', '', `/dashboard`);
                 router();
             }
@@ -202,9 +207,8 @@ export class Match extends BaseClass {
         `
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML;
-        this.socket.close();
         let timeinterval = setInterval(() => {
-            
+            this.socket.close();
             if (document.getElementById('seconds'))
             {
                 total = --total;
@@ -218,6 +222,7 @@ export class Match extends BaseClass {
         }, 1000);
     }
 
+    
     updateTimer(timer_data) {
         const timer = JSON.parse(timer_data);
         const { time_remaininig, type } = timer;

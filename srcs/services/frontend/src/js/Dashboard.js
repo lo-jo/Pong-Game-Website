@@ -251,7 +251,7 @@ export class Dashboard extends BaseClass {
 
     initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/lobby`;
 
         const socket = new WebSocket(wsUrl);
 
@@ -432,7 +432,7 @@ export class Dashboard extends BaseClass {
                     playButt.addEventListener('click', (event) => {
                         if (event.target.id == `${match.id}`){
                             event.preventDefault();
-                            navigateTo(`${this.httpProtocol}//localhost:5173/match/${match.id}`);
+                            navigateTo(`${this.httpProtocol}//${this.host}:${process.env.FRONTEND_PORT}/match/${match.id}`);
                         }
                     });
                     log_div.appendChild(playButt);

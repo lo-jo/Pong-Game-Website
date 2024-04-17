@@ -114,7 +114,8 @@ export class Chat extends BaseClass {
             this.chatSocket.close();
             this.chatSocket = null;
         }
-        this.chatSocket = new WebSocket(`wss://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        this.chatSocket = new WebSocket(`${wsProtocol}://${this.host}:${this.backendPort}/ws/chat/${targetId}/?token=${this.token}`);
         this.chatSocket.onopen = function (e) {
             console.log('Socket successfully connected.');
             const authenticateMessage = {

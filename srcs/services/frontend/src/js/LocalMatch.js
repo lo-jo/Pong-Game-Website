@@ -17,6 +17,7 @@ export class LocalMatch extends BaseClass {
         this.token = localStorage.getItem('token');
 
         this.addDocumentClickListener();
+        // this.insertCssLink();
         this.initWebSocket();
         this.user_1_info = null;
         this.user_2_info = null;
@@ -25,7 +26,7 @@ export class LocalMatch extends BaseClass {
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/localmatch/${this.id}/`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/localmatch/${this.id}/`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -149,12 +150,12 @@ export class LocalMatch extends BaseClass {
         document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML;
+        this.socket.close();
         let timeinterval = setInterval(() => {
             total = --total;
             seconds.textContent = total;
             if (total <= 0) {
                 clearInterval(timeinterval);
-                this.socket.close();
                 history.pushState('', '', `/dashboard`);
                 router();
             }
@@ -279,9 +280,7 @@ export class LocalMatch extends BaseClass {
         // console.log(`showTimerBeforeMatch call()`);
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
-        seconds_div.setAttribute('id', 'waiting-message');
-        seconds_div.setAttribute('class', 'message-before-local-match');
-        // seconds_div.setAttribute('id', 'seconds');
+        seconds_div.setAttribute('id', 'seconds');
         board_game.appendChild(seconds_div);
         let seconds = 6;
         let total = seconds

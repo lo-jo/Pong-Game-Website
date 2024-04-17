@@ -5,19 +5,19 @@ export class MatchLobby extends BaseClass {
     constructor() {
         super();
         this.socket = null;
+        this.initWebSocketLobby();
         this.run();
     }
     
     async run()
     {
-        this.initWebSocketLobby();
         await this.postMatch();
     }
 
 
     async postMatch() {
-
-        const url = `${this.httpProtocol}//${this.host}:${this.backendPort}/pong/join_match/`;
+        const httpProtocol = window.location.protocol;
+        const url = `${httpProtocol}//${this.host}:${this.backendPort}/pong/join_match/`;
         const jwtAccess = localStorage.getItem('token');
         
         const options = {
@@ -38,6 +38,24 @@ export class MatchLobby extends BaseClass {
                 }
                 throw new Error('Unauthorized');
             }
+            else
+            {
+                const json_response = await response.json();
+                
+                const { action, match_id } = json_response;
+                if (this.socket.readyState === WebSocket.OPEN)
+                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
+
+                console.log(json_response);
+                console.log(action);
+                if (action === 'join_play')
+                {
+                    console.log('JOIN PLAY BY HTTP RESPONSE');
+                    this.socket.close();
+                    history.pushState('', '', `/match/${match_id}`);
+                    router();
+                }
+            }
         } catch (error) {
             console.error('Error:', error);
             throw error;
@@ -46,7 +64,7 @@ export class MatchLobby extends BaseClass {
 
     initWebSocketLobby() {
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/pong/lobby/`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/lobby`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -60,11 +78,10 @@ export class MatchLobby extends BaseClass {
             switch (type_message)
             {
                 case 'action':
-                    const { action } = data;
-                    const { match_id } = data;
-                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
-                    if (action == 'join_play')
+                    const { action, match_id } = data;
+                    if (action === 'join_play')
                     {
+                        console.log('JOIN PLAY BY WSS');
                         this.socket.close();
                         history.pushState('', '', `/match/${match_id}`);
                         router();

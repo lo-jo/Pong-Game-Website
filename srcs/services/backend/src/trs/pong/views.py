@@ -95,6 +95,7 @@ class JoinMatchView(APIView):
         # 2. Filter the oldest 'pending' match
         if matches:
             oldest_pending_match = matches.filter(status='pending').order_by('created_at')
+
             if oldest_pending_match:
                 print("IF OLDEST PENDING MATCH JOIN MATCH VIEW")
                 for match in oldest_pending_match:
@@ -113,20 +114,32 @@ class JoinMatchView(APIView):
 
                         match.save()
                         self.join_user_to_match_lobby('join_play', match.id)
-                        # # Sending http response
+                        # Sending http response
                         serializer = MatchSerializer(match)
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        response_data = {
+                            'data': serializer.data,
+                            'action': 'join_create',
+                            'match_id' : match.id
+                        }
+                        return Response(response_data, status=status.HTTP_201_CREATED)
         
-        print("ELSE IN JOIN MATCH VIEW")
+        print("CREATE JOIN IN JOINVIEW")
         # Creating new match because there's not pending
         new_match = Match.objects.create(status='pending')
         new_match.user_1 = request.user
         new_match.save()
+        
         self.join_user_to_match_lobby('create_join', new_match.id)
+        serializer = MatchSerializer(new_match)
+
+        response_data = {
+            'data': serializer.data,
+            'action': 'create_join',
+            'match_id' : new_match.id
+        }
 
         # Sending http response
-        serializer = MatchSerializer(new_match)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
         
 

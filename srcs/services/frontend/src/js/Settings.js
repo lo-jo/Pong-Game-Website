@@ -74,7 +74,7 @@ export class Settings extends BaseClass {
             <div class="row align-items-center">
                         
                             <div class="row justify-content-center align-items-center">
-                                <img src="${this.httpProtocol}//localhost:8000${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                                <img src="${this.httpProtocol}//${this.host}:${this.backendPort}${this.userData.qr_code}" id="qrCode" alt="QR CODE">
                         
                         </div>
             </div>

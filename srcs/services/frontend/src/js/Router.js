@@ -105,7 +105,8 @@ export const connectUser = async () => {
     }
 
     if (token){
-        onlineSocket = new WebSocket(`wss://localhost:8000/ws/notify/?token=${token}`);
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        onlineSocket = new WebSocket(`${wsProtocol}//${process.env.HOST_IN_USE}:${process.env.BACKEND_PORT}/ws/notify/?token=${token}`);
 
             onlineSocket.onopen = function (e) {
                 // console.log('WebSocket connection established.');
