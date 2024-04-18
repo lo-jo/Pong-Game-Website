@@ -82,7 +82,7 @@ export class Profile extends BaseClass {
                         navigateTo(event.target.href);
                     }
                 });
-                link.href = `/test/${friendId}`;
+                link.href = `/profile/${friendId}`;
                 link.innerText = ` ${friendUsername}`;
         
                 contentContainer.appendChild(image);

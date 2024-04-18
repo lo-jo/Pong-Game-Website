@@ -243,7 +243,7 @@ export class Tournament extends BaseClass {
         leaderboardData.forEach(entry => {
             leaderboardHTML += `<tr>
                                     <td>${entry.rank}</td>
-                                    <td><a class="opponent-link" href="/test/${entry.user_id}">${entry.username}</a></td>
+                                    <td><a class="opponent-link" href="/profile/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
                                 </tr>`;
@@ -363,7 +363,7 @@ export class Tournament extends BaseClass {
 
             return `<div class="card mb-2">
                         <div class="card-body">
-                            <h5 class="card-title mb-2">${currentUserName} vs <a class="opponent-link" href="/test/${opponentId}">${opponentName}</a></h5>
+                            <h5 class="card-title mb-2">${currentUserName} vs <a class="opponent-link" href="/profile/${opponentId}">${opponentName}</a></h5>
                             <div class="row align-items-center mb-2">
                                 <div class="col-6">
                                     <button class="btn btn-primary py-1 px-3" data-match-id="${match.id}" data-match-status="${match.status}" ${buttonDisabled}>${buttonText}</button>
@@ -438,7 +438,7 @@ export class Tournament extends BaseClass {
             // console.log(`currentUserId.user_id: ${currentUserId.user_id} player.id: ${player.id}`);
             let playerLink;
             playerLink = document.createElement('a');
-            playerLink.setAttribute('href', `/test/${player.id}`);
+            playerLink.setAttribute('href', `/profile/${player.id}`);
             playerLink.addEventListener('click', (event) => {
                 event.preventDefault();
                 console.log(`clicking to id: ${player.id}`);

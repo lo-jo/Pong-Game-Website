@@ -71,7 +71,7 @@ export class Chat extends BaseClass {
         }
     }
 
-    async blockFriendUser(targetId){
+    async blockFriendUser(targetId, targetUsername){
         await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/chat/block-user/${targetId}`, {
             method: 'POST',
             headers: {
@@ -86,7 +86,12 @@ export class Chat extends BaseClass {
             return response.json();
         })
         .then(data => {
-            console.log("Blocked", targetId);
+            const blockButt = document.getElementById(`block_${targetId}`);
+            const inviteButt = document.getElementById(`invite_${targetId}`);
+            blockButt.remove();
+            inviteButt.remove();
+            const chatLog = document.getElementById('chatLog');
+            chatLog.innerHTML = `YOU HAVE BLOCKED ${targetUsername}.`;
         })
         .catch(error => console.error('Error:', error));
     }
@@ -148,8 +153,36 @@ export class Chat extends BaseClass {
         }.bind(this);
     }
 
+    async isFriendBlocked(id) {
+        const jwtAccess = localStorage.getItem('token');
+        try {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/chat/is-blocked/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${jwtAccess}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error('Unauthorized access. Please log in.');
+                } else {
+                    console.error('Error:', response.status);
+                }
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
     async initChatWindow(targetId, targetUsername, event) {
         const chatHeader = document.getElementById('chatHeader');
+        const isBlocked = await this.isFriendBlocked(targetId);
         chatHeader.innerHTML = `<h5 class="chatHead">#${targetUsername}</h5>`;
 
         const chatWindow = document.getElementById('chatWindow');
@@ -180,28 +213,37 @@ export class Chat extends BaseClass {
 
         const blockDiv = document.getElementById('blockUser');
         blockDiv.innerText = "";
-        const blockLink = document.createElement('a');
-        blockLink.href = "#";
-        blockLink.setAttribute('id', `block_${targetId}`);
-        blockLink.setAttribute('class', 'chatFooter');
-        blockLink.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCK</i>';
-        blockLink.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            this.blockFriendUser(`${targetId}`); 
-        }.bind(this));
-
         const inviteDiv = document.getElementById('invitePong');
         inviteDiv.innerText = "";
-        const inviteLink = document.createElement('a');
-        inviteLink.href = "#";
-        inviteLink.setAttribute('id', `invite_${targetId}`);
-        inviteLink.innerHTML = '<i class="bi bi-joystick"></i><i>  INVITE</i>';
-        inviteLink.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            this.createMatch(`${targetId}`); 
-        }.bind(this));
-        blockDiv.appendChild(blockLink);
-        inviteDiv.appendChild(inviteLink);
+        if (isBlocked.blocked === false){
+            const blockLink = document.createElement('a');
+            blockLink.href = "#";
+            blockLink.setAttribute('id', `block_${targetId}`);
+            blockLink.setAttribute('class', 'chatFooter');
+            blockLink.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCK</i>';
+            blockLink.addEventListener('click', function(event) {
+                event.preventDefault(); 
+                this.blockFriendUser(`${targetId}`, `${targetUsername}`); 
+            }.bind(this));
+
+            
+            const inviteLink = document.createElement('a');
+            inviteLink.href = "#";
+            inviteLink.setAttribute('id', `invite_${targetId}`);
+            inviteLink.innerHTML = '<i class="bi bi-joystick"></i><i>  INVITE</i>';
+            inviteLink.addEventListener('click', function(event) {
+                event.preventDefault(); 
+                this.createMatch(`${targetId}`); 
+            }.bind(this));
+            blockDiv.appendChild(blockLink);
+            inviteDiv.appendChild(inviteLink);
+        }
+        else
+        {
+            blockDiv.innerHTML = '<i class="bi bi-slash-circle""></i><i>  BLOCKED</i>';
+            inviteDiv.innerText = "";
+        }
+
         await this.startConvo(targetId);
     }
 
@@ -268,7 +310,7 @@ export class Chat extends BaseClass {
                         navigateTo(event.target.href);
                     }
                 });
-                link.href = `/test/${friendId}`;
+                link.href = `/profile/${friendId}`;
                 link.innerText = ` ${friendUsername}`;
     
                 contentContainer.appendChild(messageButton);

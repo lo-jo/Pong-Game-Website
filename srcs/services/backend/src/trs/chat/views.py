@@ -26,3 +26,27 @@ class BlockUserView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetBlockedUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        blocking_id = request.user.id
+        blocked_id = pk
+
+        try:
+            blacklist_entry = BlackList.objects.get(
+                blocked_user__id=blocked_id,
+                blocking_user__id=blocking_id
+            )
+            return Response({"blocked": True})
+        except BlackList.DoesNotExist:
+            try:
+                blacklist_entry = BlackList.objects.get(
+                    blocked_user__id=blocking_id,
+                    blocking_user__id=blocked_id
+                )
+                return Response({"blocked": True})
+            except BlackList.DoesNotExist:
+                return Response({"blocked": False})
