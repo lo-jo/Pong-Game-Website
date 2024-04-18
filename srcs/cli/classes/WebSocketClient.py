@@ -23,6 +23,7 @@ class WebSocketClient:
         }
         self.websocket = None
         self.authorized = False
+        self.flag = False
 
     def __str__(self):
         return self.ws_uri
@@ -40,21 +41,28 @@ class WebSocketClient:
         print("Error:", error)
 
     def on_close(self, ws):
-        print("Connection closed")
+        pass
 
     def on_open(self, ws):
-        print("Connection opened")
+        pass
 
     def on_message(self, ws, message):
-        # print("Received:", message)
         message_json = json.loads(message)
         type_message = message_json["type_message"]
+        
 
         match type_message:
             case "ws_handshake":
                 ws_handshake_message = message_json["ws_handshake"]
                 if self.receive_ws_handshake(ws_handshake_message) == False:
                     print("Must close the connection!")
+            case "game_state":
+                game_state = json.loads(message_json["game_state"])
+                event = game_state.get('event')
+                if event == 'score':
+                    score_user_1 = game_state.get('user_1')
+                    score_user_2 = game_state.get('user_2')
+                    print(f"Current score\nUser 1 : {score_user_1}\nUser 2 : {score_user_2}")
 
 
     def receive_ws_handshake(self, message):
@@ -72,82 +80,20 @@ class WebSocketClient:
                 self.websocket.close()
             case "authorization_succesfully":
                 self.cli_client()
-
-        return continue_flag
     
     def cli_client(self):
-        while True:
-            requested_action = curses.wrapper(lambda stdscr: prompt(stdscr, list(self.request_endpoint_actions), "Choose the action for WebSocket connection:\n", False))
-            if requested_action == 'EXIT':
-                break
-            if requested_action in self.request_endpoint_actions:
-                requested_action_messages = self.request_endpoint_actions[requested_action]
-                message = curses.wrapper(lambda stdscr: prompt(stdscr, list(requested_action_messages.keys()), "Choose the message to send to WebSocket connection:\n", False))
-
-                print(message)
-                func = requested_action_messages[message]
-                print(f'func() {func()}')
-                # if http_method in endpoint_methods:
-                #     func = endpoint_methods[http_method]
-                # else:
-                #     print(f"HTTP method {http_method} not supported for endpoint {endpoint_uri}")
-                #     return False
-                # if requested_message in self.request_message:
-                #     func = self.request_message[requested_message]
-                #     print(func)
-                #     message_to_send = func()
-                    # print(f'Message to send {message_to_send}')
-            else:
-                print("No supported requested message")
-            time.sleep(5)
-
-        print("Closing connection...")
-        time.sleep(5)
-        self.websocket.close()
+        requested_action = curses.wrapper(lambda stdscr: prompt(stdscr, list(self.request_endpoint_actions), "Choose the action for WebSocket connection:\n", False))
+        if requested_action == 'EXIT':
+            return
+        if requested_action in self.request_endpoint_actions:
+            requested_action_messages = self.request_endpoint_actions[requested_action]
+            message = curses.wrapper(lambda stdscr: prompt(stdscr, list(requested_action_messages.keys()), "Choose the message to send to WebSocket connection:\n", False))
+            func = requested_action_messages[message]
+            func()
+        else:
+            print("No supported requested message")
     
     def request_score(self):
-        return 'score'
+        self.websocket.send(json.dumps({'type_message' : 'game_event', 'game_event' : 'score' , 'token' : f'{self.token_user}'}))
     def request_movement_up(self):
         return 'move_up'
-
-
-# welcome_message = self.websocket.recv()
-        # if self.parse_message(welcome_message) == False:
-        #     print("Closing connection")
-        #     self.websocket.close()
-        #     time.sleep(2)
-        #     return
-
-        # for i in range(10):
-        #     print(self.authorized)
-        #     time.sleep(1)
-
-        # while True:
-        #     requested_action = curses.wrapper(lambda stdscr: prompt(stdscr, list(self.request_endpoint_actions), "Choose the action for WebSocket connection:\n", False))
-        #     if requested_action == 'EXIT':
-        #         break
-        #     if requested_action in self.request_endpoint_actions:
-        #         requested_action_messages = self.request_endpoint_actions[requested_action]
-        #         message = curses.wrapper(lambda stdscr: prompt(stdscr, list(requested_action_messages.keys()), "Choose the message to send to WebSocket connection:\n", False))
-
-        #         print(message)
-        #         func = requested_action_messages[message]
-        #         print(f'func() {func()}')
-        #     # if http_method in endpoint_methods:
-        #     #     func = endpoint_methods[http_method]
-        #     # else:
-        #     #     print(f"HTTP method {http_method} not supported for endpoint {endpoint_uri}")
-        #     #     return False
-        #     # if requested_message in self.request_message:
-        #     #     func = self.request_message[requested_message]
-        #     #     print(func)
-        #     #     message_to_send = func()
-        #         # print(f'Message to send {message_to_send}')
-        #     else:
-        #         print("No supported requested message")
-        #     time.sleep(5)
-        # # print(f'Request message {request_message}')
-        # # time.sleep(2)
-        # # self.websocket.send(json.dumps({"message": request_message}))
-        # print("Closing connection")
-        # self.websocket.close()

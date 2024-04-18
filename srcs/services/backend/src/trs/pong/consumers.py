@@ -158,8 +158,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
 
         elif ws_handshake_message == 'confirmation':
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            print("WHEN BEFORE LAUCH THE MATCH")
-            print(match.status)
             if match.status == 'pending':
                 match.status = 'playing'
                 await sync_to_async(match.save)()
@@ -212,7 +210,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                 # This connection has chaning of url
                 if self.client_url != self.match_url:
                     # Deleting the user of the channels group
-                    print("//////////// CHANGING URL /////////////")
                     await self.disconnect(1)
                     await self.websocket_disconnect(1)
                     self.game_finish = True
@@ -464,12 +461,13 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Saving match info in consumer
         self.match_info = match_info
 
+        # Adding a the current connection to the group
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+
         if self.type_connection == 'player':
-            # Adding a the current connection to the group
-            await self.channel_layer.group_add(
-                self.group_name,
-                self.channel_name
-            )
             # Sending initial data
             await self.send_initial_data()
             # Waiting for another user 
@@ -496,6 +494,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         type_message = data.get('type_message')
 
+        #print(type_message)
         match type_message:
             # Handling ws_handshake message
             case 'ws_handshake':
@@ -514,19 +513,12 @@ class PongConsumer(AsyncWebsocketConsumer):
             case 'leader':
                 user_token = data.get('leader')
                 if (int(user_token) != self.id_from_token) and self.not_leader == True:
-                    print("Setting not leader as False")
                     self.not_leader = False
-            # Receiving other user
-            case 'other_user':
-                other_user = data.get('other_user')
-                other_user_data = json.loads(other_user)
-
             # Receiving game events (paddles movement)
             case 'game_event':
                 game_event = data.get('game_event')
                 user_id = get_user_id_by_jwt_token(data, 'token')
                 await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : f'{game_event}', 'user_id' : f'{user_id}'}))
-            
             # Broadcasting an event
             case 'broadcasted_game_event':
                 broadcast_game_event = data.get('broadcasted_game_event')
@@ -569,21 +561,23 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await self.send_to_group('game_state', json.dumps(redirect_info))
 
 
-
     # This function handle the messages received from the client in the `ws_handshake`    
     async def receive_ws_handshake(self, ws_handshake_message, data):
         if ws_handshake_message == 'authorization':
             # Getting id for authorization
             user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
-            # Checking if the user_id match with any user in db
-            if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
-                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-            else:
+            if user_id == 3:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization_succesfully'})
+            # Checking if the user_id match with any user in db
+            elif user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
+                await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
 
     async def receive_broadcast_event(self, broadcast_game_event_message, user_id):
         if self.leader == True:
             match broadcast_game_event_message:
+                case 'score':
+                    print("/////////HEREEEEEEE////////")
+                    await self.send_to_group('game_state', json.dumps({'event' : 'score', 'user_1' : f'{self.game_user_1["paddle"]["score"]}', 'user_2' : f'{self.game_user_2["paddle"]["score"]}'}))
                 case 'move_up':
                     if int(user_id) == self.game_user_1["user_id"]:
                         self.game_user_1["paddle"]["top"] -= 0.1

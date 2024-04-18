@@ -52,17 +52,6 @@ export class Match extends BaseClass {
                     const { game_state } = data;
                     this.updateGameState(game_state);
                     break;
-                case 'other_user':
-                    const { other_user } = data;
-                    console.log("Receiving other user!")
-                    const otro_usuario  = JSON.parse(other_user)
-                    console.log(otro_usuario);
-                    if (Object.keys(otro_usuario).length > 0)
-                    {
-                        console.log('Sending other user!')
-                        this.socket.send(JSON.stringify({'type_message' : 'other_user', 'other_user' : other_user }));
-                    }
-                    break;
                 case 'user_token':
                     const { user_token } = data;
                     this.socket.send(JSON.stringify({'type_message' : 'user_token', 'user_token' : user_token}));
@@ -157,7 +146,10 @@ export class Match extends BaseClass {
                 break;
             case 'disconnection':
                 this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
-                break;            
+                break;
+            case 'test':
+                console.log(game_state);
+                break;       
             default:
                 console.log(`Sorry, we are out of ${game_state}.`);
         }
@@ -345,16 +337,12 @@ export class Match extends BaseClass {
         document.addEventListener('keydown', (e) => {
             switch(e.key){
                 case 'w':
-                    // console.log("`w` pressed");
-                    // console.log(this.socket.readyState);
                     if (this.socket.readyState === WebSocket.OPEN)
                     {
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'token' : `${jwtToken}`}));
                     }
                     break;
                 case 's':
-                    // console.log("`s` pressed");
-                    // console.log(this.socket.readyState);
                     if (this.socket.readyState === WebSocket.OPEN)
                     {
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'token' : `${jwtToken}`}));
