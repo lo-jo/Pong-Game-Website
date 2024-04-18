@@ -49,8 +49,8 @@ class BaseEndpoint:
         if endpoint_wss in self.switch_request_wss:
             func = self.switch_request_wss[endpoint_wss]
             endpoint_wss_connection = func(endpoint_wss)
-            print(endpoint_wss_connection)
-            self.ws_client = WebSocketClient(f"{ws}{host}/{endpoint_wss_connection}")
+            ws_url = f"{ws}{host}/{endpoint_wss_connection}/?token={token_user}&connection=cli_client" 
+            self.ws_client = WebSocketClient(ws_url, token_user)
             self.ws_client.run_client()
         else:
             print("Error searching the correct function!")

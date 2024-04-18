@@ -8,7 +8,7 @@ import requests
 
 
 class UserCLI:
-    def __init__(self, username, password, host="127.0.0.1:8000", http="https://", ws="ws://"):
+    def __init__(self, username, password, host="127.0.0.1:8000", http="https://", ws="wss://"):
         self.username = username
         self.password = password
         self.host = host

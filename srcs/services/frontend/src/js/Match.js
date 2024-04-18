@@ -28,7 +28,7 @@ export class Match extends BaseClass {
     initWebSocket() {
         // new WebSocket(`ws://localhost:8000/ws/chat/${targetId}/?token=${this.token}`);
         const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/match/${this.id}/?token=${this.token}`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/match/${this.id}/?token=${this.token}&connection=player`;
     
         this.socket = new WebSocket(wsUrl);
 
