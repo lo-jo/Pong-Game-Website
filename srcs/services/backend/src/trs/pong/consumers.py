@@ -13,9 +13,8 @@ from channels.exceptions import StopConsumer
 
 class LocalPongConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        print('CONNECTIN')
         self.match_id = self.scope['url_route']['kwargs']['id']
-        # # Setting group (channels) for sending data to ws
+        # Setting group (channels) for sending data to ws
         self.group_name = f'match_{self.match_id}'
 
         # Database match data
@@ -29,7 +28,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         self.client_url = ''
         self.request_ping_message = True
     
-
         self.ball = {
             'elem' : 'ball',
             'size_x' : 0.02,
@@ -63,18 +61,16 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         # Seconds of the match
         self.game_time = 0
         self.game_finish = False
+        
         await self.accept()
-        print("ACCEPTING CONNECTION")
         # Checking if match exists in DB
         match_info = await self.match_in_db()
         if match_info == None:
-            print("NO SUCH MATCH IN DB")
             await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'match_do_not_exist'})
             await self.close()
             return
         # Checking if the match is not already completed
         elif match_info["status"] == 'completed':
-            print("MATCH ALREADY COMPLETED")
             await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'match_already_completed'})
             await self.close()
             return
@@ -89,23 +85,28 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
-
-        await self.send_initial_data()
+        
+        asyncio.create_task(self.request_ping())
 
 
     async def disconnect(self, close_code):
+        print("DISCONNECT")
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
         )
-        match = await sync_to_async(Match.objects.get)(id=self.match_id)
-        # Match completed
-        match.status = 'aborted'
-        await sync_to_async(match.save)()
+       
+        if close_code == 1:
+            print("ABORTING MATCHHH")
+            self.game_finish = True
+            match = await sync_to_async(Match.objects.get)(id=self.match_id)
+            # Match aborted
+            match.status = 'aborted'
+            await sync_to_async(match.save)()
         
 
     async def websocket_disconnect(self, close_code):
-        pass
+        print("WEBSOCKET DISCONNECT")
 
 
     # Receivers
@@ -119,31 +120,20 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                 await self.receive_ws_handshake(ws_handshake_message, data)
 
             case 'game_event':
-                print('GAME VEVENT', data)
                 game_event = data.get('game_event')
                 user_id = data.get('id')
                 user_id = int(user_id) if user_id is not None else None
-                print("THIS IS MY USER 2", self.game_user_2)
-                print('****GETTING THAT CURRENT USER ID ', user_id, "koko", self.game_user_1['user_id'], self.game_user_2['user_id'])
 
-                
                 if user_id == self.game_user_1['user_id']:
-                    print("///why are you not going inside here")
                     if game_event == 'move_up':
-                        print("why are you not going inside here")
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_1'}))
+                        await self.receive_game_event('move_up_paddle_1')
                     elif game_event == 'move_down':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_1'}))
+                        await self.receive_game_event('move_down_paddle_1')
                 elif user_id == int(self.game_user_2["user_id"]):
-                    print('USER 2 IS PUSHING KEYS')
                     if game_event == 'move_up':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_up_paddle_2'}))
+                        await self.receive_game_event('move_up_paddle_2')
                     elif game_event == 'move_down':
-                        await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : 'move_down_paddle_2'}))
-
-            case 'broadcasted_game_event':
-                broadcast_game_event = data.get('broadcasted_game_event')
-                await self.receive_broadcast_event(broadcast_game_event)
+                        await self.receive_game_event('move_down_paddle_2')
             case 'ping':
                 self.client_url = data.get('url')
             case 'match_completed':
@@ -160,49 +150,23 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorized'})
                 self.game_user_1['user_id'] = user_id
                 self.game_user_1['paddle'] = self.game_user_1_paddle
+                self.game_user_2['user_id'] = self.match_info["user_2"]
+                self.game_user_2['paddle'] = self.game_user_2_paddle
+                await self.send_initial_data()
             else:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-    
-        elif ws_handshake_message == 'guest_user':
-            print('////////////////////////////////////////')
-            print("IS THE ACTUAL DATA THAT IM GETTING", data)
-            self.game_user_2['user_id'] = data['guest_user']
-            self.game_user_2['paddle'] = self.game_user_2_paddle
 
         elif ws_handshake_message == 'confirmation':
             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            match.status = 'playing'
-            await sync_to_async(match.save)()
-            asyncio.create_task(self.game_loop())
+            print("WHEN BEFORE LAUCH THE MATCH")
+            print(match.status)
+            if match.status == 'pending':
+                match.status = 'playing'
+                await sync_to_async(match.save)()
+                asyncio.create_task(self.game_loop())
 
-            # if match.status == 'completed':
-            #     print('///////////// HEREEEE /////////////////////////')
-            #     await self.send_to_connection({
-            #         'type_message' : 'game_state',
-            #         'game_state' : 'match_is_already_finished'})
-            #     return
-
-            # Changing the state of the match after the confirmation received
-            # BUGGGGGG
-            # if self.game_user_1 and self.who_i_am_id == self.game_user_1["user_id"]:
-            #     if match.status == 'pending':
-            #         match.status = 'joined'
-            #         await sync_to_async(match.save)()
-            
-            # elif self.game_user_2 and self.who_i_am_id == self.game_user_2["user_id"]:
-            #     if match.status == 'pending':
-            #         while match.status == 'pending':
-            #             await asyncio.sleep(0.1)
-            #             match = await sync_to_async(Match.objects.get)(id=self.match_id)
-            #         match.status = 'playing'
-            #         await sync_to_async(match.save)()
-            #         asyncio.create_task(self.game_loop())
-            #     elif match.status == 'joined':
-            #         match.status = 'playing'
-            #         await sync_to_async(match.save)()
-
-    async def receive_broadcast_event(self, broadcast_game_event_message):
-        match broadcast_game_event_message:
+    async def receive_game_event(self, game_event_message):
+        match game_event_message:
             case 'move_up_paddle_1':
                 self.game_user_1["paddle"]["top"] -= 0.1
                 if self.game_user_1["paddle"]["top"] <= 0:
@@ -247,10 +211,11 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             if self.client_url != '':
                 # This connection has chaning of url
                 if self.client_url != self.match_url:
-                    self.game_finish = True
                     # Deleting the user of the channels group
+                    print("//////////// CHANGING URL /////////////")
                     await self.disconnect(1)
                     await self.websocket_disconnect(1)
+                    self.game_finish = True
                     break
             await self.send_to_connection({'type_message' : 'request_ping'})
             await asyncio.sleep(0.01)
@@ -266,7 +231,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             'user_2_info' : self.db_user_2
         }
         await self.send_to_connection(users_data)
-        asyncio.create_task(self.request_ping())
+
 
     async def send_to_group(self, type_message, message):
         await self.channel_layer.group_send(
@@ -293,10 +258,6 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             self.game_time += 1
 
     async def game_loop(self):
-        while not self.game_user_1 or not self.game_user_2:
-            print("Waiting for the info...")
-            await asyncio.sleep(1)
-
         print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
         print(f'Info user_2 {self.game_user_2}')
@@ -312,7 +273,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
         # Start timer
         asyncio.create_task(self.game_timer())
 
-        while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
+        while (self.game_finish == False) and (self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5):
             # Bouncing the ball in Y Axis
             if self.ball['top'] <= 0 or self.ball['top'] >= 0.96:
                 self.ball['speed_y'] *= -1
@@ -364,21 +325,26 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
 
             # Sending elements info
             await self.send_to_group('game_state', json.dumps(game_elements))
-            #  // send to connection!!
             # Sleeping one miliseconds for thread 
             await asyncio.sleep(0.1)
         
+        print("SALIMOS DEL JUEGOOOOO")
         self.game_finish = True
         # Finishing and saving the match
         await self.finish_and_save_match()
 
     async def finish_and_save_match(self):
+        match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        print(match.status)
+        # May be completed in case of client deconnection
+        if match.status == 'aborted':
+            return
+
         print("MATCH FINISHHHHH")
         print("The score:")
         print(f'User 1 {self.game_user_1["paddle"]["score"]}')
         print(f'User 2 {self.game_user_2["paddle"]["score"]}')
         # Setting score
-        match = await sync_to_async(Match.objects.get)(id=self.match_id)
         match.score_user_1 = self.game_user_1["paddle"]["score"]
         match.score_user_2 = self.game_user_2["paddle"]["score"]
         # Defining winner and loser
@@ -617,47 +583,6 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Checking if the user_id match with any user in db
             if user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'failed_authorization'})
-        #     # else:
-        #     #     #print("You are authorized for join the match !!!")
-        #     #     if user_id == self.match_info['user_1']:
-        #     #         if not self.game_user_1:
-        #     #             #print("I am the user 1")
-        #     #             self.total_game_users += 1
-        #     #             self.who_i_am_id = user_id
-        #     #             self.role_id = 1
-        #     #             self.game_user_1['user_id'] = user_id
-        #     #             self.game_user_1['paddle'] = self.game_user_1_paddle
-
-        #     #     elif user_id == self.match_info['user_2']:
-        #     #         if not self.game_user_2:
-        #     #             #print("I am the user 2")
-        #     #             self.total_game_users += 1
-        #     #             self.who_i_am_id = user_id
-        #     #             self.role_id = 2
-        #     #             self.game_user_2['user_id'] = user_id
-        #     #             self.game_user_2['paddle'] = self.game_user_2_paddle
-
-        #     #     # Sending user for the other connection!
-        #     #     asyncio.create_task(self.sending_other_user())
-
-
-        # elif ws_handshake_message == 'confirmation':
-        #     # Trying to stop one user 
-        #     if self.who_i_am_id == self.game_user_1["user_id"] and self.confirmation == False:
-        #         self.confirmation = True
-        #         # await self.send_to_group('game_state',
-        #         #     json.dumps({'event' : 'show_timer'}))
-        #         await asyncio.sleep(3)
-
-        #     match = await sync_to_async(Match.objects.get)(id=self.match_id)
-        
-        #     if match.status == 'pending':
-        #         match.status = 'joined'
-        #         await sync_to_async(match.save)()
-        #     elif match.status == 'joined':
-        #         match.status = 'playing'
-        #         await sync_to_async(match.save)()
-        #         asyncio.create_task(self.game_loop())
 
     async def receive_broadcast_event(self, broadcast_game_event_message, user_id):
         if self.leader == True:
@@ -709,6 +634,11 @@ class PongConsumer(AsyncWebsocketConsumer):
     # Waiting for both connections
     async def waiting_users(self):
         while self.other_is_connected == False or self.other_know_I_am_here == 0:
+            match = await sync_to_async(Match.objects.get)(id=self.match_id)
+            if match.status == 'completed':
+                self.request_ping = False
+                return
+
             if self.id_from_token == self.match_info["user_1"]:
                 print("Sleeping 0.1")
                 await asyncio.sleep(0.1)
@@ -764,7 +694,10 @@ class PongConsumer(AsyncWebsocketConsumer):
                     await self.disconnect(1)
                     await self.websocket_disconnect(1)
                     break
-            await self.send_to_connection({'type_message' : 'request_ping'})
+            try:
+                await self.send_to_connection({'type_message' : 'request_ping'})
+            except Disconnected:
+                break
             # print('Requesting ping')
             await asyncio.sleep(0.01)
 
@@ -795,6 +728,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 
     # Senders
     async def send_initial_data(self):
+        match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        if match.status == 'completed':
+            return
+
         self.db_user_1 = await self.user_in_db(self.match_info["user_1"])
         self.db_user_2 = await self.user_in_db(self.match_info["user_2"])
         users_data = {
@@ -837,6 +774,10 @@ class PongConsumer(AsyncWebsocketConsumer):
         if not self.game_user_1 or not self.game_user_2:
             print("That never happens")
             return
+
+        match = await sync_to_async(Match.objects.get)(id=self.match_id)
+        match.status = 'playing'
+        await sync_to_async(match.save)()
        
         print("/////////////////// We are ready to start the game ////////////////////")
         print(f'Info user_1 {self.game_user_1}')
@@ -959,11 +900,13 @@ class PongConsumer(AsyncWebsocketConsumer):
 class MatchConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+        query_params = parse_qs(self.scope['query_string'].decode())
+        # Getting the user id connection
+        self.match_id = query_params.get('id_match', [None])[0]
+
+        print(f"CONNNNNECTION WITH ID {self.match_id} sur lllby")
         # All the users (ws) that we are going to play a match will be stored in this group
         self.room_group_name = 'matches_group'
-
-        # Match id
-        self.match_id = None
 
         # Match lobby url (Ping system)
         self.match_url = f"{os.getenv('PROTOCOL')}://{os.getenv('HOST_IN_USE')}:{os.getenv('FRONTEND_PORT')}/match_lobby"

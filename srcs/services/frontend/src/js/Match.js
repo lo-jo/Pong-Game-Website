@@ -6,6 +6,7 @@ import { initGameTwoD, drawGameElements } from './GameElement';
 export class Match extends BaseClass {
     constructor(id) {
         super();
+        /*Url*/
         /*Id of the match*/
         this.id = id;
         /*Socket*/
@@ -113,8 +114,11 @@ export class Match extends BaseClass {
                 this.showMessageAndRedirect(`You don't have authorization to play this match.`);
                 break;
             case 'initial_data':
-                const { user_1_info, user_2_info } = data
-                this.initGame(user_1_info, user_2_info);
+                if (window.location.href === `https://localhost:5173/match/${this.id}`)
+                {
+                    const { user_1_info, user_2_info } = data
+                    this.initGame(user_1_info, user_2_info);
+                }
                 break;
             case 'request_confirmation':
                 console.log("Sending confirmation!");

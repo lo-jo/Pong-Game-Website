@@ -5,12 +5,13 @@ export class MatchLobby extends BaseClass {
     constructor() {
         super();
         this.socket = null;
-        this.initWebSocketLobby();
+        
         this.run();
     }
     
     async run()
     {
+        // await this.initWebSocketLobby();
         await this.postMatch();
     }
 
@@ -42,15 +43,19 @@ export class MatchLobby extends BaseClass {
                 const json_response = await response.json();
                 
                 const { action, match_id } = json_response;
-                if (this.socket.readyState === WebSocket.OPEN)
-                    this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
 
-                console.log(json_response);
-                console.log(action);
+                this.initWebSocketLobby(match_id);
+
+                // if (this.socket.readyState === WebSocket.OPEN)
+                //     this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
+
+                // console.log(json_response);
+                // console.log(action);
                 if (action === 'join_play')
                 {
                     console.log('JOIN PLAY BY HTTP RESPONSE');
-                    this.socket.close();
+                    if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+                        this.socket.close();
                     history.pushState('', '', `/match/${match_id}`);
                     router();
                 }
@@ -61,9 +66,24 @@ export class MatchLobby extends BaseClass {
         }
     }
 
-    initWebSocketLobby() {
+    showMessageAndRedirect(redirect_reason) {
+        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
+        let seconds = document.getElementById('seconds'),
+        total = seconds.innerHTML;
+        let timeinterval = setInterval(() => {
+            total = --total;
+            seconds.textContent = total;
+            if (total <= 0) {
+                clearInterval(timeinterval);
+                history.pushState('', '', `/dashboard`);
+                router();
+            }
+        }, 1000);
+    }
+
+    async initWebSocketLobby(id_match) {
         const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/lobby`;
+        const wsUrl = `${wsProtocol}//${this.host}:${this.backendPort}/ws/pong/lobby/?id_match=${id_match}`;
     
         this.socket = new WebSocket(wsUrl);
 
@@ -74,35 +94,41 @@ export class MatchLobby extends BaseClass {
         this.socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { type_message } = data;
-            switch (type_message)
+            if (this.socket.readyState === WebSocket.OPEN)
             {
-                case 'action':
-                    const { action, match_id } = data;
-                    if (action === 'join_play')
-                    {
-                        console.log('JOIN PLAY BY WSS');
+                switch (type_message)
+                {
+                    case 'action':
+                        const { action, match_id } = data;
+                        if (action === 'join_play')
+                        {
+                            console.log('JOIN PLAY BY WSS');
+                            if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+                                this.socket.close();
+                            history.pushState('', '', `/match/${match_id}`);
+                            router();
+                        }
+                        break;
+                    case 'request_ping':
+                        this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
+                        break;
+                    case 'match_aborted':
                         this.socket.close();
-                        history.pushState('', '', `/match/${match_id}`);
-                        router();
-                    }
-                    break;
-                case 'request_ping':
-                    this.socket.send(JSON.stringify({'type_message' : 'ping', 'url' : `${window.location.href}`}));
-                    break;
-                case 'match_aborted':
-                    this.socket.close();
-                    break;
+                        break;
+                }
             }
         };
 
         this.socket.onerror = function(error) {
-            console.error('WebSocket error:', error);
+            // this.showMessageAndRedirect('Tesssst')
+            console.log(error);
         };
     
         this.socket.onclose = function() {
             console.log('WebSocket (match lobby) connection closed.');
         };
     }
+
 
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {

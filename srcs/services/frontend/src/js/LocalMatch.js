@@ -80,9 +80,6 @@ export class LocalMatch extends BaseClass {
                 const jwtToken = localStorage.getItem('token');
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization' , 'authorization' : `${jwtToken}`}));
                 break;
-            case 'authorized':
-                this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'guest_user' , 'guest_user' : `${this.user_2_info.id}`}));
-                break;
             case 'failed_authorization':
                 this.showMessageAndRedirect(`You don't have authorization to this match.`);
                 break;
@@ -90,7 +87,6 @@ export class LocalMatch extends BaseClass {
                 const { user_1_info, user_2_info } = data
                 this.user_1_info = user_1_info;
                 this.user_2_info = user_2_info;
-                console.log("INITIAL DATA", user_2_info.id);
                 this.initGame(user_1_info, user_2_info);
         }
     }
@@ -98,7 +94,6 @@ export class LocalMatch extends BaseClass {
     /*Methods to update the game state*/
     updateGameState(game_state_data)
     {
-        console.log('GAME EVEMT');
         const game_state = JSON.parse(game_state_data);
         switch (game_state.event)
         {
@@ -108,11 +103,6 @@ export class LocalMatch extends BaseClass {
                 break;
             case 'someone_left':
                 console.log('Someone left');
-                break;
-            case 'broadcasted_game_event':
-                console.log("44444Supposed to b getting a broadcasted gane element");
-                const { broadcasted_game_event } = game_state;
-                this.socket.send(JSON.stringify({'type_message' : 'broadcasted_game_event', 'broadcasted_game_event' : `${broadcasted_game_event}`}));
                 break;
             case 'game_elements':
                 drawGameElements(game_state);
@@ -211,14 +201,12 @@ export class LocalMatch extends BaseClass {
     
     initGame(user_1_info, user_2_info)
     {
-        console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
-        this.showTimerBeforeMatch(user_1_info, user_2_info);
+        this.showTimerBeforeMatch();
     }
 
     initBoard(user_1_info, user_2_info)
     {
-        console.log("init game board");
         const app = document.getElementById('app');
 
         const appContainer = document.createElement('div');
@@ -276,8 +264,7 @@ export class LocalMatch extends BaseClass {
         app.appendChild(appContainer);
     }
 
-    showTimerBeforeMatch(user_1_info, user_2_info){
-        // console.log(`showTimerBeforeMatch call()`);
+    showTimerBeforeMatch(){
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
         seconds_div.setAttribute('id', 'seconds');
@@ -304,15 +291,12 @@ export class LocalMatch extends BaseClass {
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_1_info.id}`}));
                         break;
                     case 's':
-                        // console.log("`s` pressed");
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_1_info.id}`}));
                         break;
                     case 'ArrowUp':
-                        // console.log("`w` pressed");
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_up' , 'id' : `${this.user_2_info.id}`}));
                         break;
                     case 'ArrowDown':
-                        // console.log("`s` pressed");
                         this.socket.send(JSON.stringify({'type_message' : 'game_event', 'game_event' : 'move_down' , 'id' : `${this.user_2_info.id}`}));
                         break;       
                 }
