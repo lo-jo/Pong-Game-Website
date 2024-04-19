@@ -136,3 +136,9 @@ a{
     /* overflow-x: auto; */
     overflow-x: hidden;
 }
+
+.progress-text {
+    white-space: normal;
+    line-height: 0.6;
+    /* font-size: 0.6rem; */
+}

@@ -145,7 +145,7 @@ export class Match extends BaseClass {
                 // this.showMessageAndRedirect(`Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
             case 'disconnection':
-                this.showMessageAndRedirect(`We are so sorry! The other person is going out!<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
+                this.showMessageAndRedirect(`We are so sorry! Your opponent left the game...<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
             case 'test':
                 console.log(game_state);
@@ -177,17 +177,19 @@ export class Match extends BaseClass {
     }
 
     showMessageAndRedirect(redirect_reason) {
-        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected in to dashboard page <time><strong id="seconds">5</strong> seconds</time>.</p>`
+        document.getElementById('app').innerHTML = `<p>${redirect_reason}<br>You will be redirected to the dashboard page in <br><time><strong id="seconds">5</strong><br> seconds</time>.</p>`
         let seconds = document.getElementById('seconds'),
         total = seconds.innerHTML;
-        this.socket.close();
         let timeinterval = setInterval(() => {
-            total = --total;
-            seconds.textContent = total;
-            if (total <= 0) {
-                clearInterval(timeinterval);
-                history.pushState('', '', `/dashboard`);
-                router();
+            this.socket.close();
+            if (document.getElementById('seconds')){
+                total = --total;
+                seconds.textContent = total;
+                if (total <= 0) {
+                    clearInterval(timeinterval);
+                    history.pushState('', '', `/dashboard`);
+                    router();
+                }
             }
         }, 1000);
     }
@@ -263,11 +265,11 @@ export class Match extends BaseClass {
         const user1Div = document.createElement('div');
         user1Div.classList.add('user-info');
         user1Div.innerHTML = `
-            <span>${user_1_info.username}</span>`;
+        <span>${user_1_info.username} <span class="controls-info">W</span><span class="controls-info">S</span></span>`;
 
         const user2Div = document.createElement('div');
         user2Div.classList.add('user-info');
-        user2Div.innerHTML = `<span>${user_2_info.username}</span>`;
+        user2Div.innerHTML = `<span><span class="controls-info">W</span><span class="controls-info">S</span></span> ${user_2_info.username} `;
 
         /*Creating timer*/
         const timerElement = document.createElement('div');

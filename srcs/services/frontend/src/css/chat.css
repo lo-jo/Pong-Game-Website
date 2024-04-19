@@ -63,7 +63,20 @@ a, a > i{
 }
 
 .time {
-    font-size: 0.5vw;
+    font-size: 0.8vw;
+}
+
+@media (max-width: 768px) {
+    .time {
+        font-size: 10px;
+    }
+}
+
+.conchasuwrawra{
+    /* padding: 6px 10px!important; */
+    text-wrap: wrap!important;
+    color: #383434;
+    /* background-color: #FFFFFC; */
 }
 
 .custom-text-color {
@@ -74,8 +87,4 @@ a, a > i{
     /* background-color: #e884f1; */
     text-align: right;
 
-}
-
-.conchasuwrawra{
-    text-wrap: wrap;
 }
