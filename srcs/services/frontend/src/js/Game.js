@@ -167,7 +167,7 @@ export class PongGame extends BaseClass
 	  this.ball_coord = this.ball.getBoundingClientRect();
 	  // Use requestAnimationFrame for smoother animation and call the moveBall function recursively
 	  requestAnimationFrame(() => {
-		// //console.log(`ball_coord = ${JSON.stringify(this.ball_coord, null, 2)}`);
+		// console.log(`ball_coord = ${JSON.stringify(this.ball_coord, null, 2)}`);
 		this.moveBall();
 	  });
 	}
@@ -212,7 +212,7 @@ export class PongGame extends BaseClass
 	}
   
 	updatePositionsOnResize() {
-		//console.log("window resize detected, updating ping pong elements");
+		console.log("window resize detected, updating ping pong elements");
 		this.paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
 		this.paddle_2_coord = document.getElementById('app').querySelector('.paddle_2').getBoundingClientRect();
 		this.paddle_common = document.getElementById('app').querySelector('.paddle').getBoundingClientRect();
@@ -226,7 +226,7 @@ export class PongGame extends BaseClass
 		if (e.key == 'Enter') {
 			this.gameState = (this.gameState == 'start') ? 'play' : 'start';
 			if (this.gameState == 'play') {
-				//console.log("enter pressed");
+				console.log("enter pressed");
 				this.message.querySelector('h1').innerHTML = 'Game started';
 				requestAnimationFrame(() => {
 					window.addEventListener('resize', this.updatePositionsOnResize);
@@ -240,36 +240,36 @@ export class PongGame extends BaseClass
 		}
 
 		if (this.gameState == 'play') {
-			//console.log(`Board_height: ${this.board_coord.height}, board_width ${this.board_coord.width}`);
+			console.log(`Board_height: ${this.board_coord.height}, board_width ${this.board_coord.width}`);
 
 			if (e.key == 'w') { // go up
-				//console.log("`w` pressed");
-				//console.log(`paddle_1_coord.top  before = ${this.paddle_1_coord.top }`);
+				console.log("`w` pressed");
+				console.log(`paddle_1_coord.top  before = ${this.paddle_1_coord.top }`);
 				this.paddle_1.style.top = Math.max(this.board_coord.top, this.paddle_1_coord.top - this.board_coord.height * 0.06) + 'px';
-				//console.log(`paddle_1.style.top after = ${this.paddle_1.style.top}`);
+				console.log(`paddle_1.style.top after = ${this.paddle_1.style.top}`);
 				this.paddle_1_coord = this.paddle_1.getBoundingClientRect();
-				//console.log(`paddle_1_coord = ${JSON.stringify(this.paddle_1_coord, null, 2)}`);
+				console.log(`paddle_1_coord = ${JSON.stringify(this.paddle_1_coord, null, 2)}`);
 			}
 
 			if (e.key == 's') { // go down
-				//console.log("`s` pressed");
+				console.log("`s` pressed");
 				this.paddle_1.style.top = Math.min(this.board_coord.bottom - this.paddle_common.height, this.paddle_1_coord.top + this.board_coord.height * 0.06) + 'px';
 				this.paddle_1_coord = this.paddle_1.getBoundingClientRect();
-				//console.log(`paddle_1_coord = ${JSON.stringify(this.paddle_1_coord, null, 2)}`);
+				console.log(`paddle_1_coord = ${JSON.stringify(this.paddle_1_coord, null, 2)}`);
 			}
 
 			if (e.key == 'ArrowUp') {
-				//console.log("`ArrowUp` pressed");
+				console.log("`ArrowUp` pressed");
 				this.paddle_2.style.top = Math.max(this.board_coord.top, this.paddle_2_coord.top - this.board_coord.height * 0.1) + 'px';
 				this.paddle_2_coord = this.paddle_2.getBoundingClientRect();
-				//console.log(`paddle_2_coord = ${JSON.stringify(this.paddle_2_coord, null, 2)}`);
+				console.log(`paddle_2_coord = ${JSON.stringify(this.paddle_2_coord, null, 2)}`);
 			}
 
 			if (e.key == 'ArrowDown') {
-				//console.log("`ArrowDown` pressed");
+				console.log("`ArrowDown` pressed");
 				this.paddle_2.style.top = Math.min(this.board_coord.bottom - this.paddle_common.height, this.paddle_2_coord.top + this.board_coord.height * 0.1) + 'px';
 				this.paddle_2_coord = this.paddle_2.getBoundingClientRect();
-				//console.log(`paddle_2_coord = ${JSON.stringify(this.paddle_2_coord, null, 2)}`);
+				console.log(`paddle_2_coord = ${JSON.stringify(this.paddle_2_coord, null, 2)}`);
 			}
 		}
 	}

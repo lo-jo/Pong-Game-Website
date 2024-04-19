@@ -49,11 +49,11 @@ export class MatchLobby extends BaseClass {
                 // if (this.socket.readyState === WebSocket.OPEN)
                 //     this.socket.send(JSON.stringify({'type_message' : 'match_id', 'match_id' : `${match_id}`}));
 
-                // //console.log(json_response);
-                // //console.log(action);
+                // console.log(json_response);
+                // console.log(action);
                 if (action === 'join_play')
                 {
-                    //console.log('JOIN PLAY BY HTTP RESPONSE');
+                    console.log('JOIN PLAY BY HTTP RESPONSE');
                     if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
                         this.socket.close();
                     history.pushState('', '', `/match/${match_id}`);
@@ -88,7 +88,7 @@ export class MatchLobby extends BaseClass {
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onopen = function() {
-            //console.log('WebSocket(match lobby) connection established.');
+            console.log('WebSocket(match lobby) connection established.');
         };
 
         this.socket.onmessage = (event) => {
@@ -102,7 +102,7 @@ export class MatchLobby extends BaseClass {
                         const { action, match_id } = data;
                         if (action === 'join_play')
                         {
-                            //console.log('JOIN PLAY BY WSS');
+                            console.log('JOIN PLAY BY WSS');
                             if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
                                 this.socket.close();
                             history.pushState('', '', `/match/${match_id}`);
@@ -121,11 +121,11 @@ export class MatchLobby extends BaseClass {
 
         this.socket.onerror = function(error) {
             // this.showMessageAndRedirect('Tesssst')
-            //console.log(error);
+            console.log(error);
         };
     
         this.socket.onclose = function() {
-            //console.log('WebSocket (match lobby) connection closed.');
+            console.log('WebSocket (match lobby) connection closed.');
         };
     }
 

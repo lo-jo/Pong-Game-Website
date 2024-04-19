@@ -2,7 +2,7 @@ import jwt_decode from 'jwt-decode';
 
 export default class Navbar {
     constructor() {
-        //console.log("Navbar created!");
+        console.log("Navbar created!");
         this.isAuthenticated = false;
         // this.checkAuthentication().then(flag => this.isAuthenticated = flag);
         this.updateNavbar();
@@ -16,7 +16,7 @@ export default class Navbar {
         // const isAuthenticated = await this.checkAuthentication();
         const navbar = document.getElementById('nav-bar');
         const alert = document.getElementById('bellButton');
-        //console.log("NAVBAR RENDERED:", document.getElementById('nav-bar'));
+        console.log("NAVBAR RENDERED:", document.getElementById('nav-bar'));
 
         if (this.isAuthenticated) {
             alert.style.display = 'block';

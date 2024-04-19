@@ -27,14 +27,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv("REMOTE_HOST"), os.getenv("ALLOWED_HOST_1"), os.getenv("ALLOWED_HOST_2")]
-
+ALLOWED_HOSTS = [os.getenv("REMOTE_HOST")]
 
 # Application definition
 
 INSTALLED_APPS = [
-    # server pong app
-    #'server_side_pong.apps.ServerSidePongConfig',
     'channels',
     'daphne',
     'corsheaders',
@@ -73,11 +70,8 @@ SECURE_SSL_CERTIFICATE = '/etc/ssl/private/selfsigned.crt'
 SECURE_SSL_KEY = '/etc/ssl/private/selfsigned.key'
 
 
-CORS_ALLOWED_ORIGINS = [
-    # "https://localhost:5173",
-    f"{os.getenv('PROTOCOL')}://{os.getenv('HOST_IN_USE')}:{os.getenv('FRONTEND_PORT')}",
-]
-
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True 
 
 ROOT_URLCONF = 'trs.urls'
 

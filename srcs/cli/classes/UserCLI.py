@@ -9,7 +9,7 @@ import jwt
 
 
 class UserCLI:
-    def __init__(self, username, password, host="127.0.0.1:8000", http="https://", ws="wss://"):
+    def __init__(self, username, password, host="paul-f5Ar3s8:8000", http="https://", ws="wss://"):
         self.username = username
         self.password = password
         self.host = host

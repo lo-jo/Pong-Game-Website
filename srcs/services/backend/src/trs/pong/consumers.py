@@ -209,6 +209,7 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
             if self.client_url != '':
                 # This connection has chaning of url
                 if self.client_url != self.match_url:
+                    print("MATCH =>", self.match)
                     # Deleting the user of the channels group
                     await self.disconnect(1)
                     await self.websocket_disconnect(1)
@@ -412,8 +413,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             'size_y' : 0.04,
             'top' : 0.5,
             'left' : 0.5,
-            'speed_x': 0.03,
-            'speed_y': 0.03
+            'speed_x': 0.05,
+            'speed_y': 0.05
         }
 
         self.game_user_1_paddle = {
@@ -472,18 +473,19 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.send_initial_data()
             # Waiting for another user 
             asyncio.create_task(self.waiting_users())
+            print("Player is connected!")
         elif type_connection == 'cli_client':
             print("CLI CLIENT CONNECTED!")
 
     async def disconnect(self, close_code):
-        # print("DISCONNECT**************************")
+        print("DISCONNECT**************************")
         await self.channel_layer.group_discard(
             self.group_name,
             self.channel_name
         )
 
     async def websocket_disconnect(self, close_code):
-        # print("DISCONNECT!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("DISCONNECT!!!!!!!!!!!!!!!!!!!!!!!!!!")
         if self.type_connection == 'player': 
             self.game_finish = True
             await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
@@ -775,9 +777,9 @@ class PongConsumer(AsyncWebsocketConsumer):
                 if self.game_user_2["paddle"]["score"] == 3 and flag_speed == False:
                     flag_speed = True
                     if self.ball['speed_x'] < 0:
-                        self.ball['speed_x'] = 0.06
+                        self.ball['speed_x'] = 0.07
                     elif self.ball['speed_x'] > 0:
-                        self.ball['speed_x'] = -0.06
+                        self.ball['speed_x'] = -0.07
             
                 # Put the ball in the center
                 self.ball['top'] = 0.5
@@ -789,19 +791,19 @@ class PongConsumer(AsyncWebsocketConsumer):
                 if self.game_user_1["paddle"]["score"] == 3 and flag_speed == False:
                     flag_speed = True
                     if self.ball['speed_x'] < 0:
-                        self.ball['speed_x'] = 0.06
+                        self.ball['speed_x'] = 0.07
                     elif self.ball['speed_x'] > 0:
-                        self.ball['speed_x'] = -0.06
+                        self.ball['speed_x'] = -0.07
                 # Putting the ball in the center
                 self.ball['top'] = 0.5
                 self.ball['left'] = 0.5
         
             #Checking and setting precision limits for ball in top and left coordinates
-            # self.ball['top'] += self.ball['speed_y']
-            # if self.ball['top'] <= 0:
-            #     self.ball['top'] = 0
-            # else:
-            #     self.ball['top'] = round(self.ball['top'], 5)
+            self.ball['top'] += self.ball['speed_y']
+            if self.ball['top'] <= 0:
+                self.ball['top'] = 0
+            else:
+                self.ball['top'] = round(self.ball['top'], 5)
     
             self.ball['left'] += self.ball['speed_x']
             if self.ball['left'] <= 0:
@@ -891,14 +893,16 @@ class MatchConsumer(AsyncWebsocketConsumer):
         asyncio.create_task(self.request_ping())
 
     async def disconnect(self, close_code):
-        #print('////// DECONNECTIONNNNNNN //////////////')
+        # print('////// DECONNECTIONNNNNNN IN MATCH LOBBY //////////////')
+        # print(close_code)
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
     async def websocket_disconnect(self, close_code):
-        #print('////// DECONNECTION WEBSOCKET  //////////////')
+        # print('////// DECONNECTION WEBSOCKET IN MATCH LOBBY  //////////////')
+        # print(close_code)
         self.request_ping_message = False
         if close_code == 1:
             try:
@@ -936,7 +940,7 @@ class MatchConsumer(AsyncWebsocketConsumer):
                 if self.client_url != self.match_url:
                     # Deleting the user of the channels group
                     try:
-                        await self.websocket_disconnect(1)
+                        await self.websocket_disconnect(2)
                     except StopConsumer:
                         pass
                     break

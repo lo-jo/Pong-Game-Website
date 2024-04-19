@@ -38,9 +38,6 @@ WORKDIR /code
 # Copy source code of project
 COPY src/ /code/src/
 
-# COPY selfsigned.crt /etc/ssl/private/selfsigned.crt
-# COPY selfsigned.key /etc/ssl/private/selfsigned.key
-
 # Copy script
 COPY ./script/start_django.sh ./script/start_django.sh
 

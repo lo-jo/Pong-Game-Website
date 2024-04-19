@@ -11,9 +11,6 @@ RUN npm install --save
 
 COPY ./src ./src
 
-# COPY selfsigned.crt /etc/ssl/private/selfsigned.crt
-# COPY selfsigned.key /etc/ssl/private/selfsigned.key
-
 EXPOSE ${FRONTEND_PORT}
 # EXPOSE 5173
 

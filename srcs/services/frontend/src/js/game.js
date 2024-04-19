@@ -97,7 +97,7 @@ export const initGameTwoD = () => {
 		if (e.key == 'Enter') {
 			gameState = (gameState == 'start') ? 'play' : 'start';
 			if (gameState == 'play') {
-				//console.log("enter pressed");
+				console.log("enter pressed");
 				message.querySelector('h1').innerHTML = 'Game started';
 				requestAnimationFrame(() => {
 					window.addEventListener('resize', updatePositionsOnResize);
@@ -111,36 +111,36 @@ export const initGameTwoD = () => {
 		}
 
 		if (gameState == 'play') {
-			//console.log(`Board_height: ${board_coord.height}, board_width ${board_coord.width}`);
+			console.log(`Board_height: ${board_coord.height}, board_width ${board_coord.width}`);
 
 			if (e.key == 'w') { // go up
-				//console.log("`w` pressed");
-				//console.log(`paddle_1_coord.top  before = ${paddle_1_coord.top }`);
+				console.log("`w` pressed");
+				console.log(`paddle_1_coord.top  before = ${paddle_1_coord.top }`);
 				paddle_1.style.top = Math.max(board_coord.top, paddle_1_coord.top - board_coord.height * 0.06) + 'px';
-				//console.log(`paddle_1.style.top after = ${paddle_1.style.top}`);
+				console.log(`paddle_1.style.top after = ${paddle_1.style.top}`);
 				paddle_1_coord = paddle_1.getBoundingClientRect();
-				//console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
+				console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
 			}
 
 			if (e.key == 's') { // go down
-				//console.log("`s` pressed");
+				console.log("`s` pressed");
 				paddle_1.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_1_coord.top + board_coord.height * 0.06) + 'px';
 				paddle_1_coord = paddle_1.getBoundingClientRect();
-				//console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
+				console.log(`paddle_1_coord = ${JSON.stringify(paddle_1_coord, null, 2)}`);
 			}
 
 			if (e.key == 'ArrowUp') {
-				//console.log("`ArrowUp` pressed");
+				console.log("`ArrowUp` pressed");
 				paddle_2.style.top = Math.max(board_coord.top, paddle_2_coord.top - board_coord.height * 0.1) + 'px';
 				paddle_2_coord = paddle_2.getBoundingClientRect();
-				//console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
+				console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
 			}
 
 			if (e.key == 'ArrowDown') {
-				//console.log("`ArrowDown` pressed");
+				console.log("`ArrowDown` pressed");
 				paddle_2.style.top = Math.min(board_coord.bottom - paddle_common.height, paddle_2_coord.top + board_coord.height * 0.1) + 'px';
 				paddle_2_coord = paddle_2.getBoundingClientRect();
-				//console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
+				console.log(`paddle_2_coord = ${JSON.stringify(paddle_2_coord, null, 2)}`);
 			}
 		}
     });
@@ -252,7 +252,7 @@ const moveBall = (dx, dy, dxd, dyd) => {
 	ball_coord = ball.getBoundingClientRect();
 	// Use requestAnimationFrame for smoother animation and call the moveBall function recursively
 	requestAnimationFrame(() => {
-		// //console.log(`ball_coord = ${JSON.stringify(ball_coord, null, 2)}`);
+		// console.log(`ball_coord = ${JSON.stringify(ball_coord, null, 2)}`);
 		moveBall(dx, dy, dxd, dyd);
 	});
 }
@@ -301,7 +301,7 @@ const createBoard = (className) => {
 
 // Screen resizing function
 const updatePositionsOnResize = () => {
-	//console.log("window resize detected, updating ping pong elements");
+	console.log("window resize detected, updating ping pong elements");
 	paddle_1_coord = document.getElementById('app').querySelector('.paddle_1').getBoundingClientRect();
 	paddle_2_coord = document.getElementById('app').querySelector('.paddle_2').getBoundingClientRect();
 	paddle_common = document.getElementById('app').querySelector('.paddle').getBoundingClientRect();

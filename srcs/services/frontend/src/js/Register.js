@@ -40,7 +40,7 @@ export class Register extends BaseClass
     }
 
     async handleButtonClick(event) {
-        //console.log("We are at submitRegister!");
+        console.log("We are at submitRegister!");
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const email = document.getElementById('email').value;
