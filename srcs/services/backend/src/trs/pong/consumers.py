@@ -412,8 +412,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             'size_y' : 0.04,
             'top' : 0.5,
             'left' : 0.5,
-            'speed_x': get_random_speed(),
-            'speed_y': get_random_speed()
+            'speed_x': 0.03,
+            'speed_y': 0.03
         }
 
         self.game_user_1_paddle = {
@@ -475,7 +475,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         elif type_connection == 'cli_client':
             print("CLI CLIENT CONNECTED!")
 
-
     async def disconnect(self, close_code):
         # print("DISCONNECT**************************")
         await self.channel_layer.group_discard(
@@ -488,6 +487,8 @@ class PongConsumer(AsyncWebsocketConsumer):
         if self.type_connection == 'player': 
             self.game_finish = True
             await self.send_to_group('game_state', json.dumps({'event' : 'someone_left'}))
+
+        raise StopConsumer()
 
     # Receivers
     async def receive(self, text_data):
@@ -517,7 +518,11 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Receiving game events (paddles movement)
             case 'game_event':
                 game_event = data.get('game_event')
-                user_id = get_user_id_by_jwt_token(data, 'token')
+                if self.type_connection == 'cli_client':
+                    user_id = data.get('user_id')
+                elif self.type_connection == 'player':
+                    user_id = get_user_id_by_jwt_token(data, 'token')
+                
                 await self.send_to_group('game_state', json.dumps({'event' : 'broadcasted_game_event', 'broadcasted_game_event' : f'{game_event}', 'user_id' : f'{user_id}'}))
             # Broadcasting an event
             case 'broadcasted_game_event':
@@ -566,7 +571,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         if ws_handshake_message == 'authorization':
             # Getting id for authorization
             user_id = get_user_id_by_jwt_token(data, ws_handshake_message)
-            if user_id == 3:
+            if user_id == 1:
                 await self.send_to_connection({'type_message' : 'ws_handshake', 'ws_handshake' : 'authorization_succesfully'})
             # Checking if the user_id match with any user in db
             elif user_id != self.match_info["user_1"] and user_id != self.match_info["user_2"]:
@@ -576,7 +581,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         if self.leader == True:
             match broadcast_game_event_message:
                 case 'score':
-                    print("/////////HEREEEEEEE////////")
                     await self.send_to_group('game_state', json.dumps({'event' : 'score', 'user_1' : f'{self.game_user_1["paddle"]["score"]}', 'user_2' : f'{self.game_user_2["paddle"]["score"]}'}))
                 case 'move_up':
                     if int(user_id) == self.game_user_1["user_id"]:
@@ -666,9 +670,12 @@ class PongConsumer(AsyncWebsocketConsumer):
                 # This connection has chaning of url
                 if self.client_url != self.match_url:
                     self.game_finish = True
-                    # Deleting the user of the channels group
-                    await self.disconnect(1)
-                    await self.websocket_disconnect(1)
+                    try:
+                        # Deleting the user of the channels group
+                        await self.disconnect(1)
+                        await self.websocket_disconnect(1)
+                    except StopConsumer:
+                        pass
                     break
             try:
                 await self.send_to_connection({'type_message' : 'request_ping'})
@@ -740,6 +747,9 @@ class PongConsumer(AsyncWebsocketConsumer):
         # Start timer
         asyncio.create_task(self.game_timer())
 
+        # Flag speed
+        flag_speed = False
+
         while self.game_user_1["paddle"]["score"] < 5 and self.game_user_2["paddle"]["score"] < 5:
             # Bouncing the ball in Y Axis
             if self.ball['top'] <= 0 or self.ball['top'] >= 0.96:
@@ -752,11 +762,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Checking possible hit with game_user_1
             if self.ball['left'] <= 0.05:
                 if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_1["paddle"]['top'], self.game_user_1["paddle"]['size_y']):
-                    # self.ball['speed_x'] =
-                    if self.ball['speed_x'] < 0:
-                        self.ball['speed_x'] = random.choice([0.04, 0.05, 0.06, 0.07])
-                    elif self.ball['speed_x'] > 0:
-                        self.ball['speed_x'] = random.choice([-0.04, -0.05, -0.06, -0.07])
+                    self.ball['speed_x'] *= -1
+
             # Checking possible hit with game_user_2
             if (self.ball['left'] + self.ball['size_x']) >= 0.94:
                 if check_hit(self.ball['top'], self.ball['size_y'], self.game_user_2["paddle"]['top'], self.game_user_2["paddle"]['size_y']):
@@ -765,11 +772,27 @@ class PongConsumer(AsyncWebsocketConsumer):
             # Checking for points
             if self.ball['left'] <= 0:
                 self.game_user_2["paddle"]["score"] += 1
+                if self.game_user_2["paddle"]["score"] == 3 and flag_speed == False:
+                    flag_speed = True
+                    if self.ball['speed_x'] < 0:
+                        self.ball['speed_x'] = 0.06
+                    elif self.ball['speed_x'] > 0:
+                        self.ball['speed_x'] = -0.06
+            
+                # Put the ball in the center
                 self.ball['top'] = 0.5
                 self.ball['left'] = 0.5
+                
 
             if (self.ball['left'] + self.ball['size_x']) >= 1:
                 self.game_user_1["paddle"]["score"] += 1
+                if self.game_user_1["paddle"]["score"] == 3 and flag_speed == False:
+                    flag_speed = True
+                    if self.ball['speed_x'] < 0:
+                        self.ball['speed_x'] = 0.06
+                    elif self.ball['speed_x'] > 0:
+                        self.ball['speed_x'] = -0.06
+                # Putting the ball in the center
                 self.ball['top'] = 0.5
                 self.ball['left'] = 0.5
         
