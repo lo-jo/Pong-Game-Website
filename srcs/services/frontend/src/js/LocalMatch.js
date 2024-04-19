@@ -267,7 +267,7 @@ export class LocalMatch extends BaseClass {
     showTimerBeforeMatch(){
         const board_game = document.getElementById('board-game');
         let seconds_div = document.createElement('div');
-        seconds_div.setAttribute('id', 'seconds');
+        seconds_div.setAttribute('id', 'countdown');
         board_game.appendChild(seconds_div);
         let seconds = 6;
         let total = seconds
