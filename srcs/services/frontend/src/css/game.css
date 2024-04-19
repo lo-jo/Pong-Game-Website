@@ -16,7 +16,7 @@
 }
 
 .game-header{
-  font-size: 18px;
+  font-size: 3vw;
   width: 100%;
   height: auto;
   display: flex;
@@ -33,7 +33,7 @@
 }
 
 .user-info {
-  font-size: 22px;
+    font-size: 3vw;
   /* margin: 5px; */
   padding: 5px;
   max-width: auto;

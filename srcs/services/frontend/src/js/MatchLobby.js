@@ -133,7 +133,7 @@ export class MatchLobby extends BaseClass {
     /*Method to get the HTML of the dashboard*/
     getHtmlForMain() {
         return `<div>
-                    <p> Waiting for someone...</p>
+                    <p> Searching for opponent...</p>
                     <br>
                 </div>
                 <div class="spinner-border" role="status">

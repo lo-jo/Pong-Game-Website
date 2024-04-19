@@ -367,8 +367,13 @@ export class LoadProfile extends BaseClass
                     <div class="col p-3"  id="stat_content">
                         <h6> Matches </h6>
                         <div class="progress bg-dark mb-3" role="progressbar" aria-label="Danger example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar-win" style="width: ${wins}%">${wins}% winner</div><div class="progress-bar bg-danger" style="width: ${losses}%">${losses}% loser</div>
-                    </div>
+                            <div class="progress-bar-win" style="width: ${wins}%">
+                                <span class="progress-text">${wins}% winner</span>
+                            </div>
+                            <div class="progress-bar bg-danger" style="width: ${losses}%">
+                                <span class="progress-text">${losses}% loser</span>
+                            </div>
+                        </div>
 
                     <h6> Tournaments </h6>
                     <div class="row justify-content-center p-2">
