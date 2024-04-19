@@ -11,6 +11,7 @@ import { ErrorClass } from './ErrorClass.js'
 import { Chat } from './Chat.js';
 import { LoadProfile } from './LoadProfile.js'
 import { Logout } from './Logout.js';
+import { LocalTournamentMatch } from './LocalTournamentMatch.js';
 import Navbar from './Navbar.js';
 import jwt_decode from 'jwt-decode';
 
@@ -80,6 +81,12 @@ export const routes = {
     },
     '/localmatch/:id' : {
         view : LocalMatch,
+        dinamic : true,
+        css : '../css/game.css',
+        auth : true
+    },
+    '/local_tournament_match/:id' : {
+        view : LocalTournamentMatch,
         dinamic : true,
         css : '../css/game.css',
         auth : true

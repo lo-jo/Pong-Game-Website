@@ -103,5 +103,5 @@ class Match(models.Model):
     score_user_2 = models.IntegerField(default=0)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True, related_name='matches')
     created_at = models.DateTimeField(default=timezone.now)
-    # timer_started = models.BooleanField(default=False)
+    local_tournament = models.BooleanField(default=False)
     time_elapsed = models.IntegerField(default=0)

@@ -142,6 +142,97 @@ export class Tournament extends BaseClass {
         }
     }
 
+    generateRandomPassword(length) {
+        const passwordLength = length || 8; // Default length is 8 characters
+        let password = '';
+        for (let i = 0; i < passwordLength; i++) {
+            const digit = Math.floor(Math.random() * 10); // Generate a random digit (0-9)
+            password += digit;
+        }
+        return password;
+    }
+    
+    async postLocalUser(username1) {
+        console.log("Posting that local match");
+        // const userData = await this.getUserData();
+        const username = `${username1}`;
+        const password = this.generateRandomPassword();
+        const email = `${username}@amigo.org`;
+        
+        try {
+            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/register/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
+            });
+    
+            if (!response.ok) {
+                let responseData = await response.text(); // Get response text
+                const errorData = JSON.parse(responseData);
+                let formattedErrorMsg = '';
+                for (const [key, value] of Object.entries(errorData)) {
+                    if (Array.isArray(value)) {
+                        formattedErrorMsg += `${key}: ${value.join(', ')}\n`;
+                    } else {
+                        formattedErrorMsg += `${key}: ${value}\n`;
+                    }
+                }
+                
+                this.displayMessage(formattedErrorMsg, false);
+                throw new Error('Invalid credentials');
+            }
+            // console.log(await response.text());
+            const user2 = await response.json();
+        } catch (error) {
+            console.error('ERROR : ', error);
+        }
+    }
+
+    async createLocalTournament(tournamentName, p2, p3, p4) {
+        await this.postLocalUser(p2);
+        await this.postLocalUser(p3);
+        await this.postLocalUser(p4);
+
+        const url = `${this.httpProtocol}://${this.host}:${this.backendPort}/pong/create_local_tournament/`;
+
+        const jwtAccess = localStorage.getItem('token');
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwtAccess}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tournamentName: tournamentName,
+                player2: p2,
+                player3: p3,
+                player4: p4
+            }),
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error('The request was not successful');
+            }
+            const data = await response.json();
+            console.log('Backend response:', data);
+            return {
+                success: true,
+                message: `Tournament ${data.name} succesfully created!`,
+            };
+        } catch (error) {
+            console.error('Error making request:', error);
+            return {
+                success: false,
+                message: `Error while creating ${tournamentName}`,
+            };
+        }
+    }
+
     async fetchOpenTournaments() {
         const jwtAccess = localStorage.getItem('token');
     
