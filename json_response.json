@@ -1,0 +1,112 @@
+[
+    {
+        "username": "daniel",
+        "email": "daniel@gmail.com",
+        "id": 1,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "alejo",
+        "email": "alejo@gmail.com",
+        "id": 2,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "chelo",
+        "email": "chelo@gmail.com",
+        "id": 3,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "toto",
+        "email": "toto@gmail.com",
+        "id": 4,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER578",
+        "email": "USER578@amigo.org",
+        "id": 5,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER392",
+        "email": "USER392@amigo.org",
+        "id": 6,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER694",
+        "email": "USER694@amigo.org",
+        "id": 7,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER554",
+        "email": "USER554@amigo.org",
+        "id": 8,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER746",
+        "email": "USER746@amigo.org",
+        "id": 9,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER811",
+        "email": "USER811@amigo.org",
+        "id": 10,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    },
+    {
+        "username": "USER309",
+        "email": "USER309@amigo.org",
+        "id": 11,
+        "bio": "",
+        "profile_pic": "/media/users/profile_pic/default.png",
+        "otp_enabled": false,
+        "otp_verified": false,
+        "qr_code": null
+    }
+]

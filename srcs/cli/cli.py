@@ -7,6 +7,9 @@ import time
 from classes.UserCLI import UserCLI
 from classes.Endpoints import UsersEndpoint, PongEndpoint
 from modules.prompt import prompt
+from modules.signal_handler import signal_handler
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # Endpoints container dict
 endpoints = {
@@ -68,5 +71,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # signal.signal(signal.SIGINT, handler)
     main()

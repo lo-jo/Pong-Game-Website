@@ -31,11 +31,9 @@ class BaseEndpoint:
             print(f"Endpoint {endpoint_uri} not found in switch_request")
             return False
 
-        # if 
         command = func(endpoint_uri, http_method, token_user, host, http)
         last_command = command
 
-        # print(command)
         try:
             output = subprocess.check_output(command, stderr=subprocess.DEVNULL)
             json_response = output.decode()
