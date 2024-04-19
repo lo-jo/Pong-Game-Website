@@ -16,6 +16,8 @@ echo "Applying database migrations..."
 # python manage.py makemigrations
 python manage.py makemigrations
 python manage.py migrate
+python create_user.py
+
 
 echo "Starting server..."
 daphne -e ssl:8000:privateKey=/etc/ssl/private/selfsigned.key:certKey=/etc/ssl/private/selfsigned.crt trs.asgi:application

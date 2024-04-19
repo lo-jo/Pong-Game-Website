@@ -236,6 +236,7 @@ export class Tournament extends BaseClass {
                                                     <th>User</th>
                                                     <th>Points</th>
                                                     <th>Points against</th>
+                                                    <th>Duration of matches</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-group-divider">`;
@@ -246,6 +247,7 @@ export class Tournament extends BaseClass {
                                     <td><a class="opponent-link" href="/profile/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
+                                    <td>${entry.total_duration}</td>
                                 </tr>`;
         });
     
@@ -511,9 +513,9 @@ export class Tournament extends BaseClass {
                                     </div>`;
     
         if (openTournaments.length === 0) {
-            gameStatsDiv.innerHTML += `<div class="row">
+            gameStatsDiv.innerHTML += `<div class="row align-items-center justify-content-center">
                                             <div class="col-10">
-                                                <h4 class="mt-5">No tournaments available 🧐</h4>
+                                                <h4 class="my-5">No tournaments available 🧐</h4>
                                             </div>
                                         </div>`;
             return;

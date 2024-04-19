@@ -97,16 +97,16 @@ export class Chat extends BaseClass {
     }
 
     generateChatBubble(sender, message, time){
-        return `
-        <div class="text-start" ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`} mb-2">
-
-        <div>
-          <p class="small p-2 m-2 mb-0 rounded-3 custom-text-color conchasuwrawra" style="background-color: #FFFFFC;">
-          ${message}</p>
-          <p class="time ms-3 mb-0 rounded-3 text-muted ${(this.profileData.username == sender) ? `text-end` : `text-start`}">${time}</p>
-        </div>
-      </div>
-            `;
+        return `<div class="p-0 mt-2 row align-items-center ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`}">
+                    <div class="p-0 m-0 col-xl-6 col-md-8 col-11 ${(this.profileData.username == sender) ? `text-end justify-content-end` : `text-start justify-content-start`}">
+                        <div class="px-2 m-0 row ${(this.profileData.username == sender) ? `justify-content-end` : `justify-content-start`}">
+                            <div class="p-0 m-0 col">
+                                <p class="p-1 m-0 rounded-3 conchasuwrawra" style="background-color: ${(this.profileData.username == sender) ? '#FFFFFC' : 'rgba(166, 118, 255, 0.5)'};">${message}</p>
+                                <p class="time px-1 rounded-3 text-muted ${(this.profileData.username == sender) ? `text-end` : `text-start`}">${time}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
     }
 
     async auto_scroll_down(){
@@ -191,7 +191,7 @@ export class Chat extends BaseClass {
         // Create a div for chat log
         const chatLog = document.createElement('div');
         chatLog.setAttribute('id', 'chatLog');
-        chatLog.setAttribute('class', 'chatLog');
+        chatLog.setAttribute('class', 'chatLog col');
         chatWindow.appendChild(chatLog);
     
         const chatInput = document.getElementById('chatInput');
