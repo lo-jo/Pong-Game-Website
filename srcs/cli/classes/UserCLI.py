@@ -5,6 +5,7 @@ import curses
 import time
 import os
 import requests
+import jwt
 
 
 class UserCLI:
@@ -26,8 +27,12 @@ class UserCLI:
         response = requests.post(url, json=data, headers=headers, verify=False)
         if response.status_code == 200:
             self.token = response.json()["access"]
-            print("Authentication succesfully!")
-            return True
+            decoded_token = jwt.decode(self.token, "S*CR*T", algorithms=['HS256'])
+            user_id = decoded_token['user_id']
+            if user_id == 1:
+                return True
+                print("Authentication succesfully!")
+            return False
         else:
             print("Failed to get the token for authentication, are you admin?")
             print(f"Log : {response.text}")

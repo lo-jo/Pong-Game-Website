@@ -72,7 +72,6 @@ class WebSocketClient:
         pass
 
     def on_message(self, ws, message):
-        print(message)
         message_json = json.loads(message)
         type_message = message_json["type_message"]
         

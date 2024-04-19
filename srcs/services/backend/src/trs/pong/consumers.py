@@ -301,11 +301,11 @@ class LocalPongConsumer(AsyncWebsocketConsumer):
                 self.ball['left'] = 0.5
         
             # Checking and setting precision limits for ball in top and left coordinates
-            self.ball['top'] += self.ball['speed_y']
-            if self.ball['top'] <= 0:
-                self.ball['top'] = 0
-            else:
-                self.ball['top'] = round(self.ball['top'], 5)
+            # self.ball['top'] += self.ball['speed_y']
+            # if self.ball['top'] <= 0:
+            #     self.ball['top'] = 0
+            # else:
+            #     self.ball['top'] = round(self.ball['top'], 5)
     
             self.ball['left'] += self.ball['speed_x']
             if self.ball['left'] <= 0:

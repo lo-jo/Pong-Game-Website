@@ -31,7 +31,7 @@ export class LocalMatch extends BaseClass {
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onopen = () => {
-            console.log('WebSocket(match gameeee) connection established.');
+            //console.log('WebSocket(match gameeee) connection established.');
         };
 
         this.socket.onmessage = (event) => {
@@ -67,7 +67,7 @@ export class LocalMatch extends BaseClass {
         };
     
         this.socket.onclose = function() {
-            console.log('WebSocket (match game) connection closed.');
+            //console.log('WebSocket (match game) connection closed.');
         };
     }
 
@@ -102,7 +102,7 @@ export class LocalMatch extends BaseClass {
                 this.initKeyEvents();
                 break;
             case 'someone_left':
-                console.log('Someone left');
+                //console.log('Someone left');
                 break;
             case 'game_elements':
                 drawGameElements(game_state);
@@ -111,7 +111,7 @@ export class LocalMatch extends BaseClass {
                 this.displayWinner(game_state.winner, game_state.loser);
                 break;
             default:
-                console.log(`Sorry, we are out of ${game_state}.`);
+                //console.log(`Sorry, we are out of ${game_state}.`);
         }
     }
 

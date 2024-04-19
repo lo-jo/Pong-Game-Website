@@ -12,7 +12,7 @@ export class Dashboard extends BaseClass {
     }
 
     async handleDocumentClick(event) {
-        console.log(`button clicked:[${event.target.id || event.target.className }]`);
+        //console.log(`button clicked:[${event.target.id || event.target.className }]`);
         if (event.target.id === 'launch-game-button') {
             event.preventDefault();
             history.pushState({}, '', '/match_lobby');
@@ -27,7 +27,7 @@ export class Dashboard extends BaseClass {
         else if (event.target.id == 'launch-local-game'){
             event.preventDefault();
             try{
-                console.log('CLICKED');
+                //console.log('CLICKED');
                 await this.postLocalMatch();
             } catch (error) {
                 console.error('Error:', error);
@@ -179,10 +179,10 @@ export class Dashboard extends BaseClass {
 
 
     async postLocalMatch() {
-        console.log("Posting that local match");
+        //console.log("Posting that local match");
         // const userData = await this.getUserData();
         const username = this.generateRandomName();
-        console.log(username);
+        //console.log(username);
         const password = this.generateRandomPassword();
         const email = `${username}@amigo.org`;
         
@@ -210,7 +210,7 @@ export class Dashboard extends BaseClass {
                 this.displayMessage(formattedErrorMsg, false);
                 throw new Error('Invalid credentials');
             }
-            // console.log(await response.text());
+            // //console.log(await response.text());
             const user2 = await response.json();
             await this.createMatch(user2.id);
           
@@ -255,7 +255,7 @@ export class Dashboard extends BaseClass {
         const socket = new WebSocket(wsUrl);
 
         socket.onopen = function() {
-            console.log('WebSocket(match lobby) connection established.');
+            //console.log('WebSocket(match lobby) connection established.');
         };
 
         socket.onmessage = (event) => {
@@ -275,7 +275,7 @@ export class Dashboard extends BaseClass {
         };
     
         socket.onclose = function() {
-            console.log('WebSocket (match lobby) connection closed.');
+            //console.log('WebSocket (match lobby) connection closed.');
         };
     }
 

@@ -12,7 +12,6 @@ all:
 # Start services in the foreground
 up:
 	@echo "Start service of ft_transcendence in the foreground ..."
-# @bash ./srcs/certs/certicate_generator.sh
 	@docker compose -f $(COMPOSE_FILE) up --build
 
 # Start services in the background
@@ -64,13 +63,6 @@ remove_certs:
 	else \
 		echo "\n$(BOLD)$(RED)No Docker volumes found.\n$(RESET)"; \
 	fi
-# @if [ -z "$(wildcard $(CERTS))" ]; then \
-# 	echo "\n$(BOLD)$(RED)No SSL certificates found.$(RESET)\n"; \
-# else \
-# 	echo "$(YELLOW)\n. . . deleting SSL certificates . . . \n$(RESET)"; \
-# 	rm -f $(CERTS); \
-# 	echo "\n$(BOLD)$(GREEN)SSL certificates removed [ ✔ ]\n$(RESET)"; \
-# fi	
 
 clean: remove_certs
 	@echo "ft_transcendence certs cleaned $(GREEN)\t\t[ ✔ ]$(RESET)"

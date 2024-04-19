@@ -14,10 +14,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         query_string = self.scope["query_string"]
         token_params = parse_qs(query_string.decode("utf-8")).get("token", [""])[0]
         user = await self.get_user_from_token(token_params)
-        print("PRINTING USER AT CONNECTION", user)
         self.scope['user'] = user
         self.group_name = str(user.username)
-        print("GROUP NAME", self.group_name)
         await self.handle_user_connection(user)
         await self.channel_layer.group_add(
                 self.group_name,

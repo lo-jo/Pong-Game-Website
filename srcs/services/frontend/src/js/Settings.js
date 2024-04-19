@@ -133,7 +133,7 @@ export class Settings extends BaseClass {
             const fileName = profile_pic.files[0].name;
         }
         else
-            console.log('No file selected');
+            //console.log('No file selected');
     
         // Merge JSON and file data into FormData
         for (const [key, value] of Object.entries(jsonData)) {
@@ -157,7 +157,7 @@ export class Settings extends BaseClass {
             }
     
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
             document.getElementById('app').innerHTML = "Profile successfully updated";
             if (this.isChecked === true && this.isChecked !== this.formerState && this.userData.otp_enabled === false) {
                 await this.enableTwoFa();
