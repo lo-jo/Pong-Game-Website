@@ -57,7 +57,7 @@ class Tournament(models.Model):
             user_durations = user_match_durations.get(user, []) 
             total_duration = sum(user_durations)
             total_points_against = user_points_against.get(user, 0)
-            print(user.pk)
+            # print(user.pk)
             leaderboard.append({
                 'rank': rank,
                 'user_id': str(user.pk),
@@ -67,7 +67,7 @@ class Tournament(models.Model):
                 'total_duration': total_duration
             })
         
-        # print(leaderboard)
+        # # print(leaderboard)
 
         if sorted_users:
             winner_user, winner_points = sorted_users[0]
@@ -103,5 +103,4 @@ class Match(models.Model):
     score_user_2 = models.IntegerField(default=0)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True, related_name='matches')
     created_at = models.DateTimeField(default=timezone.now)
-    local_tournament = models.BooleanField(default=False)
     time_elapsed = models.IntegerField(default=0)

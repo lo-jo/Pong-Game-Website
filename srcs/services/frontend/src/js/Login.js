@@ -26,7 +26,7 @@ export class Login extends BaseClass {
                 this.displayMessage("Invalid code", false);
             }
             else {
-                // console.log(res.message);
+                // //console.log(res.message);
                 localStorage.setItem('token', this.token);
                 await connectUser();
                 history.pushState({}, '', '/dashboard');
@@ -40,7 +40,7 @@ export class Login extends BaseClass {
             await this.handleButtonClick(event);
         } else if (event.target.id === 'twoFaButton'){
             event.preventDefault();
-            // console.log('submitting code...');
+            // //console.log('submitting code...');
             const codeTwoFa = document.getElementById("codeTwoFa").value;
             if (!codeTwoFa)
                 this.displayMessage("Please enter a code", false);
@@ -77,7 +77,7 @@ export class Login extends BaseClass {
     }
 
     async getVerifyTwoFaHtml() {
-        console.log("userData: ", this.userData);
+        //console.log("userData: ", this.userData);
         return `<div class="container-fluid">
                     <div class="row p-2 align-items-center justify-content-center">
                         <div class="col-2">
@@ -131,7 +131,7 @@ export class Login extends BaseClass {
                         router();
                     }
                 } else {
-                    // console.log("Invalid Credentials");
+                    // //console.log("Invalid Credentials");
                     this.displayMessage("Invalid Credentials", false);
                     // Handle invalid credentials
                 }

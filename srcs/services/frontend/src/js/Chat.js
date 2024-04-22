@@ -122,7 +122,7 @@ export class Chat extends BaseClass {
         const wsProtocol = process.env.PROTOCOL === 'https' ? 'wss:' : 'ws:';
         this.chatSocket = new WebSocket(`${wsProtocol}//${this.host}:${this.backendPort}/ws/chat/${targetId}/?token=${this.token}`);
         this.chatSocket.onopen = function (e) {
-            console.log('Socket successfully connected.');
+            //console.log('Socket successfully connected.');
             const authenticateMessage = {
                 type: 'authenticate',
                 token: this.token,
@@ -134,7 +134,7 @@ export class Chat extends BaseClass {
             this.auto_scroll_down();
         }.bind(this);
         this.chatSocket.onclose = function (e) {
-            console.log('Socket closed unexpectedly');
+            //console.log('Socket closed unexpectedly');
 
         }.bind(this);
 
@@ -299,7 +299,7 @@ export class Chat extends BaseClass {
                 messageButton.appendChild(chatIcon);
     
                 const image = document.createElement('img');
-                image.setAttribute('src', `${friendData.profile_pic}`);
+                image.setAttribute('src', friendData.profile_pic.replace(`${this.host}:${this.backendPort}`, `${this.host}:${this.frontendPort}`));
                 image.setAttribute('class', 'chatvatar');
     
                 const link = document.createElement('a');

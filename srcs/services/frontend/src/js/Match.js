@@ -33,7 +33,7 @@ export class Match extends BaseClass {
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onopen = () => {
-            console.log('WebSocket(match gameeee) connection established.');
+            //console.log('WebSocket(match gameeee) connection established.');
         };
 
         this.socket.onmessage = (event) => {
@@ -80,7 +80,7 @@ export class Match extends BaseClass {
         };
     
         this.socket.onclose = function() {
-            console.log('WebSocket (match game) connection closed.');
+            //console.log('WebSocket (match game) connection closed.');
         };
     }
 
@@ -110,7 +110,7 @@ export class Match extends BaseClass {
                 }
                 break;
             case 'request_confirmation':
-                console.log("Sending confirmation!");
+                //console.log("Sending confirmation!");
                 this.socket.send(JSON.stringify({'type_message' : 'ws_handshake', 'ws_handshake' : 'confirmation'}));
                 break;
         }
@@ -147,11 +147,8 @@ export class Match extends BaseClass {
             case 'disconnection':
                 this.showMessageAndRedirect(`We are so sorry! Your opponent left the game...<br>Match finished<br>Winner: ${game_state.winner}<br>Loser: ${game_state.loser}`);
                 break;
-            case 'test':
-                console.log(game_state);
-                break;       
             default:
-                console.log(`Sorry, we are out of ${game_state}.`);
+                //console.log(`Sorry, we are out of ${game_state}.`);
         }
     }
 
@@ -244,7 +241,7 @@ export class Match extends BaseClass {
     
     initGame(user_1_info, user_2_info)
     {
-        // console.log(`initGame call()`);
+        // //console.log(`initGame call()`);
         this.initBoard(user_1_info, user_2_info);
         // this.showTimerBeforeMatch();
     }

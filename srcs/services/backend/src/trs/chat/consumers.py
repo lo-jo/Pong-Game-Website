@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             unread_messages = await self.get_unread_messages(target)
             for message in unread_messages:
-                print("UNREAD MESSAGE:", message)
+                # print("UNREAD MESSAGE:", message)
                 await self.send_unread_msg(message)
                 await self.mark_msg_as_read(message)
 
@@ -66,7 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if token:
             user = await self.get_user_from_token(token)
             if user:
-                print("RECEIVING", data)
+                # print("RECEIVING", data)
                 message = escape(data['message'])
                 receiver_id = user.username
                 sender = await self.get_user(receiver_id.replace('"', ''))

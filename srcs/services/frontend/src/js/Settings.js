@@ -71,13 +71,11 @@ export class Settings extends BaseClass {
             <p class="text-center">Please scan the QR code with Google authenticator:</p>
             <p class="text-center">Disclaimer : This is your only chance to scan it!</p>
             <div class="container">
-            <div class="row align-items-center">
-                        
-                            <div class="row justify-content-center align-items-center">
-                                <img src="${this.httpProtocol}://${this.host}:${this.backendPort}${this.userData.qr_code}" id="qrCode" alt="QR CODE">
-                        
-                        </div>
-            </div>
+                <div class="row align-items-center">
+                    <div class="row justify-content-center align-items-center">
+                        <img src="${this.userData.qr_code}" id="qrCode" alt="QR CODE">
+                    </div>
+                </div>
             </div>`;
         }
     }
@@ -133,7 +131,7 @@ export class Settings extends BaseClass {
             const fileName = profile_pic.files[0].name;
         }
         else
-            console.log('No file selected');
+            //console.log('No file selected');
     
         // Merge JSON and file data into FormData
         for (const [key, value] of Object.entries(jsonData)) {
@@ -157,7 +155,7 @@ export class Settings extends BaseClass {
             }
     
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
             document.getElementById('app').innerHTML = "Profile successfully updated";
             if (this.isChecked === true && this.isChecked !== this.formerState && this.userData.otp_enabled === false) {
                 await this.enableTwoFa();

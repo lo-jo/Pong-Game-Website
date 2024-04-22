@@ -330,6 +330,7 @@ export class LoadProfile extends BaseClass
     async getHtmlForMain() {
         try{
         const profileData = await this.getUserData();
+        const picPath = profileData.profile_pic.replace(`${this.host}:${this.backendPort}`, `${this.host}:${this.frontendPort}`)
         await this.delayedDisplayStatus(profileData);
         await this.displayMatchLogDelayed(profileData);
         const matchData = await this.getMatchData(profileData);
@@ -340,7 +341,7 @@ export class LoadProfile extends BaseClass
         if (!losses)
             losses = 0;
         const tournData = await this.getTournData(profileData);
-        let twins = this.getCurrentWeekWins(tournData);
+        let twins = this.getCurrentWeekWins(tournData);3
         return `<div class="container text-center">
         <div class="row align-items-center">
             <div class="col" id="leftCol">
@@ -348,7 +349,7 @@ export class LoadProfile extends BaseClass
                     <h1>${profileData.username}</h1>
                 </div>
                 <div class="btn-group dropstart">
-                    <img src="${profileData.profile_pic}" id="pic" class="avatar img-fluid" alt="Profile Image">
+                    <img src="${picPath}" id="pic" class="avatar img-fluid" alt="Profile Image">
                     <span class="" id="status">
                     </span>
                 </div>

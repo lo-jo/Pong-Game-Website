@@ -3,6 +3,7 @@ import { navigateTo } from './Router';
 
 class User{
     constructor(username, pic, id, email, bio) {
+        //console.log("PICPATH IN PROFILE", pic);
         this.username = username;
         this.pic = pic;
         this.id = id;
@@ -12,9 +13,10 @@ class User{
         this.httpProtocol = process.env.PROTOCOL;
         this.host = process.env.HOST_IN_USE;
         this.backendPort = process.env.BACKEND_PORT;
+        this.frontendPort = process.env.FRONTEND_PORT;
     }
     getProfilePicPath() {
-        return `${this.httpProtocol}://${this.host}:${this.backendPort}` + this.pic;
+        return `${this.httpProtocol}://${this.host}:${this.frontendPort}` + this.pic;
     }
     getFriendReq() {
         return `${this.httpProtocol}://${this.host}:${this.backendPort}/users/friendship/` + this.username + "/";
@@ -69,7 +71,7 @@ export class Profile extends BaseClass {
             try {
                 const friendData = await this.getFriendData(friendId);
                 const friendUsername = friendData.username;
-                const friendProfilePic = friendData.profile_pic;
+                const friendProfilePic = friendData.profile_pic.replace(`${this.host}:${this.backendPort}`, `${this.host}:${this.frontendPort}`);
                 const contentContainer = document.createElement('div');
                 contentContainer.classList.add('d-flex', 'align-items-center');
                 const image = document.createElement('img');

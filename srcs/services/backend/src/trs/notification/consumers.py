@@ -29,7 +29,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         user = self.scope.get("user")
         if user :
-            print("DISCONNECTING ", user.username)
+            # print("DISCONNECTING ", user.username)
             #On closing of a websockt, remove user from public channel 
             await self.channel_layer.group_discard(
                 self.group_name,
@@ -43,8 +43,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         sender = event.get('sender')
         if message:
             await self.send(text_data=json.dumps({ 'message': message, 'sender': sender}))
-        else:
-            print("Message key not found in the event dictionary.")
 
     @database_sync_to_async
     def get_user_from_token(self, token):
@@ -61,9 +59,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     def handle_user_connection(self, user):
         if not PublicRoom.objects.filter(user=user).exists():
             PublicRoom.objects.create(user=user)
-            print("WELCOME @", user)
+            # print("WELCOME @", user)
 
     def handle_user_disconnection(self, user):
-        print("DELETING ", user.username)
+        # print("DELETING ", user.username)
         PublicRoom.objects.filter(user=user).delete()
         self.close()

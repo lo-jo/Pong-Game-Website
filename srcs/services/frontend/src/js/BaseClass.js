@@ -23,23 +23,23 @@ export class BaseClass {
     }
 
     addDocumentClickListener() {
-        // console.log("BaseClass adding eventListener");
+        // //console.log("BaseClass adding eventListener");
         this.handleDocumentClickBound = this.handleDocumentClick.bind(this);
         document.getElementById('app').addEventListener('click', this.handleDocumentClickBound);
     }
 
     removeDocumentClickListener() {
-        // console.log("BaseClass removing eventListener");
+        // //console.log("BaseClass removing eventListener");
         document.getElementById('app').removeEventListener('click', this.handleDocumentClickBound);
     }
 
     async handleDocumentClick(event) {
-        // console.log("BaseClass handleDocumentClick");
+        // //console.log("BaseClass handleDocumentClick");
         return;
     }
 
     cleanup() {
-        // console.log("BaseClass cleanup");
+        // //console.log("BaseClass cleanup");
         this.removeDocumentClickListener();
     }
 }

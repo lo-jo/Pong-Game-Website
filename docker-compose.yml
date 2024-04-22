@@ -10,6 +10,9 @@ services:
     image: backend:trs
     build : ./srcs/services/backend/
     volumes :
+      # Binding volume for Vite to recognize changes in code => to be removed before evaluation!
+      - ./srcs/services/backend/src:/code/src
+      - media:/code/src/trs/media/
       # Name volume for SSL certificate
       - ssl_certs:/etc/ssl/private
     restart: unless-stopped
@@ -24,7 +27,10 @@ services:
     image: frontend:trs
     build : ./srcs/services/frontend/
     volumes:
+      # Binding volume for Vite to recognize changes in code => to be removed before evaluation!
+      - ./srcs/services/frontend/src/:/app/src # Mount the source code
       # Name volume containing the same SSL
+      - media:/app/src/media/
       - ssl_certs:/etc/ssl/private
     restart: unless-stopped
     env_file : .env
@@ -47,3 +53,4 @@ networks:
 
 volumes:
   ssl_certs:
+  media:

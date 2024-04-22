@@ -13,7 +13,7 @@ export class Tournament extends BaseClass {
     }
     async notifyGame(senderId, targetId, name){
         const jwtAccess = localStorage.getItem('token');
-        console.log("senderID", senderId, targetId);
+        //console.log("senderID", senderId, targetId);
         const requestBody = {
             message: `@${senderId} IS WAITING FOR YOU IN THE ${name} TOURNAMENT `,
             sender: senderId,
@@ -56,8 +56,8 @@ export class Tournament extends BaseClass {
                 throw new Error('Unauthorized');
             }
             const data = await response.json();
-            console.log("THIS IS THE MATCH DATA", data);
-            console.log('SENDING THIS TO NOTIFYGANE', data.user_1, data.user_2);
+            //console.log("THIS IS THE MATCH DATA", data);
+            //console.log('SENDING THIS TO NOTIFYGANE', data.user_1, data.user_2);
             return data;
         } catch (error) {
             console.error('Error:', error);
@@ -91,17 +91,17 @@ export class Tournament extends BaseClass {
     }
 
     async notifyUsers(data){
-        console.log("GOING TO SEND THAT NOTIFICATION", data.participants, data);
+        //console.log("GOING TO SEND THAT NOTIFICATION", data.participants, data);
         for (const matchId of data.matches) {
             const matchData = await this.getMatchData(matchId);
-            console.log("NOTIFYUSER", matchData);
+            //console.log("NOTIFYUSER", matchData);
             const user1 = await this.getUserData(matchData.user_1);
-            console.log("NUSER1", user1);
+            //console.log("NUSER1", user1);
             const user2 = await this.getUserData(matchData.user_2);
-            console.log("NUSER1", user2);
+            //console.log("NUSER1", user2);
             await this.notifyGame(user1.username, user2.id, data.name);
             await this.notifyGame(user2.username, user1.id, data.name);
-            console.log("Match ID:", matchId);
+            //console.log("Match ID:", matchId);
         }
     }
 
@@ -128,98 +128,7 @@ export class Tournament extends BaseClass {
                 throw new Error('The request was not successful');
             }
             const data = await response.json();
-            console.log('Backend response:', data);
-            return {
-                success: true,
-                message: `Tournament ${data.name} succesfully created!`,
-            };
-        } catch (error) {
-            console.error('Error making request:', error);
-            return {
-                success: false,
-                message: `Error while creating ${tournamentName}`,
-            };
-        }
-    }
-
-    generateRandomPassword(length) {
-        const passwordLength = length || 8; // Default length is 8 characters
-        let password = '';
-        for (let i = 0; i < passwordLength; i++) {
-            const digit = Math.floor(Math.random() * 10); // Generate a random digit (0-9)
-            password += digit;
-        }
-        return password;
-    }
-    
-    async postLocalUser(username1) {
-        console.log("Posting that local match");
-        // const userData = await this.getUserData();
-        const username = `${username1}`;
-        const password = this.generateRandomPassword();
-        const email = `${username}@amigo.org`;
-        
-        try {
-            const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/users/register/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, email, password }),
-            });
-    
-            if (!response.ok) {
-                let responseData = await response.text(); // Get response text
-                const errorData = JSON.parse(responseData);
-                let formattedErrorMsg = '';
-                for (const [key, value] of Object.entries(errorData)) {
-                    if (Array.isArray(value)) {
-                        formattedErrorMsg += `${key}: ${value.join(', ')}\n`;
-                    } else {
-                        formattedErrorMsg += `${key}: ${value}\n`;
-                    }
-                }
-                
-                this.displayMessage(formattedErrorMsg, false);
-                throw new Error('Invalid credentials');
-            }
-            // console.log(await response.text());
-            const user2 = await response.json();
-        } catch (error) {
-            console.error('ERROR : ', error);
-        }
-    }
-
-    async createLocalTournament(tournamentName, p2, p3, p4) {
-        await this.postLocalUser(p2);
-        await this.postLocalUser(p3);
-        await this.postLocalUser(p4);
-
-        const url = `${this.httpProtocol}://${this.host}:${this.backendPort}/pong/create_local_tournament/`;
-
-        const jwtAccess = localStorage.getItem('token');
-
-        const options = {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${jwtAccess}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                tournamentName: tournamentName,
-                player2: p2,
-                player3: p3,
-                player4: p4
-            }),
-        };
-
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                throw new Error('The request was not successful');
-            }
-            const data = await response.json();
-            console.log('Backend response:', data);
+            //console.log('Backend response:', data);
             return {
                 success: true,
                 message: `Tournament ${data.name} succesfully created!`,
@@ -245,7 +154,7 @@ export class Tournament extends BaseClass {
         };
         const response = await fetch(`${this.httpProtocol}://${this.host}:${this.backendPort}/pong/tournaments/`, options);
         const data = await response.json();
-        console.log("tournament list", data);
+        //console.log("tournament list", data);
         return data;
     }
 
@@ -268,7 +177,7 @@ export class Tournament extends BaseClass {
                 console.error('Error fetching tournament leaderboard:', errorData.error);
             } else {
                 const tournamentData = await response.json();
-                console.log('Successfully fetched tournament leaderboard:', tournamentData);
+                //console.log('Successfully fetched tournament leaderboard:', tournamentData);
                 return tournamentData;
             }
         } catch (error) {
@@ -295,7 +204,7 @@ export class Tournament extends BaseClass {
                 console.error('Error fetching tournament data:', errorData.error);
             } else {
                 const tournamentData = await response.json();
-                console.log('Successfully fetched tournament data:', tournamentData);
+                //console.log('Successfully fetched tournament data:', tournamentData);
                 return tournamentData;
             }
         } catch (error) {
@@ -327,7 +236,6 @@ export class Tournament extends BaseClass {
                                                     <th>User</th>
                                                     <th>Points</th>
                                                     <th>Points against</th>
-                                                    <th>Duration of matches</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-group-divider">`;
@@ -338,7 +246,6 @@ export class Tournament extends BaseClass {
                                     <td><a class="opponent-link" href="/profile/${entry.user_id}">${entry.username}</a></td>
                                     <td>${entry.points}</td>
                                     <td>${entry.total_points_against}</td>
-                                    <td>${entry.total_duration}</td>
                                 </tr>`;
         });
     
@@ -361,7 +268,7 @@ export class Tournament extends BaseClass {
         const joinButton = document.getElementById(`join-button-${tournamentId}`);
         const spinner = document.getElementById(`spinner-${tournamentId}`);
 
-        console.log(`joinButton: ${joinButton.id}`);
+        //console.log(`joinButton: ${joinButton.id}`);
         
         try {
             spinner.style.display = 'inline-block';
@@ -401,7 +308,7 @@ export class Tournament extends BaseClass {
                 console.error('Error joining tournament:', errorData.error);
             } else {
                 const tournamentData = await response.json();
-                console.log('Successfully joined tournament:', tournamentData);
+                //console.log('Successfully joined tournament:', tournamentData);
                 if (tournamentData.status == 'full')
                     this.notifyUsers(tournamentData);
             }
@@ -502,13 +409,13 @@ export class Tournament extends BaseClass {
     }
 
     async startMatch(matchId, matchStatus) {
-        // console.log(`match id: ${matchId}, match.status ${matchStatus}`);
+        // //console.log(`match id: ${matchId}, match.status ${matchStatus}`);
         if (matchStatus && matchStatus !== "completed") {
-            // console.log(`Starting matchId: ${matchId}`);
+            // //console.log(`Starting matchId: ${matchId}`);
             history.pushState('', '', `/match/${matchId}`);
             router();
         } else {
-            console.log(`Match ${matchId} is already completed.`);
+            //console.log(`Match ${matchId} is already completed.`);
         }
     }
 
@@ -528,13 +435,13 @@ export class Tournament extends BaseClass {
         const players = await Promise.all(tournament.participants.map(participant => this.getParticipants(participant.user_id)));
 
         players.forEach((player, index) => {
-            // console.log(`currentUserId.user_id: ${currentUserId.user_id} player.id: ${player.id}`);
+            // //console.log(`currentUserId.user_id: ${currentUserId.user_id} player.id: ${player.id}`);
             let playerLink;
             playerLink = document.createElement('a');
             playerLink.setAttribute('href', `/profile/${player.id}`);
             playerLink.addEventListener('click', (event) => {
                 event.preventDefault();
-                console.log(`clicking to id: ${player.id}`);
+                //console.log(`clicking to id: ${player.id}`);
                 navigateTo(event.target.href);
             });
             playerLink.textContent = player.username;

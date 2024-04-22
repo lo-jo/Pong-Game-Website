@@ -7,11 +7,11 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { router } from './js/Router.js';
 
 window.addEventListener("popstate", () => {
-    console.log("POPSTATE (index.js)");
+    //console.log("POPSTATE (index.js)");
     router();
 });
 
 window.addEventListener("onpopstate", () => {
-    console.log("ON POPSTATE (index.js)");
+    //console.log("ON POPSTATE (index.js)");
     router();
 });

@@ -13,7 +13,7 @@ def notification_created(sender, instance, created, **kwargs):
         sender = instance.sender
         recipient = instance.recipient
         group_name = str(instance.recipient)
-        # print("####INSTANCE.MESSAGE", instance.message, "from", sender, "to", group_name)
+        # # print("####INSTANCE.MESSAGE", instance.message, "from", sender, "to", group_name)
         channel_layer = get_channel_layer()
 
         message = {

@@ -101,11 +101,13 @@ class FriendshipView(APIView):
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class UserDetailView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
+
 
 class UserProfileView(RetrieveAPIView):
     queryset = User.objects.all()

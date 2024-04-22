@@ -10,13 +10,11 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # Own imports
 from .models import Match, Tournament, Participant
-from users.models import User
 from .serializers import MatchSerializer, TournamentSerializer, ParticipantSerializer
 from django.db import transaction
 from itertools import combinations
 from django.db.models import Q
 from django.utils.html import escape
-from django.shortcuts import get_object_or_404
 # from notification.models import Notification
 # from notification.serializers import NotificationSerializer
 # from django.contrib.auth import get_user_model
@@ -70,15 +68,15 @@ class JoinMatchView(APIView):
             oldest_pending_match = matches.filter(status='pending').order_by('created_at')
 
             if oldest_pending_match:
-                print("IF OLDEST PENDING MATCH JOIN MATCH VIEW")
+                # print("IF OLDEST PENDING MATCH JOIN MATCH VIEW")
                 for match in oldest_pending_match:
-                    print("GOING THRU MATCHES")
+                    # print("GOING THRU MATCHES")
                     # 2.1 If the oldest pending match is 'full', post a new match
                     if match.user_1 and match.user_2:
-                        print("MATCH IS FULL")
+                        # print("MATCH IS FULL")
                         continue
                     else:
-                        print("MATCH PENDINGUND", match.id)
+                        # print("MATCH PENDINGUND", match.id)
                         # Joining match pending
                         if match.user_1 == None and match.user_2 != request.user:
                             match.user_1 = request.user
@@ -96,7 +94,7 @@ class JoinMatchView(APIView):
                         }
                         return Response(response_data, status=status.HTTP_201_CREATED)
         
-        print("CREATE JOIN IN JOINVIEW")
+        # print("CREATE JOIN IN JOINVIEW")
         # Creating new match because there's not pending
         new_match = Match.objects.create(status='pending')
         new_match.user_1 = request.user
@@ -139,74 +137,13 @@ class TournamentView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class CreateLocalTournamentView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        try:
-            print("=> Creating new tournament")
-            tournament_name = escape(request.data.get('tournamentName'))
-
-            p2 = escape(request.data.get('player2'))
-            p3 = escape(request.data.get('player3'))
-            p4 = escape(request.data.get('player4'))
-
-            # Create tournament
-            tournament = Tournament.objects.create(name=tournament_name, creator_id=request.user, status='pending')
-            print("adding players: ", request.data.get('player2'), request.data.get('player3'), request.data.get('player4'))
-            player2 = User.objects.get(username=p2)
-            player3 = User.objects.get(username=p3)
-            player4 = User.objects.get(username=p4)
-            
-            # player2 = objects.get_object_or_404(User, username=p2)
-            # player3 = objects.get_object_or_404(User, username=p3)
-            # player4 = objects.get_object_or_404(User, username=p4)
-            print("finished adding players")
-            # Add creator of the tournament to the actual tournament DUH
-            participant = Participant.objects.create(tournament_id=tournament, user_id=request.user)
-            participant2 = Participant.objects.create(tournament_id=tournament, user_id=player2)
-            participant3 = Participant.objects.create(tournament_id=tournament, user_id=player3)
-            participant4 = Participant.objects.create(tournament_id=tournament, user_id=player4)
-        
-            serializer = TournamentSerializer(tournament)
-
-            tournament.status = 'full'
-            tournament.save()
-            self.create_matches_for_tournament(tournament)
-
-            return Response({
-                'id': serializer.data['id'],
-                'creator_id': serializer.data['creator_id'],
-                'name': serializer.data['name'],
-                'created_at': serializer.data['created_at'],
-                'status': serializer.data['status'],
-                'participants': ParticipantSerializer(participant).data,
-            }, status=status.HTTP_201_CREATED)
-        
-        except User.DoesNotExist:
-                return JsonResponse({"error": f"User with username {player2_username} does not exist."}, status=404)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def create_matches_for_tournament(self, tournament):
-            participants = tournament.participants.all()
-
-            if participants.count() == 4:
-                for p1, p2 in combinations(participants, 2):
-                    Match.objects.create(
-                        user_1=p1.user_id,
-                        user_2=p2.user_id,
-                        tournament=tournament,
-                        local_tournament= True
-                    )
 
 class CreateTournamentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            print("=> Creating new tournament")
+            # print("=> Creating new tournament")
             tournament_name = escape(request.data.get('tournamentName'))
 
             # Create tournament
@@ -277,7 +214,7 @@ class JoinTournamentView(APIView):
                 # user2 = get_user_model().objects.get(username=p2.user_id)
                 # user1 = User.objects.get(username=p1.user_id)
                 # user2 = User.objects.get(username=p2.user_id)
-                # print(user1, user2)
+                # # print(user1, user2)
                 Match.objects.create(
                     user_1=p1.user_id,
                     user_2=p2.user_id,

@@ -12,7 +12,7 @@ export class Dashboard extends BaseClass {
     }
 
     async handleDocumentClick(event) {
-        console.log(`button clicked:[${event.target.id || event.target.className }]`);
+        //console.log(`button clicked:[${event.target.id || event.target.className }]`);
         if (event.target.id === 'launch-game-button') {
             event.preventDefault();
             history.pushState({}, '', '/match_lobby');
@@ -27,7 +27,7 @@ export class Dashboard extends BaseClass {
         else if (event.target.id == 'launch-local-game'){
             event.preventDefault();
             try{
-                console.log('CLICKED');
+                //console.log('CLICKED');
                 await this.postLocalMatch();
             } catch (error) {
                 console.error('Error:', error);
@@ -60,36 +60,7 @@ export class Dashboard extends BaseClass {
                 }, 1500);
                 return;
             }
-            let player2 = document.getElementById("player2");
-            let player3 = document.getElementById("player3");
-            let player4 = document.getElementById("player4");
-            let p2, p3, p4 = null;
-            if (player2 && player3 && player4)
-            {
-                player2.disabled = true;
-                player3.disabled = true;
-                player4.disabled = true;
-                p2 = player2.value.trim();
-                p3 = player3.value.trim();
-                p4 = player4.value.trim();
-
-                if (!p2 || !p3 || !p4) {
-                    this.displayMessage("Player names cannot be empty.", false);
-                    setTimeout(async () => {
-                        if (document.getElementById("tournamentName"))
-                        {
-                            tournamentNameInput.disabled = false;
-                            player2.disabled = false;
-                            player3.disabled = false;
-                            player4.disabled = false;
-                            createTournamentButton.disabled = false;
-                            goBackBtn.disabled = false;
-                        }
-                    }, 1500);
-                    return;
-                }
-            }
-            let obj = (p2 && p3 && p4) ? await this.tournament.createLocalTournament(tournamentName, p2, p3, p4) : await this.tournament.createTournament(tournamentName);
+            let obj = await this.tournament.createTournament(tournamentName);
             this.displayMessage(`${obj.message}`, obj.success);
             setTimeout(async () => {
                 if (document.getElementById("createTournament"))
@@ -103,10 +74,7 @@ export class Dashboard extends BaseClass {
         } else if (event.target.id === 'join-tournament') {
             event.preventDefault();
             await this.tournament.displayOpenTournaments();
-        } else if (event.target.id === 'launch-local-tournament') {
-            history.pushState({}, '', '/dashboard');
-            document.getElementById('app').innerHTML = await this.getHtmlFormLocalTournament();
-        } 
+        }
     }
 
     async getUserData() {
@@ -211,10 +179,10 @@ export class Dashboard extends BaseClass {
 
 
     async postLocalMatch() {
-        console.log("Posting that local match");
+        //console.log("Posting that local match");
         // const userData = await this.getUserData();
         const username = this.generateRandomName();
-        console.log(username);
+        //console.log(username);
         const password = this.generateRandomPassword();
         const email = `${username}@amigo.org`;
         
@@ -242,7 +210,7 @@ export class Dashboard extends BaseClass {
                 this.displayMessage(formattedErrorMsg, false);
                 throw new Error('Invalid credentials');
             }
-            // console.log(await response.text());
+            // //console.log(await response.text());
             const user2 = await response.json();
             await this.createMatch(user2.id);
           
@@ -287,7 +255,7 @@ export class Dashboard extends BaseClass {
         const socket = new WebSocket(wsUrl);
 
         socket.onopen = function() {
-            console.log('WebSocket(match lobby) connection established.');
+            //console.log('WebSocket(match lobby) connection established.');
         };
 
         socket.onmessage = (event) => {
@@ -307,7 +275,7 @@ export class Dashboard extends BaseClass {
         };
     
         socket.onclose = function() {
-            console.log('WebSocket (match lobby) connection closed.');
+            //console.log('WebSocket (match lobby) connection closed.');
         };
     }
 
@@ -348,54 +316,6 @@ export class Dashboard extends BaseClass {
                             <div class="col-xl-4 col-lg-6 col-md-8">
                                 <label for="tournamentName">Tournament name:</label>
                                 <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Pong masters">
-                            </div>
-                        </div>
-                        <div class="row m-2 text-center justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <div id="redWarning" class="alert alert-danger" role="alert"></div>
-                                <div id="greenNotif" class="alert alert-success" role="alert"></div>
-                                <button type="submit" id="createTournament" class="my-3 p-1 btn btn-dark btn-sm">Create</button>
-                            </div>        
-                        </div>            
-                    </form>
-                </div>`;
-    };
-
-    async getHtmlFormLocalTournament() {
-        return `<div class="row justify-content-center">
-                    <div class="col-xl-4 col-lg-6 col-md-8">
-                        <div class="d-flex align-items-center my-3">
-                            <button type="button" id="goBackBtn" class="p-1 btn btn-dark me-3">
-                                <i id="goBack" class="bi bi-arrow-left-circle m-2"></i>
-                            </button>
-                            <h3 class="mb-0">Create local tournament</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <form id="tournamentForm" class="text-start">
-                        <div class="row my-3 justify-content-center align-items-center">
-                            <div class="col-xl-4 col-lg-6 col-md-8">
-                                <label for="tournamentName">Tournament name:</label>
-                                <input class="form-control form-control-sm" type="text" id="tournamentName" name="tournamentName" required placeholder="Pong masters">
-                            </div>
-                        </div>
-                        <div class="row my-3 justify-content-center align-items-center">
-                            <div class="col-xl-4 col-lg-6 col-md-8">
-                                <label for="tournamentName">Player 2:</label>
-                                <input class="form-control form-control-sm" type="text" id="player2" name="player2" required placeholder="Paquito">
-                            </div>
-                        </div>
-                        <div class="row my-3 justify-content-center align-items-center">
-                            <div class="col-xl-4 col-lg-6 col-md-8">
-                                <label for="tournamentName">Player 3:</label>
-                                <input class="form-control form-control-sm" type="text" id="player3" name="player3" required placeholder="Taquito">
-                            </div>
-                        </div>
-                        <div class="row my-3 justify-content-center align-items-center">
-                            <div class="col-xl-4 col-lg-6 col-md-8">
-                                <label for="tournamentName">Player 4:</label>
-                                <input class="form-control form-control-sm" type="text" id="player4" name="player4" required placeholder="Pollito">
                             </div>
                         </div>
                         <div class="row m-2 text-center justify-content-center">
@@ -494,7 +414,6 @@ export class Dashboard extends BaseClass {
                 return;
             }
             for (const match of data) {
-                console.log(data);
                 try {
                     if (!match.user_1 || !match.user_2){
                         // CHECK THIS WITH DANIEL
@@ -504,37 +423,19 @@ export class Dashboard extends BaseClass {
                     log_div.setAttribute('class', 'p-1 log-content');
                     const user_1 = await this.getFriendData(match.user_1);
                     const user_2 = await this.getFriendData(match.user_2);
-                    log_div.innerText = `${match.local_tournament} ${user_1.username} vs. ${user_2.username} `;
-                    
-                    if (match.local_tournament === true){
-                        const localButt = document.createElement('button');
-                        localButt.setAttribute('class', "px-2 btn btn-dark btn-sm");
-                        localButt.setAttribute('id', `${match.id}`);
-                        localButt.innerText = 'PLAY';
-                        localButt.addEventListener('click', (event) => {
-                            if (event.target.id == `${match.id}`){
-                                event.preventDefault();
-                                navigateTo(`${this.httpProtocol}://${this.host}:${process.env.FRONTEND_PORT}/local_tournament_match/${match.id}`);
-                            }
-                        });
-                        log_div.appendChild(localButt);
-                        log_content.appendChild(log_div);
-                    }
-                    else {
-                        const playButt = document.createElement('button');
-                        playButt.setAttribute('class', "px-2 btn btn-danger btn-sm");
-                        playButt.setAttribute('id', `${match.id}`);
-                        playButt.innerText = 'PLAY';
-                        playButt.addEventListener('click', (event) => {
-                            if (event.target.id == `${match.id}`){
-                                event.preventDefault();
-                                navigateTo(`${this.httpProtocol}://${this.host}:${process.env.FRONTEND_PORT}/match/${match.id}`);
-                            }
-                        });
-                        log_div.appendChild(playButt);
-                        log_content.appendChild(log_div);
-                    }
-
+                    log_div.innerText = `${user_1.username} vs. ${user_2.username} `;
+                    const playButt = document.createElement('button');
+                    playButt.setAttribute('class', "px-2 btn btn-danger btn-sm");
+                    playButt.setAttribute('id', `${match.id}`);
+                    playButt.innerText = 'PLAY';
+                    playButt.addEventListener('click', (event) => {
+                        if (event.target.id == `${match.id}`){
+                            event.preventDefault();
+                            navigateTo(`${this.httpProtocol}://${this.host}:${process.env.FRONTEND_PORT}/match/${match.id}`);
+                        }
+                    });
+                    log_div.appendChild(playButt);
+                    log_content.appendChild(log_div);
                 } catch (error) {
                     console.error('Error fetching upcoming matches:', error);
                 }
@@ -553,11 +454,6 @@ export class Dashboard extends BaseClass {
                             <div id="game-actions" class="row justify-content-center">
                                 <div class="game-action col">
                                     <button id="launch-local-game" class="btn my-3 py-2" type="button">PLAY A LOCAL MATCH</button>
-                                </div>
-                            </div>
-                            <div id="game-actions" class="row justify-content-center">
-                                <div class="game-action col">
-                                    <button id="launch-local-tournament" class="btn my-3 py-2" type="button">PLAY A LOCAL TOURNAMENT</button>
                                 </div>
                             </div>
                             <div id="game-actions" class="row justify-content-center">

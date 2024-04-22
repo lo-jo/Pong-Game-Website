@@ -22,10 +22,9 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
-# SECRET_KEY = "S*CR*T"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [os.getenv("HOST_IN_USE")]
 
