@@ -5,6 +5,10 @@ CLI = $(addprefix $(SRCS_PATH), $(CLI_PATH))
 CERTS = ./srcs/services/backend/selfsigned.crt ./srcs/services/backend/selfsigned.key \
 		./srcs/services/frontend/selfsigned.crt ./srcs/services/frontend/selfsigned.key
 
+# Load variables from .env file
+include .env
+export
+
 all:
 	@echo "Launching ft_transcendence ..."
 	@docker compose -f $(COMPOSE_FILE) up --build -d
@@ -85,7 +89,7 @@ exec:
 	docker exec -it $(service) $(cmd)
 
 cli:
-	@python3 $(CLI)
+	@python3 $(CLI) $(HOST_IN_USE) $(BACKEND_PORT)
 
 status:
 	@echo "\n$(YELLOW)docker ps -a $(RESET)" && docker ps -a

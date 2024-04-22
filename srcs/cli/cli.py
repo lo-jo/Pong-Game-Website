@@ -3,6 +3,7 @@ import signal
 import getpass
 import os
 import time
+import sys
 # Own classes and modules
 from classes.UserCLI import UserCLI
 from classes.Endpoints import UsersEndpoint, PongEndpoint
@@ -24,12 +25,15 @@ http_methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 
 def main():
     # Authentification
+    host = sys.argv[1]
+    port = sys.argv[2]
+    host_user_cli = host + ':' + port
     username = input("Username: ")
     password = getpass.getpass("Password: ")
-    user_cli = UserCLI(username, password)
+    user_cli = UserCLI(username, password, host_user_cli)
     if user_cli.authenticate() == False:
         return
-    os.system('clear')
+    #os.system('clear')
     # CLI main loop
     # The main endpoint, the uri and the http method are choosed for send the request
     while True:
