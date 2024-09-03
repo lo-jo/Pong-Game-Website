@@ -20,6 +20,9 @@ This project was done in collaboration with @[Chelo](https://github.com/mariav7)
 - The database used for the back-end should be PostgreSQL
 
 
+### Usage
+Use ```make``` to launch the project and go to https://localhost:8000
+
 ### Requirements
 Place a .env file at the root of the project with the following variables :
 
