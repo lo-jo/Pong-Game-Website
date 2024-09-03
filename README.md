@@ -19,5 +19,26 @@ This project was done in collaboration with @[Chelo](https://github.com/mariav7)
 - The backend should be developed using the Django Framework
 - The database used for the back-end should be PostgreSQL
 
+
+### Requirements
+Place a .env file at the root of the project with the following variables :
+
+```DEBUG=
+SECRET_KEY=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=trs
+POSTGRES_HOST=
+POSTGRES_PORT=5432
+PROTOCOL=https
+HOST_IN_USE=
+FRONTEND_PORT=5173
+BACKEND_PORT=8000
+ADMIN=
+PASSADMIN=
+EMAILADMIN=
+```
+
+
 ### Resources
 Notes and extra resources are on [my notion](https://river-weight-158.notion.site/TRANSCENDENCE-5c70061ba7974951af3483ee6783d924).
